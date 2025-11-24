@@ -53,7 +53,7 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 mt-8 space-y-2 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
