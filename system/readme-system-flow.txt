@@ -20,6 +20,7 @@ a. Home/Dashboard:
 b. Manage Services:
 -View/Add/edit/delete  services
 c. Appointments:
+-can cancel customer's appointment with reason
 -View/edit appointment details
 -Add/delete upcoming, in progress, completed, cancelled appointments
 -approve/reject appointment
@@ -65,6 +66,7 @@ a. Dashboard
 -view all today's and upcoming appointments
 -view service summary by category
 b. Appointments
+-can cancel customer's appointment with reason
 -view total, pending, in progress, confirmed, completed, cancelled appointments
 -search appointments
 -update appointment details
@@ -79,6 +81,7 @@ a. Dashboard
 --quick widgets of total assigned, pending, in progress completed appointments
 --view today & upcoming own appointment and mark them as in progress, completed and cancelled
 b. Appointments
+-can cancel customer's appointment with reason
 --view/edit all appointments and history
 c. My account/Profile
 -View own ratings and feedbacks

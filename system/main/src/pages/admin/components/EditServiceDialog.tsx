@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { X } from "lucide-react";
+import { iconMap } from "./CategorySettingsDialog";
+import { Box } from "lucide-react";
 
 interface Service {
   id: string;
@@ -23,6 +24,14 @@ interface Service {
   description: string;
   price: string;
   color: string;
+  icon?: string;
+}
+
+interface Category {
+  category_id: number;
+  name: string;
+  color: string;
+  icon: string;
 }
 
 interface EditServiceDialogProps {
@@ -31,6 +40,7 @@ interface EditServiceDialogProps {
   service: Service | null;
   onSave: (service: Service) => void;
   onDelete: (id: string) => void;
+  categories: Category[];
 }
 
 export function EditServiceDialog({
@@ -39,30 +49,43 @@ export function EditServiceDialog({
   service,
   onSave,
   onDelete,
+  categories,
 }: EditServiceDialogProps) {
   const [formData, setFormData] = useState<Service>({
     id: "",
     name: "",
-    category: "Installation",
+    category: "",
     description: "",
     price: "",
-    color: "#FF9B66",
+    color: "",
+    icon: "",
   });
 
   useEffect(() => {
     if (service) {
       setFormData(service);
     } else {
+      // Default to first category if available
+      const defaultCategory = categories.length > 0 ? categories[0] : null;
       setFormData({
         id: Math.random().toString(36).substr(2, 9),
         name: "",
-        category: "Installation",
+        category: defaultCategory ? defaultCategory.name : "",
         description: "",
         price: "",
-        color: "#FF9B66",
+        color: defaultCategory ? defaultCategory.color : "#9CA3AF",
+        icon: defaultCategory ? defaultCategory.icon : "Box",
       });
     }
-  }, [service, open]);
+  }, [service, open, categories]);
+
+  // Update color and icon when category changes
+  const handleCategoryChange = (value: string) => {
+    const selectedCat = categories.find((c) => c.name === value);
+    const newColor = selectedCat ? selectedCat.color : "#9CA3AF";
+    const newIcon = selectedCat ? selectedCat.icon : "Box";
+    setFormData({ ...formData, category: value, color: newColor, icon: newIcon });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,19 +130,17 @@ export function EditServiceDialog({
             </label>
             <Select
               value={formData.category}
-              onValueChange={(value) =>
-                setFormData({ ...formData, category: value })
-              }
+              onValueChange={handleCategoryChange}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Installation">Installation</SelectItem>
-                <SelectItem value="Repair">Repair</SelectItem>
-                <SelectItem value="Upgrade & Maintenance">
-                  Upgrade & Maintenance
-                </SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.category_id} value={cat.name}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -140,7 +161,7 @@ export function EditServiceDialog({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className={`space-y-2 ${service ? "col-span-2" : ""}`}>
               <label className="text-sm font-medium text-gray-700">Price</label>
               <Input
                 required
@@ -151,26 +172,56 @@ export function EditServiceDialog({
                 placeholder="e.g. ₱ 2,500.00"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-gray-700">
-                Color Theme
-              </label>
-              <div className="flex gap-2 mt-2">
-                {["#5B8FFF", "#FF9B66", "#5DD37C", "#FF6B6B"].map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, color })}
-                    className={`w-8 h-8 rounded-full transition-transform ${
-                      formData.color === color
-                        ? "ring-2 ring-offset-2 ring-[#0B4F6C] scale-110"
-                        : "hover:scale-110"
-                    }`}
-                    style={{ backgroundColor: color }}
-                  />
-                ))}
-              </div>
-            </div>
+            
+            {!service && (
+              <>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    Color Theme
+                  </label>
+                  <div className="flex gap-2 mt-2">
+                    {["#5B8FFF", "#FF9B66", "#5DD37C", "#FF6B6B"].map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, color })}
+                        className={`w-8 h-8 rounded-full transition-transform ${
+                          formData.color === color
+                            ? "ring-2 ring-offset-2 ring-[#0B4F6C] scale-110"
+                            : "hover:scale-110"
+                        }`}
+                        style={{ backgroundColor: color }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                    <label className="text-sm font-medium text-gray-700">Icon</label>
+                    <Select
+                        value={formData.icon}
+                        onValueChange={(value) => setFormData({ ...formData, icon: value })}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select icon" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[200px]">
+                            {Object.keys(iconMap).sort().map((iconName) => {
+                                const Icon = iconMap[iconName] || Box;
+                                return (
+                                    <SelectItem key={iconName} value={iconName}>
+                                        <div className="flex items-center gap-2">
+                                            <Icon className="w-4 h-4" />
+                                            <span>{iconName}</span>
+                                        </div>
+                                    </SelectItem>
+                                );
+                            })}
+                        </SelectContent>
+                    </Select>
+                </div>
+              </>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">

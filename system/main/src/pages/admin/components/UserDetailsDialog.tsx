@@ -33,7 +33,7 @@ interface UserData {
   username: string;
   email: string;
   phone: string;
-  role: "customer" | "staff" | "technician";
+  role: "customer" | "staff" | "technician" | "admin";
   avatar?: string;
   joinedDate: string;
   activityLogs: ActivityLog[];
@@ -148,25 +148,27 @@ export function UserDetailsDialog({
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
                 Role Management
               </p>
-              {user.role === "customer" && (
-                <button
-                  onClick={() => onPromote(user.id)}
-                  className="w-full py-2 px-4 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-                >
-                  <ArrowUpCircle className="w-4 h-4" />
-                  Promote to Staff
-                </button>
-              )}
-              {user.role === "staff" && (
-                <button
-                  onClick={() => onDemote(user.id)}
-                  className="w-full py-2 px-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
-                >
-                  <ArrowDownCircle className="w-4 h-4" />
-                  Demote to Customer
-                </button>
+              {user.role !== "admin" && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onPromote(user.id)}
+                    className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                  >
+                    <ArrowUpCircle className="w-4 h-4" />
+                    Promote
+                  </button>
+                  <button
+                    onClick={() => onDemote(user.id)}
+                    className="flex-1 py-2 px-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                  >
+                    <ArrowDownCircle className="w-4 h-4" />
+                    Demote
+                  </button>
+                </div>
               )}
             </div>
+
+
           </div>
 
           {/* Right Column - Details & Activity */}

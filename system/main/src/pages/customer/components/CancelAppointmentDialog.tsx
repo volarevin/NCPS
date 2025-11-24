@@ -15,15 +15,14 @@ interface CancelAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   appointment: any;
+  onConfirm: (reason: string) => void;
 }
 
-export function CancelAppointmentDialog({ open, onOpenChange, appointment }: CancelAppointmentDialogProps) {
+export function CancelAppointmentDialog({ open, onOpenChange, appointment, onConfirm }: CancelAppointmentDialogProps) {
   const [reason, setReason] = useState('');
 
   const handleCancel = () => {
-    // Handle appointment cancellation
-    console.log('Cancelling appointment:', appointment?.id, 'Reason:', reason);
-    onOpenChange(false);
+    onConfirm(reason);
     setReason('');
   };
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Mail, Phone, MapPin, Lock, Trash2, Save } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -15,6 +15,7 @@ import {
   AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
 import { PageHeader } from './PageHeader';
+import { toast } from 'sonner';
 
 export function CustomerProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -22,12 +23,40 @@ export function CustomerProfile() {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   
   const [formData, setFormData] = useState({
-    firstName: 'Maria',
-    lastName: 'Santos',
-    email: 'maria.santos@email.com',
-    phone: '+63 919 876 5432',
-    address: '123 Main St, Nasugbu, Batangas',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '123 Main St, Nasugbu, Batangas', // Hardcoded for now
   });
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/customer/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (response.ok) {
+        setFormData(prev => ({
+          ...prev,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          email: data.email,
+          phone: data.phone_number
+        }));
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -35,10 +64,33 @@ export function CustomerProfile() {
     confirmPassword: '',
   });
 
-  const handleSave = () => {
-    // Handle profile update
-    console.log('Updating profile:', formData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/customer/profile', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        toast.success('Profile updated successfully');
+        setIsEditing(false);
+        // Update local storage user info if needed
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        localStorage.setItem('user', JSON.stringify({ ...user, firstName: formData.firstName, lastName: formData.lastName }));
+      } else {
+        toast.error('Failed to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('An error occurred');
+    }
   };
 
   const handlePasswordChange = () => {

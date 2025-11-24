@@ -8,6 +8,7 @@ import { PageHeader } from "./PageHeader";
 interface TechnicianProfileProps {
   technicianProfile: any;
   setTechnicianProfile: (profile: any) => void;
+  updateProfile: (profile: any) => Promise<void>;
   technicianRatings: any[];
   handleDeleteAccount: () => void;
   renderStars: (rating: number) => JSX.Element[];
@@ -16,6 +17,7 @@ interface TechnicianProfileProps {
 export function TechnicianProfile({
   technicianProfile,
   setTechnicianProfile,
+  updateProfile,
   technicianRatings,
   handleDeleteAccount,
   renderStars
@@ -81,7 +83,12 @@ export function TechnicianProfile({
               <CardTitle className="text-[#0B4F6C]">Personal Information</CardTitle>
               <Button 
                 variant={editingProfile ? "default" : "outline"}
-                onClick={() => setEditingProfile(!editingProfile)}
+                onClick={() => {
+                  if (editingProfile) {
+                    updateProfile(technicianProfile);
+                  }
+                  setEditingProfile(!editingProfile);
+                }}
                 className={editingProfile ? "bg-[#0B4F6C] hover:bg-[#145A75]" : "border-[#0B4F6C] text-[#0B4F6C] hover:bg-[#E8F5F4]"}
               >
                 {editingProfile ? "Save Changes" : "Edit Profile"}

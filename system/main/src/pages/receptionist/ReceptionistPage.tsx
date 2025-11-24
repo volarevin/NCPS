@@ -15,13 +15,6 @@ export default function ReceptionistPage() {
     document.title = "Receptionist Dashboard";
   }, []);
 
-  const handleLogout = () => {
-    // Handle logout logic here
-    console.log('Logging out...');
-    // You might want to redirect to login page here
-    window.location.href = '/';
-  };
-
   const handleAppointmentClick = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
     setCurrentPage('appointments');
@@ -32,7 +25,6 @@ export default function ReceptionistPage() {
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage}
-        onLogout={handleLogout}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
       />
