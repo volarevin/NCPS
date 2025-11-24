@@ -15,7 +15,7 @@ export function TechnicianSidebar({ currentPage, onNavigate, className = "" }: T
   const menuItems = [
     { id: "dashboard", name: "Dashboard", icon: LayoutDashboard },
     { id: "appointments", name: "Appointments", icon: Calendar },
-    { id: "profile", name: "Profile", icon: User },
+    { id: "profile", name: "My Account", icon: User },
   ];
 
   return (

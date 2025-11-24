@@ -13,7 +13,7 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'appointments', label: 'Appointments', icon: Calendar },
-    { id: 'account', label: 'User Account', icon: User },
+    { id: 'account', label: 'My Account', icon: User },
   ];
 
   const handleNavigation = (page: string) => {

@@ -13,7 +13,7 @@ export function MobileSidebar({ currentPage, onNavigate, onClose }: MobileSideba
   const menuItems = [
     { id: 'dashboard' as Page, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'appointments' as Page, label: 'Appointments', icon: Calendar },
-    { id: 'profile' as Page, label: 'User Account', icon: User },
+    { id: 'profile' as Page, label: 'My Account', icon: User },
   ];
 
   const handleLogout = () => {
