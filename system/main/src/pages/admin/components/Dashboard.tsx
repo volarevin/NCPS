@@ -88,10 +88,15 @@ const recentActivities = [
   },
 ];
 
+import { PageHeader } from "./PageHeader";
+
 export function Dashboard() {
   return (
-    <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#0B4F6C]">Dashboard Overview</h2>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="Dashboard Overview" 
+        description="Welcome back, Admin. Here's what's happening with your operations today."
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

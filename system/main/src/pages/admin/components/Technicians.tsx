@@ -1,3 +1,4 @@
+import { PageHeader } from "./PageHeader";
 import { useState } from "react";
 import { 
   Search, 
@@ -104,14 +105,17 @@ export function Technicians() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-2xl font-bold text-[#0B4F6C]">Technicians</h2>
-        <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-colors">
-          <Plus className="w-4 h-4" />
-          Add Technician
-        </button>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="Technicians" 
+        description="Manage your field technicians and view their status."
+        action={
+          <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-colors">
+            <Plus className="w-4 h-4" />
+            Add Technician
+          </button>
+        }
+      />
 
       {/* Filters */}
       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">

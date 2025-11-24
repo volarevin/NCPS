@@ -1,3 +1,4 @@
+import { PageHeader } from "./PageHeader";
 import { useState } from "react";
 import { UserCard } from "./UserCard";
 import { UserDetailsDialog } from "./UserDetailsDialog";
@@ -131,14 +132,17 @@ export function UserAccounts() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <h2 className="text-2xl font-bold text-[#0B4F6C]">User Accounts</h2>
-        <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-colors">
-          <UserPlus className="w-4 h-4" />
-          Add New User
-        </button>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="User Accounts" 
+        description="Manage system users, roles, and permissions."
+        action={
+          <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-colors">
+            <UserPlus className="w-4 h-4" />
+            Add New User
+          </button>
+        }
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

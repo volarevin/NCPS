@@ -1,3 +1,4 @@
+import { PageHeader } from "./PageHeader";
 import { useState } from "react";
 import {
   BarChart,
@@ -150,21 +151,24 @@ const cancellationReasons = [
 
 export function Reports() {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-[#0B4F6C]">Reports & Analytics</h2>
-        <div className="flex gap-2">
-          <select className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B4F6C]">
-            <option>Last 30 Days</option>
-            <option>Last 3 Months</option>
-            <option>Last 6 Months</option>
-            <option>This Year</option>
-          </select>
-          <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] transition-colors">
-            Export Report
-          </button>
-        </div>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="Reports & Analytics" 
+        description="View detailed reports and analytics for your business."
+        action={
+          <div className="flex gap-2">
+            <select className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B4F6C]">
+              <option>Last 30 Days</option>
+              <option>Last 3 Months</option>
+              <option>Last 6 Months</option>
+              <option>This Year</option>
+            </select>
+            <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] transition-colors">
+              Export Report
+            </button>
+          </div>
+        }
+      />
 
       <Tabs defaultValue="appointments" className="w-full">
         <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-white p-1 rounded-xl border border-gray-200 mb-6">

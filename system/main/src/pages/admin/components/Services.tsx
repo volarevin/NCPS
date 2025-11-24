@@ -1,3 +1,4 @@
+import { PageHeader } from "./PageHeader";
 import { useState } from "react";
 import { Settings, Wrench, ArrowUpCircle, Plus, Menu, Sparkles } from "lucide-react";
 import { EditServiceDialog } from "./EditServiceDialog";
@@ -108,12 +109,20 @@ export function Services() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header Section */}
-      <div className="mb-6 md:mb-8">
-        <h1 className="text-2xl md:text-4xl text-[#0B4F6C] font-bold mb-2">Manage Services</h1>
-        <p className="text-sm md:text-base text-gray-600">Create, edit, and organize your service offerings</p>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="Manage Services" 
+        description="Create, edit, and organize your service offerings."
+        action={
+          <button
+            onClick={handleAddService}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0B4F6C] text-white hover:bg-[#093e54] transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Service</span>
+          </button>
+        }
+      />
 
       {/* Stats Overview */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6">
@@ -169,15 +178,6 @@ export function Services() {
               </button>
             ))}
           </div>
-
-          {/* Add Service Button */}
-          <button
-            onClick={handleAddService}
-            className="flex items-center gap-2 px-4 md:px-6 py-2 md:py-2.5 rounded-lg bg-gradient-to-r from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg text-sm md:text-base"
-          >
-            <Plus className="w-4 h-4 md:w-5 md:h-5" />
-            <span>Add Service</span>
-          </button>
         </div>
       </div>
 
