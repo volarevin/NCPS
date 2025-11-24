@@ -38,8 +38,9 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
               className="w-10 h-10 lg:w-14 lg:h-14"
             />
           </div>
-          <div className="flex-1">
-            <div className="font-bold text-xl lg:text-2xl">NCPS</div>
+          <div className="flex-1 flex flex-col">
+            <span className="font-bold text-xl lg:text-2xl leading-none">NCPS</span>
+            <span className="text-[10px] lg:text-xs font-medium text-blue-200 uppercase tracking-wider">Receptionist</span>
           </div>
           
           {/* Mobile Close Button */}
@@ -77,7 +78,7 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
         <div className="p-4 border-t border-white/10">
           <Button
             onClick={onLogout}
-            className="w-full bg-[#4DBDCC] text-[#0B4F6C] py-3 rounded-lg hover:bg-[#3FA9BC] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+            className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
             <LogOut className="w-5 h-5" />
             <span>Log out</span>

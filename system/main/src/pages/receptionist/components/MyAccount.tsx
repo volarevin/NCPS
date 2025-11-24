@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
 import { toast } from 'sonner';
 import { User, Mail, Phone, MapPin, Lock, Camera } from 'lucide-react';
+import { PageHeader } from './PageHeader';
 
 export function MyAccount() {
   const [isEditing, setIsEditing] = useState(false);
@@ -41,8 +42,11 @@ export function MyAccount() {
   };
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[#0B4F6C]">My Account</h1>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="My Account" 
+        description="Manage your profile settings and preferences."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Overview Card */}

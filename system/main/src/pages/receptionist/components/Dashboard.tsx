@@ -83,15 +83,25 @@ const mockAppointments: Appointment[] = [
   },
 ];
 
-export function Dashboard() {
+import { PageHeader } from './PageHeader';
+
+interface DashboardProps {
+  onAppointmentClick?: (appointment: Appointment) => void;
+}
+
+export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: DashboardProps) {
   const [appointments] = useState<Appointment[]>(mockAppointments);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const onAppointmentClick = (appointment: Appointment) => {
-    setSelectedAppointment(appointment);
-    setIsDetailsOpen(true);
+    if (propOnAppointmentClick) {
+      propOnAppointmentClick(appointment);
+    } else {
+      setSelectedAppointment(appointment);
+      setIsDetailsOpen(true);
+    }
   };
 
   const stats = {
@@ -136,11 +146,11 @@ export function Dashboard() {
   const upcomingAppointments = appointments.filter(apt => apt.date !== 'November 22, 2025');
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6">
-      <div className="mb-4">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl text-[#0B4F6C] mb-1 font-bold">Dashboard</h1>
-        <p className="text-xs sm:text-sm text-[#145A75]">Welcome to NCPS Receptionist Portal</p>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="Dashboard" 
+        description="Welcome to NCPS Receptionist Portal"
+      />
 
       {/* Quick Stats with Icons - Compact */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4">

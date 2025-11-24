@@ -6,6 +6,7 @@ import { Badge } from "../../../components/ui/badge";
 import { AppointmentDetailsDialog } from './AppointmentDetailsDialog';
 import { AddAppointmentDialog } from './AddAppointmentDialog';
 import { toast } from 'sonner';
+import { PageHeader } from './PageHeader';
 
 export interface Appointment {
   id: string;
@@ -190,21 +191,20 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8">
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl text-[#0B4F6C] mb-2">Appointments</h1>
-          <p className="text-sm sm:text-base text-[#145A75]">Manage and track customer appointments</p>
-        </div>
-        <Button
-          onClick={() => setAddDialogOpen(true)}
-          className="bg-[#4DBDCC] hover:bg-[#3AACBB] hover:scale-105 hover:shadow-lg transition-all duration-200 w-full sm:w-auto"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          <span className="hidden sm:inline">Add Walk-In Appointment</span>
-          <span className="sm:hidden">Add Walk-In</span>
-        </Button>
-      </div>
+    <div className="space-y-6 animate-fade-in">
+      <PageHeader 
+        title="Appointments" 
+        description="Manage and track customer appointments"
+        action={
+          <Button
+            onClick={() => setAddDialogOpen(true)}
+            className="bg-[#0B4F6C] hover:bg-[#093e54] text-white"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add Appointment
+          </Button>
+        }
+      />
 
       {/* Stats Overview with Icons */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-6">

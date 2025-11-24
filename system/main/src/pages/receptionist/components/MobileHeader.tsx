@@ -22,7 +22,10 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
             className="w-8 h-8"
           />
         </div>
-        <span className="font-bold text-lg">NCPS</span>
+        <div className="flex flex-col">
+          <span className="font-bold text-lg leading-none">NCPS</span>
+          <span className="text-[10px] font-medium text-blue-200 uppercase tracking-wider">Receptionist</span>
+        </div>
       </div>
     </div>
   );

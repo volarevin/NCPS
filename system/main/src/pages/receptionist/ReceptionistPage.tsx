@@ -36,15 +36,17 @@ export default function ReceptionistPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <MobileHeader onMenuClick={() => setMobileMenuOpen(true)} />
         
-        <main className={`flex-1 overflow-auto transition-all duration-300 ${mobileMenuOpen ? 'lg:brightness-100 brightness-50' : ''}`}>
-          {currentPage === 'dashboard' && <Dashboard onAppointmentClick={handleAppointmentClick} />}
-          {currentPage === 'appointments' && (
-            <AppointmentSchedule 
-              selectedAppointmentFromDashboard={selectedAppointment}
-              onClearSelection={() => setSelectedAppointment(null)}
-            />
-          )}
-          {currentPage === 'account' && <MyAccount />}
+        <main className={`flex-1 overflow-y-auto p-4 md:p-8 transition-all duration-300 ${mobileMenuOpen ? 'lg:brightness-100 brightness-50' : ''}`}>
+          <div className="max-w-7xl mx-auto">
+            {currentPage === 'dashboard' && <Dashboard onAppointmentClick={handleAppointmentClick} />}
+            {currentPage === 'appointments' && (
+              <AppointmentSchedule 
+                selectedAppointmentFromDashboard={selectedAppointment}
+                onClearSelection={() => setSelectedAppointment(null)}
+              />
+            )}
+            {currentPage === 'account' && <MyAccount />}
+          </div>
         </main>
       </div>
       
