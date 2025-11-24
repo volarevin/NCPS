@@ -6,7 +6,7 @@ interface UserCardProps {
   username: string;
   email: string;
   phone: string;
-  role: "customer" | "staff" | "technician";
+  role: "customer" | "staff" | "technician" | "admin";
   avatar?: string;
   onClick: () => void;
 }
@@ -24,15 +24,18 @@ export function UserCard({
     customer: "#5B8FFF",
     staff: "#7B9B7C",
     technician: "#FF9B66",
+    admin: "#0B4F6C",
   };
 
   const roleIcons = {
     customer: Users,
     staff: Shield,
     technician: Wrench,
+    admin: Shield,
   };
 
-  const RoleIcon = roleIcons[role];
+  const RoleIcon = roleIcons[role] || Users;
+  const roleColor = roleColors[role] || "#9CA3AF";
 
   return (
     <div
@@ -59,8 +62,8 @@ export function UserCard({
           <div
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium mt-1"
             style={{
-              backgroundColor: `${roleColors[role]}20`,
-              color: roleColors[role],
+              backgroundColor: `${roleColor}20`,
+              color: roleColor,
             }}
           >
             <RoleIcon className="w-3 h-3" />

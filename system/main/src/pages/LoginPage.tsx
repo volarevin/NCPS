@@ -167,10 +167,10 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
+    const API_URL = 'http://localhost:5000/api/auth';
+
     if (viewMode === 'forgot-password') {
+      // TODO: Implement forgot password API
       console.log('Reset password for:', email);
       toast.success("Password reset link sent to your email!");
       setViewMode('login');
@@ -186,35 +186,74 @@ export default function LoginPage() {
         return;
       }
 
-      // Mock check for existing username
-      if (username.toLowerCase() === 'admin' || username.toLowerCase() === 'customer') {
-        toast.error("Username already exists");
-        setIsLoading(false);
-        return;
-      }
+      try {
+        const response = await fetch(`${API_URL}/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username,
+            firstName,
+            lastName,
+            email,
+            phone,
+            password,
+            role: 'Customer' // Default role
+          }),
+        });
 
-      console.log('Sign Up attempt:', { username, firstName, lastName, email, phone, password });
-      toast.success("Account created successfully! Please login.");
-      setViewMode('login');
-      setIsLoading(false);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Registration failed');
+        }
+
+        toast.success("Account created successfully! Please login.");
+        setViewMode('login');
+        resetForm();
+      } catch (error: any) {
+        toast.error(error.message);
+      } finally {
+        setIsLoading(false);
+      }
       return;
     }
 
     // Login Logic
-    console.log('Login attempt:', { username, password });
-    
-    // Simple routing logic for demo
-    if (username.toLowerCase().includes('admin')) {
-      navigate('/admin');
-    } else if (username.toLowerCase().includes('tech')) {
-      navigate('/technician');
-    } else if (username.toLowerCase().includes('recep')) {
-      navigate('/receptionist');
-    } else {
-      navigate('/customer');
+    try {
+      const response = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identifier: username, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Store token and user info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      toast.success(`Welcome back, ${data.user.firstName}!`);
+
+      // Redirect based on role
+      const role = data.user.role.toLowerCase();
+      if (role === 'admin') {
+        navigate('/admin');
+      } else if (role === 'technician') {
+        navigate('/technician');
+      } else if (role === 'receptionist') {
+        navigate('/receptionist');
+      } else {
+        navigate('/customer');
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const resetForm = () => {

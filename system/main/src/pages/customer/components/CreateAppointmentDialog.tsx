@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +11,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { toast } from 'sonner';
 
 interface CreateAppointmentDialogProps {
   open: boolean;
@@ -19,30 +20,76 @@ interface CreateAppointmentDialogProps {
 
 export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmentDialogProps) {
   const [formData, setFormData] = useState({
-    service: '',
+    serviceId: '',
     date: '',
     time: '',
-    address: '',
+    address: '', // Note: Address is not yet in the backend schema for appointments, assuming it's part of user profile or notes for now.
     notes: '',
   });
+  const [services, setServices] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const services = [
-    'Computer Repair',
-    'Laptop Repair',
-    'CCTV Installation',
-    'Network Setup',
-    'Hardware Upgrade',
-    'Software Installation',
-    'Virus Removal',
-    'Data Recovery',
-    'Other',
-  ];
+  useEffect(() => {
+    if (open) {
+      fetchServices();
+    }
+  }, [open]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const fetchServices = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/api/services');
+      const data = await response.json();
+      setServices(data);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+      toast.error('Failed to load services');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle appointment creation
-    console.log('Creating appointment:', formData);
-    onOpenChange(false);
+    setIsLoading(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('You must be logged in to book an appointment.');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          serviceId: formData.serviceId,
+          date: formData.date,
+          time: formData.time,
+          notes: `${formData.notes} \n\nAddress: ${formData.address}` // Appending address to notes for now
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Booking failed');
+      }
+
+      toast.success('Appointment booked successfully!');
+      onOpenChange(false);
+      // Reset form
+      setFormData({ serviceId: '', date: '', time: '', address: '', notes: '' });
+      
+      // Optional: Trigger a refresh of the appointments list if we had a context or callback
+      window.location.reload(); // Simple reload to refresh data for now
+
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -60,14 +107,14 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
             <Label htmlFor="service" className="text-[#1A5560]">
               Service Type *
             </Label>
-            <Select value={formData.service} onValueChange={(value) => setFormData({ ...formData, service: value })}>
+            <Select value={formData.serviceId} onValueChange={(value) => setFormData({ ...formData, serviceId: value })}>
               <SelectTrigger className="border-[#1A5560]/20 focus:border-[#3FA9BC]">
                 <SelectValue placeholder="Select a service" />
               </SelectTrigger>
               <SelectContent>
                 {services.map((service) => (
-                  <SelectItem key={service} value={service}>
-                    {service}
+                  <SelectItem key={service.service_id} value={service.service_id.toString()}>
+                    {service.service_name} - ₱{service.base_price}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -143,8 +190,9 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
             <Button
               type="submit"
               className="flex-1 bg-[#3FA9BC] hover:bg-[#2A6570] text-white transition-colors duration-200"
+              disabled={isLoading}
             >
-              Book Appointment
+              {isLoading ? 'Booking...' : 'Book Appointment'}
             </Button>
           </div>
         </form>

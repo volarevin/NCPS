@@ -1,15 +1,30 @@
+import { useState } from 'react';
 import { Calendar, LogOut, LayoutDashboard, User, X } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface SidebarProps {
   currentPage: string;
   onNavigate: (page: string) => void;
-  onLogout: () => void;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: (open: boolean) => void;
 }
 
-export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, setMobileMenuOpen }: SidebarProps) {
+export function Sidebar({ currentPage, onNavigate, mobileMenuOpen, setMobileMenuOpen }: SidebarProps) {
+  const navigate = useNavigate();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'appointments', label: 'Appointments', icon: Calendar },
@@ -19,6 +34,17 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
   const handleNavigation = (page: string) => {
     onNavigate(page);
     setMobileMenuOpen(false);
+  };
+
+  const handleLogout = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast.success('Logged out successfully');
+    navigate('/login');
   };
 
   return (
@@ -77,7 +103,7 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
         {/* Logout Button */}
         <div className="p-4 border-t border-white/10">
           <Button
-            onClick={onLogout}
+            onClick={handleLogout}
             className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
             <LogOut className="w-5 h-5" />
@@ -85,6 +111,23 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
           </Button>
         </div>
       </div>
+
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure you want to log out?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You will be redirected to the login page.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} className="bg-red-500 hover:bg-red-600">
+              Log out
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { TechnicianSidebar } from "./components/TechnicianSidebar";
@@ -26,21 +27,73 @@ export default function TechnicianPage() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "appointments" | "profile" | "ratings">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [technicianProfile, setTechnicianProfile] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     document.title = "Technician Dashboard";
+    const init = async () => {
+      await Promise.all([fetchJobs(), fetchProfile()]);
+      setIsLoading(false);
+    };
+    init();
   }, []);
 
-  // Mock technician data
-  const [technicianProfile, setTechnicianProfile] = useState({
-    name: "John Technician",
-    email: "john.tech@ncps.com",
-    phone: "+63 912 345 6789",
-    address: "456 Tech Street, Nasugbu, Batangas",
-    specialization: "Computer Repair & CCTV Installation",
-    rating: 4.8,
-    totalJobs: 156
-  });
+  const fetchJobs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/technician/jobs', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+
+      const formatted = data.map((job: any) => ({
+        id: job.appointment_id.toString(),
+        customerName: `${job.customer_first_name} ${job.customer_last_name}`,
+        service: job.service_name,
+        date: new Date(job.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+        time: new Date(job.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+        phone: job.customer_phone || 'N/A',
+        email: job.customer_email || 'N/A',
+        address: 'N/A', // TODO
+        status: job.status,
+        notes: job.customer_notes || ''
+      }));
+
+      setAppointments(formatted);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/technician/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTechnicianProfile({
+          name: `${data.first_name} ${data.last_name}`,
+          email: data.email,
+          phone: data.phone_number,
+          address: "N/A", // TODO
+          specialization: data.specialty || "General Technician",
+          rating: parseFloat(data.average_rating) || 0,
+          totalJobs: data.total_jobs_completed || 0
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   const technicianRatings = [
     {
@@ -69,45 +122,7 @@ export default function TechnicianPage() {
     }
   ];
   
-  // Mock data for appointments
-  const [appointments, setAppointments] = useState<Appointment[]>([
-    {
-      id: "1",
-      customerName: "Maria Santos",
-      service: "Laptop Repair",
-      date: "November 27, 2025",
-      time: "10:00 AM",
-      phone: "+63 917 345 6789",
-      email: "maria.santos@email.com",
-      address: "123 Main St, Quezon City, Metro Manila",
-      status: "Pending",
-      notes: "Laptop won't turn on. Client mentioned water damage last week."
-    },
-    {
-      id: "2",
-      customerName: "Juan Dela Cruz",
-      service: "CCTV Installation",
-      date: "November 28, 2025",
-      time: "2:00 PM",
-      phone: "+63 918 234 5678",
-      email: "juan.delacruz@email.com",
-      address: "456 Oak Ave, Makati City, Metro Manila",
-      status: "In Progress",
-      notes: "Installing 4 cameras in the office area. Client prefers wireless setup."
-    },
-    {
-      id: "3",
-      customerName: "Ana Reyes",
-      service: "PC Upgrade",
-      date: "November 29, 2025",
-      time: "9:00 AM",
-      phone: "+63 919 876 5432",
-      email: "ana.reyes@email.com",
-      address: "789 Pine Rd, Pasig City, Metro Manila",
-      status: "Pending",
-      notes: "Upgrade RAM to 16GB and install SSD 500GB."
-    }
-  ]);
+
 
   const [appointmentHistory] = useState<Appointment[]>([
     {
@@ -148,12 +163,53 @@ export default function TechnicianPage() {
     }
   ]);
 
-  const updateAppointmentStatus = (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled") => {
-    setAppointments(appointments.map(apt => 
-      apt.id === appointmentId ? { ...apt, status: newStatus } : apt
-    ));
-    if (selectedAppointment && selectedAppointment.id === appointmentId) {
-      setSelectedAppointment({ ...selectedAppointment, status: newStatus });
+  const updateAppointmentStatus = async (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled") => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/appointments/${appointmentId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+
+      setAppointments(appointments.map(apt => 
+        apt.id === appointmentId ? { ...apt, status: newStatus } : apt
+      ));
+      
+      if (selectedAppointment && selectedAppointment.id === appointmentId) {
+        setSelectedAppointment({ ...selectedAppointment, status: newStatus });
+      }
+      
+      toast.success(`Appointment status updated to ${newStatus}`);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update appointment status');
+    }
+  };
+
+  const updateProfile = async (updatedProfile: any) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/technician/profile', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(updatedProfile)
+      });
+
+      if (!response.ok) throw new Error('Failed to update profile');
+
+      await response.json();
+      setTechnicianProfile((prev: any) => ({ ...prev, ...updatedProfile }));
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      toast.error('Failed to update profile');
     }
   };
 
@@ -248,6 +304,25 @@ export default function TechnicianPage() {
   };
 
   const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0B4F6C]"></div>
+        </div>
+      );
+    }
+
+    if (!technicianProfile) {
+      return (
+        <div className="flex flex-col items-center justify-center h-full text-gray-500">
+          <p>Failed to load profile data.</p>
+          <button onClick={() => window.location.reload()} className="mt-4 text-[#0B4F6C] hover:underline">
+            Retry
+          </button>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case "dashboard":
         return (
@@ -282,6 +357,7 @@ export default function TechnicianPage() {
           <TechnicianProfile
             technicianProfile={technicianProfile}
             setTechnicianProfile={setTechnicianProfile}
+            updateProfile={updateProfile}
             technicianRatings={technicianRatings}
             handleDeleteAccount={handleDeleteAccount}
             renderStars={renderStars}

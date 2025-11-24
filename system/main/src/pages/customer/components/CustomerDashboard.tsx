@@ -2,52 +2,106 @@ import { Calendar, Clock, Wrench, CheckCircle2, AlertCircle } from 'lucide-react
 import { StatCard } from './StatCard';
 import { NextAppointmentCard } from './NextAppointmentCard';
 import { AppointmentUpdateCard } from './AppointmentUpdateCard';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ViewAppointmentDialog } from './ViewAppointmentDialog';
 import { EditAppointmentDialog } from './EditAppointmentDialog';
 import { PageHeader } from './PageHeader';
+import { toast } from 'sonner';
 
 export function CustomerDashboard() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [nextAppointment, setNextAppointment] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+
+    const fetchDashboardData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const headers = { 'Authorization': `Bearer ${token}` };
+
+        // Fetch Stats
+        const statsRes = await fetch('http://localhost:5000/api/customer/stats', { headers });
+        const statsData = await statsRes.json();
+        setDashboardStats(statsData);
+
+        // Fetch Next Appointment (from appointments list)
+        const apptRes = await fetch('http://localhost:5000/api/customer/appointments', { headers });
+        const apptData = await apptRes.json();
+        
+        // Find the first upcoming appointment
+        const upcoming = apptData.find((a: any) => 
+          ['Pending', 'Confirmed'].includes(a.status) && new Date(a.appointment_date) > new Date()
+        );
+
+        if (upcoming) {
+          setNextAppointment({
+            service: upcoming.service_name,
+            date: new Date(upcoming.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            time: new Date(upcoming.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+            status: upcoming.status.toLowerCase(),
+            technician: upcoming.tech_first_name ? `Tech ${upcoming.tech_first_name} ${upcoming.tech_last_name}` : 'Pending Assignment',
+            technicianPhone: '', // TODO: Add to API
+            technicianEmail: '', // TODO: Add to API
+            address: '123 Main St, Nasugbu, Batangas', // TODO: Add address to appointment/user
+            notes: upcoming.customer_notes || 'No notes provided.',
+          });
+        }
+
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+        toast.error('Failed to load dashboard data');
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
   
   const stats = [
     {
       icon: Calendar,
       title: 'Total Appointments',
-      value: '12',
+      value: dashboardStats ? (dashboardStats.pending_count + dashboardStats.completed_count).toString() : '0', // Approximation
       color: '#4DBDCC',
     },
     {
       icon: Clock,
       title: 'Pending',
-      value: '1',
+      value: dashboardStats?.pending_count?.toString() || '0',
       color: '#F97316', // Orange
     },
     {
       icon: Wrench,
       title: 'In Progress',
-      value: '1',
+      value: '0', // TODO: Add to API stats
       color: '#3B82F6', // Blue
     },
     {
       icon: CheckCircle2,
       title: 'Completed',
-      value: '10',
+      value: dashboardStats?.completed_count?.toString() || '0',
       color: '#22C55E', // Green
     },
   ];
 
-  const nextAppointment = {
-    service: 'Laptop Repair',
-    date: 'November 23, 2025',
-    time: '10:00 AM',
-    status: 'confirmed' as const,
-    technician: 'Tech John Doe',
-    technicianPhone: '+63 919 123 4567',
-    technicianEmail: 'john.doe@ncps.com',
-    address: '123 Main St, Nasugbu, Batangas',
-    notes: 'Please bring your laptop charger and any external devices.',
+  const defaultNextAppointment = {
+    service: 'No Upcoming Appointments',
+    date: '-',
+    time: '-',
+    status: 'pending' as const,
+    technician: '-',
+    technicianPhone: '-',
+    technicianEmail: '-',
+    address: '-',
+    notes: '-',
   };
 
   const recentUpdates = [
@@ -73,7 +127,7 @@ export function CustomerDashboard() {
     <div className="p-3 md:p-8 animate-fade-in max-w-7xl mx-auto space-y-6">
       {/* Header */}
       <PageHeader 
-        title="Welcome, Maria Santos!"
+        title={`Welcome, ${user?.firstName || 'Customer'}!`}
         description="Here's an overview of your appointments."
       />
 
@@ -87,7 +141,7 @@ export function CustomerDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 md:gap-6">
         {/* Next Appointment */}
         <NextAppointmentCard 
-          appointment={nextAppointment}
+          appointment={nextAppointment || defaultNextAppointment}
           onViewDetails={() => setIsViewDialogOpen(true)}
           onReschedule={() => setIsEditDialogOpen(true)}
         />

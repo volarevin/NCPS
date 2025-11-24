@@ -1,20 +1,42 @@
 import { PageHeader } from "./PageHeader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Search, 
   Plus, 
+  Filter, 
+  MoreVertical, 
   Phone,
   Mail,
   MapPin,
-  Edit,
-  Star
+  Star,
+  Calendar,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  ArrowUpDown,
+  Edit
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TechnicianDetailsDialog, TechnicianDetails } from "./TechnicianDetailsDialog";
+import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
+import { TechnicianEditDialog } from "./TechnicianEditDialog";
+import { AddTechnicianDialog, SPECIALTIES } from "./AddTechnicianDialog";
+import { ConfirmActionDialog } from "./ConfirmActionDialog";
 
 interface Technician {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
   phone: string;
   email: string;
   location: string;
@@ -26,61 +48,220 @@ interface Technician {
   avatar?: string;
 }
 
-const initialTechnicians: Technician[] = [
-  {
-    id: "1",
-    name: "Carlos Mendez",
-    phone: "+63 912 345 6789",
-    email: "carlos.mendez@ncps.com",
-    location: "Manila",
-    specialty: "CCTV Installation",
-    status: "available",
-    activeJobs: 2,
-    completedJobs: 48,
-    rating: 4.8,
-  },
-  {
-    id: "2",
-    name: "Maria Santos",
-    phone: "+63 923 456 7890",
-    email: "maria.santos@ncps.com",
-    location: "Quezon City",
-    specialty: "Computer Repair",
-    status: "busy",
-    activeJobs: 5,
-    completedJobs: 120,
-    rating: 4.9,
-  },
-  {
-    id: "3",
-    name: "Juan Dela Cruz",
-    phone: "+63 934 567 8901",
-    email: "juan.delacruz@ncps.com",
-    location: "Makati",
-    specialty: "Network Setup",
-    status: "offline",
-    activeJobs: 0,
-    completedJobs: 35,
-    rating: 4.5,
-  },
-  {
-    id: "4",
-    name: "Ana Reyes",
-    phone: "+63 945 678 9012",
-    email: "ana.reyes@ncps.com",
-    location: "Taguig",
-    specialty: "Software Troubleshooting",
-    status: "available",
-    activeJobs: 1,
-    completedJobs: 62,
-    rating: 4.7,
-  },
-];
-
 export function Technicians() {
-  const [technicians, setTechnicians] = useState<Technician[]>(initialTechnicians);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState("name");
+  const [selectedTechnician, setSelectedTechnician] = useState<TechnicianDetails | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [isAppointmentDetailsOpen, setIsAppointmentDetailsOpen] = useState(false);
+
+  const [selectedTechnicianForEdit, setSelectedTechnicianForEdit] = useState<Technician | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isAddTechnicianOpen, setIsAddTechnicianOpen] = useState(false);
+  
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    description: string;
+    actionLabel: string;
+    onConfirm: () => void;
+    variant: "default" | "destructive";
+  }>({
+    open: false,
+    title: "",
+    description: "",
+    actionLabel: "",
+    onConfirm: () => {},
+    variant: "default"
+  });
+
+  const fetchTechnicians = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/admin/technicians', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+
+      const formatted = data.map((tech: any) => ({
+        id: tech.user_id.toString(),
+        name: `${tech.first_name} ${tech.last_name}`,
+        firstName: tech.first_name,
+        lastName: tech.last_name,
+        phone: tech.phone_number,
+        email: tech.email,
+        location: tech.address || "Manila",
+        specialty: tech.specialty || "General",
+        status: tech.availability_status.toLowerCase(),
+        activeJobs: tech.active_jobs,
+        completedJobs: tech.total_jobs_completed,
+        rating: parseFloat(tech.average_rating) || 0,
+      }));
+
+      setTechnicians(formatted);
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTechnicians();
+  }, []);
+
+  const handleTechnicianAdded = () => {
+    fetchTechnicians();
+  };
+
+  const getSpecialtyConfig = (specialtyName: string) => {
+    return SPECIALTIES.find(s => s.value === specialtyName) || SPECIALTIES.find(s => s.value === "General")!;
+  };
+
+  const handleViewDetails = async (techId: string) => {
+    try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch(`http://localhost:5000/api/admin/technicians/${techId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+            setSelectedTechnician(data);
+            setIsDetailsOpen(true);
+        } else {
+            console.error("Failed to fetch details:", data);
+            // Optional: Show a toast or alert here
+        }
+    } catch (error) {
+        console.error('Error fetching technician details:', error);
+    }
+  };
+
+  const handleViewAppointment = async (appointmentId: number) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const response = await fetch(`http://localhost:5000/api/admin/appointments/${appointmentId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setSelectedAppointment(data);
+      setIsAppointmentDetailsOpen(true);
+    } catch (error) {
+      console.error('Error fetching appointment details:', error);
+    }
+  };
+
+  const handleBan = async (id: number) => {
+    setConfirmDialog({
+      open: true,
+      title: "Ban Technician",
+      description: "Are you sure you want to ban this technician? This will prevent them from logging in and accessing the system.",
+      actionLabel: "Ban Technician",
+      variant: "destructive",
+      onConfirm: async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ action: 'ban' })
+            });
+            setIsEditOpen(false);
+            setConfirmDialog(prev => ({ ...prev, open: false }));
+            fetchTechnicians();
+        } catch (error) {
+            console.error(error);
+        }
+      }
+    });
+  };
+
+  const handleDemote = async (id: number) => {
+    setConfirmDialog({
+      open: true,
+      title: "Demote Technician",
+      description: "Are you sure you want to demote this technician? They will become a regular customer and lose access to technician features.",
+      actionLabel: "Demote to Customer",
+      variant: "destructive",
+      onConfirm: async () => {
+        try {
+            const token = localStorage.getItem('token');
+            await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({ action: 'demote' })
+            });
+            setIsEditOpen(false);
+            setConfirmDialog(prev => ({ ...prev, open: false }));
+            fetchTechnicians();
+        } catch (error) {
+            console.error(error);
+        }
+      }
+    });
+  };
+
+    const handleEdit = async (id: number, data: any) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/admin/technicians/${id}/profile`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(data)
+      });
+
+      console.log('updateTechnician response status:', response.status);
+
+      if (!response.ok) {
+        try {
+          const errorData = await response.json();
+          console.warn("Non-200 response updating technician:", errorData);
+        } catch (jsonErr) {
+          const text = await response.text();
+          console.warn("Non-200 response updating technician (text):", text, jsonErr);
+        }
+      }
+
+      // Optimistically update list regardless so UI stays in sync with intent
+      setTechnicians(prev => prev.map(t => t.id === id.toString() ? {
+        ...t,
+        name: `${data.first_name} ${data.last_name}`,
+        firstName: data.first_name,
+        lastName: data.last_name,
+        phone: data.phone_number,
+        location: data.address,
+        specialty: data.specialty
+      } : t));
+
+      setIsEditOpen(false);
+    } catch (error) {
+      console.error('Network/JS error updating technician:', error);
+    }
+    };
+
+  const openEditDialog = (e: React.MouseEvent, tech: Technician) => {
+    e.stopPropagation();
+    setSelectedTechnicianForEdit(tech);
+    setIsEditOpen(true);
+  };
 
   const filteredTechnicians = technicians.filter((tech) => {
     const matchesSearch =
@@ -89,136 +270,182 @@ export function Technicians() {
     const matchesStatus =
       statusFilter === "all" || tech.status === statusFilter;
     return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    if (sortBy === "name") return a.name.localeCompare(b.name);
+    if (sortBy === "rating") return b.rating - a.rating;
+    if (sortBy === "jobs") return b.completedJobs - a.completedJobs;
+    return 0;
   });
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "available":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "busy":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      case "offline":
-        return "bg-gray-100 text-gray-800 border-gray-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <PageHeader 
         title="Technicians" 
-        description="Manage your field technicians and view their status."
+        description="Manage your service providers"
         action={
-          <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-colors">
+          <button 
+            onClick={() => setIsAddTechnicianOpen(true)}
+            className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093d54] transition-colors shadow-sm hover:shadow-md"
+          >
             <Plus className="w-4 h-4" />
             Add Technician
           </button>
         }
       />
 
-      {/* Filters */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           <Input
-            placeholder="Search technician or specialty..."
-            className="pl-10"
+            placeholder="Search technicians..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-white border-gray-200 focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
           />
         </div>
-        <div className="flex items-center gap-2">
-          {["all", "available", "busy", "offline"].map((status) => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
-              className={`px-3 py-1.5 rounded-full text-sm capitalize transition-colors ${
-                statusFilter === status
-                  ? "bg-[#0B4F6C] text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-        </div>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px] bg-white border-gray-200">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="available">Available</SelectItem>
+            <SelectItem value="busy">Busy</SelectItem>
+            <SelectItem value="offline">Offline</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-[180px] bg-white border-gray-200">
+            <ArrowUpDown className="w-4 h-4 mr-2 text-gray-400" />
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="name">Name</SelectItem>
+            <SelectItem value="rating">Rating</SelectItem>
+            <SelectItem value="jobs">Jobs Completed</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Technicians Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredTechnicians.map((tech) => (
-          <div
-            key={tech.id}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-          >
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[#E6F0F4] flex items-center justify-center text-[#0B4F6C] font-bold text-xl">
-                    {tech.name.charAt(0)}
+        {filteredTechnicians.map((tech) => {
+          const specialtyConfig = getSpecialtyConfig(tech.specialty);
+          const SpecialtyIcon = specialtyConfig.icon;
+
+          return (
+            <div
+              key={tech.id}
+              onClick={() => handleViewDetails(tech.id)}
+              className="group bg-white rounded-xl border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#0B4F6C] opacity-0 group-hover:opacity-100 transition-opacity" />
+              
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 rounded-full ${specialtyConfig.bg} flex items-center justify-center border border-gray-200 group-hover:border-[#0B4F6C]/30 transition-colors`}>
+                    <SpecialtyIcon className={`w-6 h-6 ${specialtyConfig.color}`} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">{tech.name}</h3>
-                    <p className="text-sm text-[#0B4F6C]">{tech.specialty}</p>
+                    <h3 className="font-semibold text-gray-900 group-hover:text-[#0B4F6C] transition-colors">{tech.name}</h3>
+                    <p className="text-sm text-gray-500">{tech.specialty}</p>
                   </div>
                 </div>
-                <Badge className={getStatusColor(tech.status)}>
-                  {tech.status}
+                <Badge
+                  className={`${
+                    tech.status === "available"
+                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      : tech.status === "busy"
+                      ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  } border-0`}
+                >
+                  {tech.status.charAt(0).toUpperCase() + tech.status.slice(1)}
                 </Badge>
               </div>
 
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
+              <div className="space-y-3">
+                <div className="flex items-center text-sm text-gray-600">
+                  <Phone className="w-4 h-4 mr-2 text-gray-400" />
                   {tech.phone}
                 </div>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  {tech.email}
+                <div className="flex items-center text-sm text-gray-600">
+                  <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                  <span className="truncate">{tech.email}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-gray-400" />
-                  {tech.location}
+                <div className="flex items-center text-sm text-gray-600">
+                  <MapPin className="w-4 h-4 mr-2 text-gray-400" />
+                  <span className="truncate">{tech.location}</span>
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-3 gap-2 text-center border-t border-gray-100 pt-4">
-                <div>
-                  <p className="text-lg font-bold text-gray-800">
-                    {tech.activeJobs}
-                  </p>
-                  <p className="text-xs text-gray-500">Active</p>
+              <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                  <span className="font-semibold text-gray-900">{tech.rating.toFixed(1)}</span>
+                  <span className="text-xs text-gray-500">Rating</span>
                 </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-800">
-                    {tech.completedJobs}
-                  </p>
-                  <p className="text-xs text-gray-500">Completed</p>
-                </div>
-                <div>
-                  <div className="flex items-center justify-center gap-1">
-                    <span className="text-lg font-bold text-gray-800">
-                      {tech.rating}
-                    </span>
-                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                  </div>
-                  <p className="text-xs text-gray-500">Rating</p>
+                <div className="text-sm text-gray-500">
+                  <span className="font-semibold text-gray-900">{tech.completedJobs}</span> Jobs
                 </div>
               </div>
-            </div>
 
-            <div className="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-100">
-              <button className="text-sm text-gray-600 hover:text-[#0B4F6C] font-medium">
-                View Profile
-              </button>
-              <button className="p-2 text-gray-400 hover:text-[#0B4F6C] hover:bg-white rounded-full transition-colors">
-                <Edit className="w-4 h-4" />
-              </button>
+              <div className="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-100 -mx-6 -mb-6 mt-4">
+                <button 
+                  className="text-sm text-gray-600 hover:text-[#0B4F6C] font-medium"
+                  onClick={(e) => { e.stopPropagation(); handleViewDetails(tech.id); }}
+                >
+                  View Profile
+                </button>
+                <button 
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-[#0B4F6C] hover:bg-white rounded-full transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                  onClick={(e) => openEditDialog(e, tech)}
+                >
+                  <Edit className="w-3.5 h-3.5" />
+                  Edit
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
+
+      <TechnicianDetailsDialog 
+        open={isDetailsOpen} 
+        onOpenChange={setIsDetailsOpen} 
+        technician={selectedTechnician}
+        onViewAppointment={handleViewAppointment}
+      />
+
+      <TechnicianEditDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        technician={selectedTechnicianForEdit}
+        onEdit={handleEdit}
+        onBan={handleBan}
+        onDemote={handleDemote}
+      />
+
+      <AddTechnicianDialog
+        open={isAddTechnicianOpen}
+        onOpenChange={setIsAddTechnicianOpen}
+        onTechnicianAdded={handleTechnicianAdded}
+      />
+
+      <AppointmentDetailsDialog
+        open={isAppointmentDetailsOpen}
+        onOpenChange={setIsAppointmentDetailsOpen}
+        appointment={selectedAppointment}
+      />
+
+      <ConfirmActionDialog
+        open={confirmDialog.open}
+        onOpenChange={(open) => setConfirmDialog(prev => ({ ...prev, open }))}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        actionLabel={confirmDialog.actionLabel}
+        onConfirm={confirmDialog.onConfirm}
+        variant={confirmDialog.variant}
+      />
     </div>
   );
 }

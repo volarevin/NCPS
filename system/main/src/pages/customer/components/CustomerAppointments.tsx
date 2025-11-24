@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Calendar, Search } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -9,6 +9,7 @@ import { EditAppointmentDialog } from './EditAppointmentDialog';
 import { CancelAppointmentDialog } from './CancelAppointmentDialog';
 import { RateTechnicianDialog } from './RateTechnicianDialog';
 import { PageHeader } from './PageHeader';
+import { toast } from 'sonner';
 
 type AppointmentStatus = 'all' | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 
@@ -21,74 +22,69 @@ export function CustomerAppointments() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isRateDialogOpen, setIsRateDialogOpen] = useState(false);
+  const [appointments, setAppointments] = useState<any[]>([]);
 
-  const appointments = [
-    {
-      id: '1',
-      service: 'Laptop Repair',
-      description: 'Screen replacement and keyboard cleaning',
-      date: 'November 23, 2025',
-      time: '10:00 AM',
-      status: 'confirmed' as const,
-      technician: 'Tech John Doe',
-      technicianPhone: '+63 919 123 4567',
-      technicianEmail: 'john.doe@ncps.com',
-      address: '123 Main St, Nasugbu, Batangas',
-      notes: 'Please bring your laptop charger.',
-    },
-    {
-      id: '2',
-      service: 'CCTV Installation',
-      description: '4-camera setup with DVR',
-      date: 'November 22, 2025',
-      time: '2:00 PM',
-      status: 'in_progress' as const,
-      technician: 'Tech Jane Smith',
-      technicianPhone: '+63 919 234 5678',
-      technicianEmail: 'jane.smith@ncps.com',
-      address: '456 Oak Ave, Nasugbu, Batangas',
-      notes: 'Installation at the main entrance and parking area.',
-    },
-    {
-      id: '3',
-      service: 'Computer Upgrade',
-      description: 'RAM and SSD upgrade',
-      date: 'November 20, 2025',
-      time: '3:00 PM',
-      status: 'completed' as const,
-      technician: 'Tech Mike Johnson',
-      technicianPhone: '+63 919 345 6789',
-      technicianEmail: 'mike.johnson@ncps.com',
-      address: '789 Pine Rd, Nasugbu, Batangas',
-      notes: 'Completed successfully. System running smoothly.',
-    },
-    {
-      id: '4',
-      service: 'Network Setup',
-      description: 'Router configuration and WiFi optimization',
-      date: 'November 18, 2025',
-      time: '1:00 PM',
-      status: 'completed' as const,
-      technician: 'Tech John Doe',
-      technicianPhone: '+63 919 123 4567',
-      technicianEmail: 'john.doe@ncps.com',
-      address: '123 Main St, Nasugbu, Batangas',
-      notes: 'All devices connected successfully.',
-    },
-    {
-      id: '5',
-      service: 'Virus Removal',
-      description: 'Full system scan and malware removal',
-      date: 'November 25, 2025',
-      time: '9:00 AM',
-      status: 'pending' as const,
-      technician: 'Pending assignment',
-      technicianPhone: '',
-      technicianEmail: '',
-      address: '123 Main St, Nasugbu, Batangas',
-      notes: 'Awaiting confirmation.',
-    },
-  ];
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('http://localhost:5000/api/customer/appointments', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        const formattedAppointments = data.map((appt: any) => ({
+          id: appt.appointment_id.toString(),
+          service: appt.service_name,
+          description: appt.customer_notes || 'No description provided',
+          date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+          time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+          status: appt.status.toLowerCase().replace(' ', '_'),
+          technician: appt.tech_first_name ? `Tech ${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
+          technicianPhone: '', // TODO
+          technicianEmail: '', // TODO
+          address: '123 Main St, Nasugbu, Batangas', // TODO
+          notes: appt.customer_notes,
+        }));
+
+        setAppointments(formattedAppointments);
+      } catch (error) {
+        console.error('Error fetching appointments:', error);
+        toast.error('Failed to load appointments');
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
+  const handleCancelAppointment = async (reason: string) => {
+    if (!selectedAppointment) return;
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/appointments/${selectedAppointment.id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ status: 'Cancelled', reason })
+      });
+
+      if (!response.ok) throw new Error('Failed to cancel appointment');
+
+      setAppointments(appointments.map(apt => 
+        apt.id === selectedAppointment.id ? { ...apt, status: 'cancelled' } : apt
+      ));
+      
+      toast.success('Appointment cancelled successfully');
+      setIsCancelDialogOpen(false);
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      toast.error('Failed to cancel appointment');
+    }
+  };
 
   const filteredAppointments = appointments.filter((apt) => {
     const matchesTab = activeTab === 'all' || apt.status === activeTab;
@@ -222,6 +218,7 @@ export function CustomerAppointments() {
         open={isCancelDialogOpen}
         onOpenChange={setIsCancelDialogOpen}
         appointment={selectedAppointment}
+        onConfirm={handleCancelAppointment}
       />
 
       <RateTechnicianDialog

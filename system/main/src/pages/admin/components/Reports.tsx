@@ -1,5 +1,5 @@
 import { PageHeader } from "./PageHeader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -33,123 +33,103 @@ import {
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Mock Data
-const appointmentSummaryData = {
-  total: 245,
-  completed: 178,
-  pending: 42,
-  confirmed: 15,
-  cancelled: 8,
-  noShow: 2,
-};
 
-const monthlyAppointments = [
-  { month: "Jan", appointments: 18, completed: 15, cancelled: 3 },
-  { month: "Feb", appointments: 22, completed: 19, cancelled: 3 },
-  { month: "Mar", appointments: 25, completed: 22, cancelled: 3 },
-  { month: "Apr", appointments: 20, completed: 18, cancelled: 2 },
-  { month: "May", appointments: 28, completed: 24, cancelled: 4 },
-  { month: "Jun", appointments: 32, completed: 28, cancelled: 4 },
-  { month: "Jul", appointments: 30, completed: 26, cancelled: 4 },
-  { month: "Aug", appointments: 35, completed: 31, cancelled: 4 },
-  { month: "Sep", appointments: 28, completed: 25, cancelled: 3 },
-  { month: "Oct", appointments: 25, completed: 22, cancelled: 3 },
-];
 
-const servicePerformanceData = [
-  { name: "CCTV Installation", requests: 85, revenue: 127500, rating: 4.8 },
-  { name: "Computer Repair", requests: 120, revenue: 60000, rating: 4.7 },
-  { name: "Network Setup", requests: 45, revenue: 67500, rating: 4.9 },
-  { name: "Software Support", requests: 65, revenue: 32500, rating: 4.6 },
-  { name: "Printer Repair", requests: 30, revenue: 15000, rating: 4.5 },
-];
 
-const staffPerformanceData = [
-  {
-    name: "Carlos Mendez",
-    role: "Technician",
-    totalHandled: 48,
-    confirmed: 45,
-    rating: 4.8,
-    efficiency: 94,
-  },
-  {
-    name: "Maria Santos",
-    role: "Technician",
-    totalHandled: 52,
-    confirmed: 49,
-    rating: 4.9,
-    efficiency: 96,
-  },
-  {
-    name: "Juan Dela Cruz",
-    role: "Technician",
-    totalHandled: 35,
-    confirmed: 32,
-    rating: 4.5,
-    efficiency: 91,
-  },
-  {
-    name: "Ana Reyes",
-    role: "Technician",
-    totalHandled: 62,
-    confirmed: 58,
-    rating: 4.7,
-    efficiency: 93,
-  },
-];
 
-const revenueData = {
-  totalRevenue: 302500,
-  avgPerAppointment: 1234,
-  totalPaid: 285000,
-  totalUnpaid: 17500,
-};
 
-const monthlyRevenue = [
-  { month: "Jan", paid: 25000, unpaid: 2000 },
-  { month: "Feb", paid: 28000, unpaid: 1500 },
-  { month: "Mar", paid: 32000, unpaid: 2500 },
-  { month: "Apr", paid: 29000, unpaid: 1000 },
-  { month: "May", paid: 35000, unpaid: 3000 },
-  { month: "Jun", paid: 42000, unpaid: 2000 },
-  { month: "Jul", paid: 38000, unpaid: 1500 },
-  { month: "Aug", paid: 45000, unpaid: 2500 },
-  { month: "Sep", paid: 36000, unpaid: 1000 },
-  { month: "Oct", paid: 32000, unpaid: 500 },
-];
 
-const peakHoursData = [
-  { hour: "8 AM", bookings: 12 },
-  { hour: "9 AM", bookings: 25 },
-  { hour: "10 AM", bookings: 35 },
-  { hour: "11 AM", bookings: 28 },
-  { hour: "1 PM", bookings: 30 },
-  { hour: "2 PM", bookings: 32 },
-  { hour: "3 PM", bookings: 25 },
-  { hour: "4 PM", bookings: 18 },
-  { hour: "5 PM", bookings: 10 },
-];
 
-const peakDaysData = [
-  { day: "Mon", bookings: 45 },
-  { day: "Tue", bookings: 38 },
-  { day: "Wed", bookings: 42 },
-  { day: "Thu", bookings: 40 },
-  { day: "Fri", bookings: 55 },
-  { day: "Sat", bookings: 65 },
-  { day: "Sun", bookings: 25 },
-];
 
-const cancellationReasons = [
-  { reason: "Client Reschedule", count: 15, color: "#5B8FFF" },
-  { reason: "Technician Unavailable", count: 8, color: "#FFB366" },
-  { reason: "Service Not Needed", count: 5, color: "#5DD37C" },
-  { reason: "Price Issue", count: 3, color: "#FF6B6B" },
-  { reason: "Other", count: 2, color: "#A0A0A0" },
-];
+
+
+
+
+
+
+
+
+
 
 export function Reports() {
+  const [summary, setSummary] = useState<any>({
+    total: 0,
+    completed: 0,
+    pending: 0,
+    confirmed: 0,
+    cancelled: 0,
+    noShow: 0,
+  });
+  const [monthlyData, setMonthlyData] = useState<any[]>([]);
+  const [serviceData, setServiceData] = useState<any[]>([]);
+  const [staffData, setStaffData] = useState<any[]>([]);
+  const [peakHours, setPeakHours] = useState<any[]>([]);
+  const [peakDays, setPeakDays] = useState<any[]>([]);
+  const [cancellationReasonsData, setCancellationReasonsData] = useState<any[]>([]);
+  const [revenueStats, setRevenueStats] = useState<any>({
+    totalRevenue: 0,
+    avgPerAppointment: 0,
+    totalPaid: 0,
+    totalUnpaid: 0
+  });
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('http://localhost:5000/api/admin/reports', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        if (data.summary) setSummary(data.summary);
+        if (data.monthly) setMonthlyData(data.monthly);
+        if (data.services) setServiceData(data.services);
+        if (data.staff) {
+          setStaffData(data.staff.map((s: any) => ({
+            name: `${s.first_name} ${s.last_name}`,
+            role: "Technician",
+            totalHandled: s.totalHandled,
+            confirmed: s.totalHandled,
+            rating: parseFloat(s.rating) || 0,
+            efficiency: 95
+          })));
+        }
+        if (data.peakHours) setPeakHours(data.peakHours);
+        if (data.peakDays) setPeakDays(data.peakDays);
+        if (data.cancellationReasons) {
+            const colors = ["#5B8FFF", "#FFB366", "#5DD37C", "#FF6B6B", "#A0A0A0"];
+            setCancellationReasonsData(data.cancellationReasons.map((r: any, index: number) => ({
+                reason: r.reason,
+                count: r.count,
+                color: colors[index % colors.length]
+            })));
+        }
+        if (data.revenueStats) setRevenueStats(data.revenueStats);
+
+      } catch (error) {
+        console.error('Error fetching reports:', error);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  const appointmentSummaryData = summary;
+  const monthlyAppointments = monthlyData;
+  const servicePerformanceData = serviceData;
+  const staffPerformanceData = staffData;
+  const monthlyRevenue = monthlyData.map(m => ({
+      month: m.month,
+      paid: m.revenue || 0,
+      unpaid: 0
+  }));
+  const peakHoursData = peakHours;
+  const peakDaysData = peakDays;
+  const cancellationReasons = cancellationReasonsData;
+  const revenueData = revenueStats;
   return (
     <div className="space-y-6 animate-fade-in">
       <PageHeader 
@@ -475,7 +455,7 @@ export function Reports() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ reason, percent }) =>
+                    label={({ reason, percent }: any) =>
                       `${reason}: ${(percent * 100).toFixed(0)}%`
                     }
                     outerRadius={80}

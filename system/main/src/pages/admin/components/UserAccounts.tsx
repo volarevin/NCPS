@@ -1,5 +1,5 @@
 import { PageHeader } from "./PageHeader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UserCard } from "./UserCard";
 import { UserDetailsDialog } from "./UserDetailsDialog";
 import { Search, Users, Shield, UserPlus, UserCheck, Activity } from "lucide-react";
@@ -18,77 +18,59 @@ interface UserData {
   username: string;
   email: string;
   phone: string;
-  role: "customer" | "staff" | "technician";
+  role: "customer" | "staff" | "technician" | "admin";
   avatar?: string;
   joinedDate: string;
   activityLogs: ActivityLog[];
 }
 
-const initialUsers: UserData[] = [
-  {
-    id: "1",
-    fullName: "Maria Santos",
-    username: "maria.santos",
-    email: "maria.santos@email.com",
-    phone: "+63 912 345 6789",
-    role: "customer",
-    joinedDate: "Jan 15, 2024",
-    activityLogs: [
-      {
-        id: "1",
-        action: "Service Booking",
-        timestamp: "Nov 21, 2025 - 10:30 AM",
-        details: "Booked CCTV Installation service for Nov 25, 2025",
-      },
-      {
-        id: "2",
-        action: "Profile Update",
-        timestamp: "Nov 20, 2025 - 3:15 PM",
-        details: "Updated phone number",
-      },
-      {
-        id: "3",
-        action: "Account Created",
-        timestamp: "Jan 15, 2024 - 9:00 AM",
-        details: "Registered new account",
-      },
-    ],
-  },
-  {
-    id: "2",
-    fullName: "Juan Dela Cruz",
-    username: "juan.dc",
-    email: "juan.dc@email.com",
-    phone: "+63 923 456 7890",
-    role: "technician",
-    joinedDate: "Feb 10, 2024",
-    activityLogs: [
-      {
-        id: "1",
-        action: "Job Completed",
-        timestamp: "Nov 21, 2025 - 2:00 PM",
-        details: "Completed repair for Ticket #1234",
-      },
-    ],
-  },
-  {
-    id: "3",
-    fullName: "Admin Staff",
-    username: "admin.staff",
-    email: "admin@ncps.com",
-    phone: "+63 934 567 8901",
-    role: "staff",
-    joinedDate: "Jan 1, 2024",
-    activityLogs: [],
-  },
-];
-
 export function UserAccounts() {
-  const [users, setUsers] = useState<UserData[]>(initialUsers);
+  const [users, setUsers] = useState<UserData[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
+        const response = await fetch('http://localhost:5000/api/admin/users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+
+        const formatted = data.map((user: any) => {
+          let role = "customer";
+          const dbRole = user.role.toLowerCase();
+          
+          if (dbRole === "technician") role = "technician";
+          else if (dbRole === "admin") role = "admin";
+          else if (dbRole === "receptionist") role = "staff";
+          else if (dbRole === "customer") role = "customer";
+
+          return {
+            id: user.user_id.toString(),
+            fullName: `${user.first_name} ${user.last_name}`,
+            username: user.username,
+            email: user.email,
+            phone: user.phone_number,
+            role: role,
+            joinedDate: new Date(user.created_at).toLocaleDateString(),
+            activityLogs: [], // Fetched on demand
+          };
+        });
+
+        setUsers(formatted);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
@@ -99,9 +81,29 @@ export function UserAccounts() {
     return matchesSearch && matchesRole;
   });
 
-  const handleViewDetails = (user: UserData) => {
+  const handleViewDetails = async (user: UserData) => {
     setSelectedUser(user);
     setIsDetailsOpen(true);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      const response = await fetch(`http://localhost:5000/api/admin/users/${user.id}/logs`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const logs = await response.json();
+      
+      const formattedLogs = logs.map((log: any) => ({
+          id: log.log_id.toString(),
+          action: log.action_type,
+          timestamp: new Date(log.created_at).toLocaleString(),
+          details: log.description
+      }));
+      
+      setSelectedUser({ ...user, activityLogs: formattedLogs });
+    } catch (error) {
+        console.error("Error fetching logs", error);
+    }
   };
 
   const stats = [
@@ -176,7 +178,7 @@ export function UserAccounts() {
           />
         </div>
         <div className="flex items-center gap-2">
-          {["all", "customer", "technician", "staff"].map((role) => (
+          {["all", "customer", "technician", "staff", "admin"].map((role) => (
             <button
               key={role}
               onClick={() => setRoleFilter(role)}
@@ -207,12 +209,12 @@ export function UserAccounts() {
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
         user={selectedUser}
-        onSave={(updatedUser) => {
-            setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u));
-            setIsDetailsOpen(false);
+        onSave={(updatedUser: UserData) => {
+          setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+          setIsDetailsOpen(false);
         }}
-        onPromote={(id) => console.log("Promote", id)}
-        onDemote={(id) => console.log("Demote", id)}
+        onPromote={(id: string) => console.log("Promote", id)}
+        onDemote={(id: string) => console.log("Demote", id)}
       />
     </div>
   );
