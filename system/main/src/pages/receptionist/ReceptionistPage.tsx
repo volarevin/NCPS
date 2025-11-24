@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { AppointmentSchedule, Appointment } from './components/AppointmentSchedule';
 import { Dashboard } from './components/Dashboard';
@@ -10,6 +10,10 @@ export default function ReceptionistPage() {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+
+  useEffect(() => {
+    document.title = "Receptionist Dashboard";
+  }, []);
 
   const handleLogout = () => {
     // Handle logout logic here

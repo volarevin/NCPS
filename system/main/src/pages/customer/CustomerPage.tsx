@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CustomerSidebar } from './components/CustomerSidebar';
 import { CustomerDashboard } from './components/CustomerDashboard';
 import { CustomerAppointments } from './components/CustomerAppointments';
@@ -11,6 +11,10 @@ export type Page = 'dashboard' | 'appointments' | 'profile';
 export default function CustomerPage() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "Customer Dashboard";
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">

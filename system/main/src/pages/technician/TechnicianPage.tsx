@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { TechnicianSidebar } from "./components/TechnicianSidebar";
@@ -26,6 +26,10 @@ export default function TechnicianPage() {
   const [activeTab, setActiveTab] = useState<"dashboard" | "appointments" | "profile" | "ratings">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+
+  useEffect(() => {
+    document.title = "Technician Dashboard";
+  }, []);
 
   // Mock technician data
   const [technicianProfile, setTechnicianProfile] = useState({

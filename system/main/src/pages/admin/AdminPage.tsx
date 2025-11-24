@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { Dashboard } from "./components/Dashboard";
 import { Appointments } from "./components/Appointments";
@@ -11,6 +11,10 @@ import { MobileHeader } from "./components/MobileHeader";
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("Dashboard");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.title = "Admin Dashboard";
+  }, []);
 
   const renderContent = () => {
     switch (activeTab) {
