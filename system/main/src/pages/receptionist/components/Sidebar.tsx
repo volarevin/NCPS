@@ -31,16 +31,15 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
       >
         {/* Header with Logo */}
         <div className="p-6 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center bg-[#4DBDCC] shadow-lg">
+          <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 border-[#0B4F6C] flex items-center justify-center overflow-hidden bg-[#4DBDCC] p-2">
             <img 
               src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=042D62"
               alt="NCPS Logo"
-              className="w-8 h-8"
+              className="w-10 h-10 lg:w-14 lg:h-14"
             />
           </div>
           <div className="flex-1">
-            <div className="font-bold text-lg">NCPS</div>
-            <div className="text-xs text-[#B5D9D9]">Receptionist Portal</div>
+            <div className="font-bold text-xl lg:text-2xl">NCPS</div>
           </div>
           
           {/* Mobile Close Button */}
@@ -53,35 +52,35 @@ export function Sidebar({ currentPage, onNavigate, onLogout, mobileMenuOpen, set
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-4 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
           {menuItems.map((item) => {
             const Icon = item.icon;
+            const isActive = currentPage === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => handleNavigation(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-1 transition-all duration-200 ${
-                  currentPage === item.id
-                    ? 'bg-[#145A75] text-white'
-                    : 'text-[#B5D9D9] hover:bg-[#145A75]/30 hover:text-white'
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                  isActive
+                    ? 'bg-white/20 font-medium shadow-sm'
+                    : 'hover:bg-white/10 hover:translate-x-1'
                 }`}
               >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{item.label}</span>
+                <Icon className={`w-5 h-5 ${isActive ? "text-[#4DBDCC]" : "text-gray-300"}`} />
+                <span>{item.label}</span>
               </button>
             );
           })}
         </nav>
 
         {/* Logout Button */}
-        <div className="p-4">
+        <div className="p-4 border-t border-white/10">
           <Button
             onClick={onLogout}
-            variant="outline"
-            className="w-full bg-transparent border-[#B5D9D9] text-[#B5D9D9] hover:bg-[#B5D9D9] hover:text-[#0B4F6C] transition-all duration-200 flex items-center justify-center gap-2"
+            className="w-full bg-[#4DBDCC] text-[#0B4F6C] py-3 rounded-lg hover:bg-[#3FA9BC] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
           >
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm">Log Out</span>
+            <LogOut className="w-5 h-5" />
+            <span>Log out</span>
           </Button>
         </div>
       </div>

@@ -24,7 +24,7 @@ export default function ReceptionistPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-[#B5D9D9] to-[#9BC7C7] overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage}

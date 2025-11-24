@@ -22,35 +22,33 @@ export function CustomerSidebar({ currentPage, onNavigate }: CustomerSidebarProp
   return (
     <div className="w-64 bg-[#0B4F6C] text-white flex flex-col shadow-xl h-screen">
       {/* Logo Section */}
-      <div className="p-6 flex items-center gap-3 border-b border-[#145A75]">
-        <div className="w-16 h-16 rounded-full border-2 border-[#0B4F6C] flex items-center justify-center overflow-hidden bg-[#4DBDCC] p-2 shadow-lg transition-transform hover:scale-110 duration-300">
+      <div className="p-6 flex items-center gap-3">
+        <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 border-[#0B4F6C] flex items-center justify-center overflow-hidden bg-[#4DBDCC] p-2">
           <img 
             src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=042D62"
             alt="Security Camera"
-            className="w-14 h-14"
+            className="w-10 h-10 lg:w-14 lg:h-14"
           />
         </div>
-        <div>
-          <span className="text-2xl font-bold">NCPS</span>
-          <p className="text-xs text-[#B5D9D9]">Customer Portal</p>
-        </div>
+        <span className="text-xl lg:text-2xl font-bold">NCPS</span>
       </div>
 
       {/* Menu Items */}
-      <nav className="flex-1 px-4 py-6">
+      <nav className="flex-1 px-4 py-6 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
+          const isActive = currentPage === item.id;
           return (
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-all duration-200 ${
-                currentPage === item.id
-                  ? 'bg-[#145A75] text-white shadow-lg scale-105'
-                  : 'text-[#B5D9D9] hover:bg-[#145A75]/50 hover:text-white hover:translate-x-1'
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                isActive
+                  ? 'bg-white/20 font-medium shadow-sm'
+                  : 'hover:bg-white/10 hover:translate-x-1'
               }`}
             >
-              <Icon className="w-5 h-5" />
+              <Icon className={`w-5 h-5 ${isActive ? "text-[#4DBDCC]" : "text-gray-300"}`} />
               <span>{item.label}</span>
             </button>
           );
@@ -58,14 +56,13 @@ export function CustomerSidebar({ currentPage, onNavigate }: CustomerSidebarProp
       </nav>
 
       {/* Logout Button */}
-      <div className="p-4 border-t border-[#145A75]">
+      <div className="p-4 border-t border-white/10">
         <Button
           onClick={handleLogout}
-          variant="secondary"
-          className="w-full bg-[#B5D9D9] text-[#0B4F6C] hover:bg-white hover:shadow-lg transition-all duration-200"
+          className="w-full bg-[#4DBDCC] text-[#0B4F6C] py-3 rounded-lg hover:bg-[#3FA9BC] hover:text-white transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
         >
-          <LogOut className="w-4 h-4 mr-2" />
-          Log Out
+          <LogOut className="w-5 h-5" />
+          <span>Log out</span>
         </Button>
       </div>
     </div>

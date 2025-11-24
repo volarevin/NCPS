@@ -13,7 +13,7 @@ export default function CustomerPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-[#B8D4D8] overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden">
       {/* Desktop Sidebar - hidden on mobile */}
       <div className="hidden md:block">
         <CustomerSidebar currentPage={currentPage} onNavigate={setCurrentPage} />
