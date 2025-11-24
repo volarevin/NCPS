@@ -6,9 +6,11 @@ import { Services } from "./components/Services";
 import { Technicians } from "./components/Technicians";
 import { UserAccounts } from "./components/UserAccounts";
 import { Reports } from "./components/Reports";
+import { MobileHeader } from "./components/MobileHeader";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("Dashboard");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const renderContent = () => {
     switch (activeTab) {
@@ -30,13 +32,23 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans">
-      <Sidebar currentPage={activeTab} onNavigate={setActiveTab} />
-      <main className="flex-1 overflow-y-auto p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          {renderContent()}
-        </div>
-      </main>
+    <div className="flex h-screen bg-gray-50 font-sans overflow-hidden">
+      <Sidebar 
+        currentPage={activeTab} 
+        onNavigate={setActiveTab} 
+        mobileMenuOpen={mobileMenuOpen}
+        setMobileMenuOpen={setMobileMenuOpen}
+      />
+      
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <MobileHeader onMenuClick={() => setMobileMenuOpen(true)} />
+        
+        <main className={`flex-1 overflow-y-auto p-4 md:p-8 transition-all duration-300 ${mobileMenuOpen ? 'lg:brightness-100 brightness-50' : ''}`}>
+          <div className="max-w-7xl mx-auto">
+            {renderContent()}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
