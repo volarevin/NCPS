@@ -1,6 +1,7 @@
 import { Calendar, Clock, PlayCircle } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
+import { PageHeader } from "./PageHeader";
 
 interface TechnicianDashboardContentProps {
   technicianProfile: any;
@@ -23,10 +24,10 @@ export function TechnicianDashboardContent({
 }: TechnicianDashboardContentProps) {
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
-      <div>
-        <h1 className="text-2xl lg:text-3xl font-bold text-[#0B4F6C]">Welcome back, {technicianProfile.name.split(' ')[0]}!</h1>
-        <p className="text-gray-600 mt-1">Here's your schedule overview for today.</p>
-      </div>
+      <PageHeader 
+        title={`Welcome back, ${technicianProfile.name.split(' ')[0]}!`}
+        description="Here's your schedule overview for today."
+      />
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

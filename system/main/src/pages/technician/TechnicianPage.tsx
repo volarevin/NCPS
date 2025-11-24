@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf, Menu } from "lucide-react";
+import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { TechnicianSidebar } from "./components/TechnicianSidebar";
 import { TechnicianDashboardContent } from "./components/TechnicianDashboardContent";
 import { TechnicianAppointments } from "./components/TechnicianAppointments";
 import { TechnicianProfile } from "./components/TechnicianProfile";
 import AppointmentDetailsModal from "./components/AppointmentDetailsModal";
+import { MobileHeader } from "./components/MobileHeader";
 
 interface Appointment {
   id: string;
@@ -282,26 +283,8 @@ export default function TechnicianPage() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       {/* Mobile Header - Fixed at top */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-[#0B4F6C] text-white shadow-lg">
-        <div className="flex items-center justify-between p-3">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full border-2 border-[#4DBDCC] flex items-center justify-center bg-[#4DBDCC] p-1.5">
-              <img 
-                src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=042D62"
-                alt="NCPS Logo"
-                className="w-full h-full"
-              />
-            </div>
-            <span className="text-xl font-bold">NCPS</span>
-          </div>
-          <div className="w-10"></div> {/* Spacer for balance */}
-        </div>
+      <div className="fixed top-0 left-0 right-0 z-40">
+        <MobileHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       </div>
 
       {/* Sidebar Overlay */}

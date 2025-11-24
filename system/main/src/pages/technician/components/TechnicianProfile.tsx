@@ -3,6 +3,7 @@ import { Edit, Mail, Phone, MapPin, Trash2 } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
+import { PageHeader } from "./PageHeader";
 
 interface TechnicianProfileProps {
   technicianProfile: any;
@@ -23,7 +24,10 @@ export function TechnicianProfile({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
-      <h1 className="text-2xl lg:text-3xl font-bold text-[#0B4F6C]">My Profile</h1>
+      <PageHeader 
+        title="My Profile"
+        description="Manage your personal information and account settings."
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}

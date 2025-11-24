@@ -3,6 +3,7 @@ import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Separator } from "../../../components/ui/separator";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
+import { PageHeader } from "./PageHeader";
 
 interface TechnicianAppointmentsProps {
   appointments: any[];
@@ -19,19 +20,22 @@ export function TechnicianAppointments({
 }: TechnicianAppointmentsProps) {
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl lg:text-3xl font-bold text-[#0B4F6C]">My Appointments</h1>
-        <div className="flex gap-2">
-          <Button variant="outline" className="gap-2 border-[#0B4F6C] text-[#0B4F6C] hover:bg-[#E8F5F4]">
-            <History className="w-4 h-4" />
-            History
-          </Button>
-          <Button className="bg-[#0B4F6C] hover:bg-[#145A75] gap-2 shadow-md hover:shadow-lg transition-all">
-            <Calendar className="w-4 h-4" />
-            Calendar View
-          </Button>
-        </div>
-      </div>
+      <PageHeader 
+        title="My Appointments"
+        description="Manage your assigned service appointments."
+        action={
+          <div className="flex gap-2">
+            <Button variant="outline" className="gap-2 border-[#0B4F6C] text-[#0B4F6C] hover:bg-[#E8F5F4]">
+              <History className="w-4 h-4" />
+              History
+            </Button>
+            <Button className="bg-[#0B4F6C] hover:bg-[#145A75] gap-2 shadow-md hover:shadow-lg transition-all">
+              <Calendar className="w-4 h-4" />
+              Calendar View
+            </Button>
+          </div>
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointment List */}
