@@ -14,6 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
+import { PageHeader } from './PageHeader';
 
 export function CustomerProfile() {
   const [isEditing, setIsEditing] = useState(false);
@@ -54,39 +55,39 @@ export function CustomerProfile() {
   };
 
   return (
-    <div className="p-3 md:p-8">
+    <div className="p-3 md:p-8 animate-fade-in max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 md:mb-8">
-        <div>
-          <h1 className="text-[#1A5560] mb-1 text-xl md:text-3xl">My Account</h1>
-          <p className="text-[#1A5560]/70 text-xs md:text-base">Manage your account information and settings.</p>
-        </div>
-        {!isEditing ? (
-          <Button
-            onClick={() => setIsEditing(true)}
-            className="bg-[#3FA9BC] hover:bg-[#2A6570] transition-colors duration-200 w-full sm:w-auto h-9 text-sm"
-          >
-            Edit Profile
-          </Button>
-        ) : (
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <PageHeader 
+        title="My Account"
+        description="Manage your account information and settings."
+        action={
+          !isEditing ? (
             <Button
-              variant="outline"
-              onClick={() => setIsEditing(false)}
-              className="border-[#1A5560] text-[#1A5560] hover:bg-[#1A5560]/10 h-9 text-sm"
+              onClick={() => setIsEditing(true)}
+              className="bg-[#3FA9BC] hover:bg-[#2A6570] transition-colors duration-200 w-full sm:w-auto h-9 text-sm"
             >
-              Cancel
+              Edit Profile
             </Button>
-            <Button
-              onClick={handleSave}
-              className="bg-[#3FA9BC] hover:bg-[#2A6570] transition-colors duration-200 h-9 text-sm"
-            >
-              <Save className="w-4 h-4 mr-2" />
-              Save Changes
-            </Button>
-          </div>
-        )}
-      </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+                className="border-[#1A5560] text-[#1A5560] hover:bg-[#1A5560]/10 h-9 text-sm"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSave}
+                className="bg-[#3FA9BC] hover:bg-[#2A6570] transition-colors duration-200 h-9 text-sm"
+              >
+                <Save className="w-4 h-4 mr-2" />
+                Save Changes
+              </Button>
+            </div>
+          )
+        }
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
         {/* Profile Information */}

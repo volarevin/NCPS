@@ -8,6 +8,7 @@ import { ViewAppointmentDialog } from './ViewAppointmentDialog';
 import { EditAppointmentDialog } from './EditAppointmentDialog';
 import { CancelAppointmentDialog } from './CancelAppointmentDialog';
 import { RateTechnicianDialog } from './RateTechnicianDialog';
+import { PageHeader } from './PageHeader';
 
 type AppointmentStatus = 'all' | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 
@@ -107,21 +108,21 @@ export function CustomerAppointments() {
   ];
 
   return (
-    <div className="p-3 md:p-8">
+    <div className="p-3 md:p-8 animate-fade-in max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
-        <div>
-          <h1 className="text-[#1A5560] mb-1 text-xl md:text-3xl">My Appointments</h1>
-          <p className="text-[#1A5560]/70 text-xs md:text-base">Manage and track your service requests.</p>
-        </div>
-        <Button 
-          onClick={() => setIsCreateDialogOpen(true)}
-          className="bg-[#3FA9BC] hover:bg-[#2A6570] transition-colors duration-200 shadow-md hover:shadow-lg w-full md:w-auto"
-        >
-          <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-          Book Appointment
-        </Button>
-      </div>
+      <PageHeader 
+        title="My Appointments"
+        description="Manage and track your service requests."
+        action={
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="bg-[#3FA9BC] hover:bg-[#2A6570] transition-colors duration-200 shadow-md hover:shadow-lg w-full md:w-auto"
+          >
+            <Plus className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+            Book Appointment
+          </Button>
+        }
+      />
 
       {/* Filters and Search */}
       <div className="bg-white rounded-xl shadow-sm p-3 md:p-4 mb-4 md:mb-6">

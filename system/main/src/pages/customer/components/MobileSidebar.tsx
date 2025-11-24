@@ -25,16 +25,16 @@ export function MobileSidebar({ currentPage, onNavigate, onClose }: MobileSideba
       {/* Header */}
       <div className="p-4 flex items-center justify-between border-b border-[#145A75]">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full border-2 border-[#0B4F6C] flex items-center justify-center overflow-hidden bg-[#4DBDCC] p-2 shadow-lg">
+          <div className="w-10 h-10 rounded-full border-2 border-[#4DBDCC] flex items-center justify-center bg-[#4DBDCC] p-1.5 shadow-lg">
             <img 
               src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=042D62"
-              alt="Security Camera"
-              className="w-10 h-10"
+              alt="NCPS Logo"
+              className="w-full h-full object-contain"
             />
           </div>
-          <div>
-            <span className="text-xl font-bold">NCPS</span>
-            <p className="text-xs text-[#B5D9D9]">Customer</p>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold tracking-wide">NCPS</span>
+            <span className="text-[10px] font-bold text-[#4DBDCC] tracking-widest">CUSTOMER</span>
           </div>
         </div>
         <button 
@@ -70,11 +70,10 @@ export function MobileSidebar({ currentPage, onNavigate, onClose }: MobileSideba
       <div className="p-4 border-t border-[#145A75] absolute bottom-0 left-0 right-0">
         <Button
           onClick={handleLogout}
-          variant="secondary"
-          className="w-full bg-[#B5D9D9] text-[#0B4F6C] hover:bg-white hover:shadow-lg transition-all duration-200"
+          className="w-full bg-red-500 text-white py-2.5 rounded-lg hover:bg-red-600 transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg"
         >
-          <LogOut className="w-4 h-4 mr-2" />
-          Log Out
+          <LogOut className="w-4 h-4" />
+          <span>Log out</span>
         </Button>
       </div>
     </div>

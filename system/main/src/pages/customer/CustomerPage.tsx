@@ -13,14 +13,14 @@ export default function CustomerPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
       {/* Desktop Sidebar - hidden on mobile */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         <CustomerSidebar currentPage={currentPage} onNavigate={setCurrentPage} />
       </div>
 
       {/* Mobile Header */}
-      <div className="md:hidden">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-40">
         <MobileHeader onMenuClick={() => setIsMobileSidebarOpen(true)} />
       </div>
 
@@ -29,7 +29,7 @@ export default function CustomerPage() {
         <>
           {/* Dimmed Overlay */}
           <div 
-            className="fixed inset-0 bg-[#0B4F6C]/40 z-40 md:hidden"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setIsMobileSidebarOpen(false)}
           />
           {/* Sidebar */}
@@ -44,7 +44,7 @@ export default function CustomerPage() {
         </>
       )}
       
-      <main className="flex-1 overflow-y-auto pt-16 md:pt-0">
+      <main className="flex-1 overflow-y-auto pt-16 lg:pt-0">
         {currentPage === 'dashboard' && <CustomerDashboard />}
         {currentPage === 'appointments' && <CustomerAppointments />}
         {currentPage === 'profile' && <CustomerProfile />}

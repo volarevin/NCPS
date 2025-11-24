@@ -5,6 +5,7 @@ import { AppointmentUpdateCard } from './AppointmentUpdateCard';
 import { useState } from 'react';
 import { ViewAppointmentDialog } from './ViewAppointmentDialog';
 import { EditAppointmentDialog } from './EditAppointmentDialog';
+import { PageHeader } from './PageHeader';
 
 export function CustomerDashboard() {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
@@ -69,12 +70,12 @@ export function CustomerDashboard() {
   ];
 
   return (
-    <div className="p-3 md:p-8">
+    <div className="p-3 md:p-8 animate-fade-in max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="mb-4 md:mb-8">
-        <h1 className="text-[#0B4F6C] mb-1 text-xl md:text-3xl font-bold">Welcome, Maria Santos!</h1>
-        <p className="text-[#0B4F6C]/70 text-xs md:text-base">Here's an overview of your appointments.</p>
-      </div>
+      <PageHeader 
+        title="Welcome, Maria Santos!"
+        description="Here's an overview of your appointments."
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
