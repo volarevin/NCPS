@@ -9,7 +9,7 @@ interface TechnicianDashboardContentProps {
   todayAppointments: any[];
   upcomingAppointments: any[];
   setSelectedAppointment: (apt: any) => void;
-  setActiveTab: (tab: "dashboard" | "appointments" | "profile") => void;
+  setActiveTab: (tab: "dashboard" | "appointments" | "profile" | "ratings") => void;
   getStatusBadge: (status: string) => JSX.Element;
 }
 

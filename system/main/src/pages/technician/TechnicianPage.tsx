@@ -5,6 +5,7 @@ import { TechnicianSidebar } from "./components/TechnicianSidebar";
 import { TechnicianDashboardContent } from "./components/TechnicianDashboardContent";
 import { TechnicianAppointments } from "./components/TechnicianAppointments";
 import { TechnicianProfile } from "./components/TechnicianProfile";
+import { TechnicianRatings } from "./components/TechnicianRatings";
 import AppointmentDetailsModal from "./components/AppointmentDetailsModal";
 import { MobileHeader } from "./components/MobileHeader";
 
@@ -22,7 +23,7 @@ interface Appointment {
 }
 
 export default function TechnicianPage() {
-  const [activeTab, setActiveTab] = useState<"dashboard" | "appointments" | "profile">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "appointments" | "profile" | "ratings">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
@@ -263,6 +264,13 @@ export default function TechnicianPage() {
             setSelectedAppointment={setSelectedAppointment}
             updateAppointmentStatus={updateAppointmentStatus}
             getStatusBadge={getStatusBadge}
+          />
+        );
+      case "ratings":
+        return (
+          <TechnicianRatings
+            ratings={technicianRatings}
+            renderStars={renderStars}
           />
         );
       case "profile":

@@ -2,12 +2,13 @@ import {
   LayoutDashboard, 
   Calendar, 
   User, 
-  LogOut 
+  LogOut,
+  Star
 } from "lucide-react";
 
 interface TechnicianSidebarProps {
   currentPage: string;
-  onNavigate: (page: "dashboard" | "appointments" | "profile") => void;
+  onNavigate: (page: "dashboard" | "appointments" | "profile" | "ratings") => void;
   className?: string;
 }
 
@@ -15,6 +16,7 @@ export function TechnicianSidebar({ currentPage, onNavigate, className = "" }: T
   const menuItems = [
     { id: "dashboard", name: "Dashboard", icon: LayoutDashboard },
     { id: "appointments", name: "Appointments", icon: Calendar },
+    { id: "ratings", name: "Ratings", icon: Star },
     { id: "profile", name: "My Account", icon: User },
   ];
 
@@ -43,7 +45,7 @@ export function TechnicianSidebar({ currentPage, onNavigate, className = "" }: T
           return (
             <button
               key={item.id}
-              onClick={() => onNavigate(item.id as "dashboard" | "appointments" | "profile")}
+              onClick={() => onNavigate(item.id as "dashboard" | "appointments" | "profile" | "ratings")}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 isActive
                   ? "bg-white/20 font-medium shadow-sm"
