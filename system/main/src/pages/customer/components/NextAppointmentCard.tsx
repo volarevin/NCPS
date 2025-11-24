@@ -31,11 +31,11 @@ export function NextAppointmentCard({ appointment, onViewDetails, onReschedule }
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-shadow duration-200 border border-gray-100">
       <div className="flex items-center justify-between mb-3 md:mb-6">
         <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 md:w-5 md:h-5 text-[#1A5560]" />
-          <h2 className="text-[#1A5560] text-base md:text-xl">Next Appointment</h2>
+          <Calendar className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
+          <h2 className="text-[#0B4F6C] font-semibold text-base md:text-xl">Next Appointment</h2>
         </div>
         <span className={`${statusColors[appointment.status]} text-white px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-sm`}>
           {statusLabels[appointment.status]}
@@ -44,10 +44,10 @@ export function NextAppointmentCard({ appointment, onViewDetails, onReschedule }
 
       <div className="space-y-2 md:space-y-4">
         <div>
-          <h3 className="text-[#1A5560] mb-1 text-sm md:text-lg">{appointment.service}</h3>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-[#1A5560]/70 text-xs md:text-sm">
+          <h3 className="text-[#0B4F6C] font-medium mb-1 text-sm md:text-lg">{appointment.service}</h3>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-gray-600 text-xs md:text-sm">
             <div className="flex items-center gap-1">
-              <Calendar className="w-3 h-3 md:w-4 md:h-4" />
+              <Calendar className="w-3 h-3 md:w-4 md:h-4 text-[#4DBDCC]" />
               <span>{appointment.date}</span>
             </div>
             <div className="flex items-center gap-1">

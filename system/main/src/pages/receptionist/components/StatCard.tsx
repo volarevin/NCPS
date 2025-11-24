@@ -25,4 +25,3 @@ export function StatCard({ title, value, icon: Icon, trend, color = "#4DBDCC", c
     </Card>
   );
 }
-

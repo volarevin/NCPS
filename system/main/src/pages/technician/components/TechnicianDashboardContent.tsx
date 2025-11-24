@@ -31,15 +31,15 @@ export function TechnicianDashboardContent({
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => (
-          <Card key={index} className={`${stat.color} border-l-4 shadow-sm hover:shadow-md transition-all duration-200`}>
+          <Card key={index} className={`${stat.color} border-l-4 shadow-sm hover:shadow-md transition-all duration-200 bg-white`}>
             <CardContent className="p-4 lg:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                  <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mt-1">{stat.value}</h3>
+                  <h3 className="text-2xl lg:text-3xl font-bold text-[#0B4F6C] mt-1">{stat.value}</h3>
                   <p className="text-xs text-gray-500 mt-1">{stat.subtitle}</p>
                 </div>
-                <div className={`p-3 rounded-full bg-white/50 ${stat.iconColor}`}>
+                <div className={`p-3 rounded-full bg-gray-50 ${stat.iconColor}`}>
                   {stat.icon}
                 </div>
               </div>

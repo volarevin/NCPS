@@ -1,7 +1,17 @@
-import { useState } from 'react';
-import { Calendar, Clock, CheckCircle, TrendingUp, Users, Activity } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
-import { Badge } from "../../../components/ui/badge";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Calendar, 
+  Clock, 
+  CheckCircle, 
+  Users,
+  Activity,
+  TrendingUp
+} from 'lucide-react';
+import { AddAppointmentDialog } from './AddAppointmentDialog';
+import { AppointmentDetailsDialog } from './AppointmentDetailsDialog';
+import { StatCard } from './StatCard';
 import { Appointment } from './AppointmentSchedule';
 
 // Mock data - In production, this would come from your backend
@@ -73,12 +83,16 @@ const mockAppointments: Appointment[] = [
   },
 ];
 
-interface DashboardProps {
-  onAppointmentClick: (appointment: Appointment) => void;
-}
-
-export function Dashboard({ onAppointmentClick }: DashboardProps) {
+export function Dashboard() {
   const [appointments] = useState<Appointment[]>(mockAppointments);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const onAppointmentClick = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsDetailsOpen(true);
+  };
 
   const stats = {
     total: appointments.length,
@@ -88,14 +102,12 @@ export function Dashboard({ onAppointmentClick }: DashboardProps) {
     completed: appointments.filter(apt => apt.status === 'completed').length,
   };
 
-  // Get today's appointments
-  const today = 'November 22, 2025';
-  const todayAppointments = appointments.filter(apt => apt.date === today);
-
-  // Get upcoming appointments
-  const upcomingAppointments = appointments
-    .filter(apt => apt.status !== 'cancelled' && apt.status !== 'completed')
-    .slice(0, 5);
+  const today = new Date().toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -120,54 +132,42 @@ export function Dashboard({ onAppointmentClick }: DashboardProps) {
     return acc;
   }, {} as Record<string, number>);
 
+  const todayAppointments = appointments.filter(apt => apt.date === 'November 22, 2025'); // Mock date check
+  const upcomingAppointments = appointments.filter(apt => apt.date !== 'November 22, 2025');
+
   return (
     <div className="p-3 sm:p-4 lg:p-6">
       <div className="mb-4">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl text-[#0B4F6C] mb-1">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl text-[#0B4F6C] mb-1 font-bold">Dashboard</h1>
         <p className="text-xs sm:text-sm text-[#145A75]">Welcome to NCPS Receptionist Portal</p>
       </div>
 
       {/* Quick Stats with Icons - Compact */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-3 mb-4">
-        <Card className="border-l-4 border-orange-500 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 sm:p-4">
-            <div className="flex-1">
-              <CardTitle className="text-xs sm:text-sm group-hover:text-orange-600 transition-colors">Pending</CardTitle>
-              <div className="text-2xl sm:text-3xl text-[#0B4F6C] mt-1">{stats.pending}</div>
-            </div>
-            <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 group-hover:scale-110 transition-transform flex-shrink-0" />
-          </CardHeader>
-        </Card>
-
-        <Card className="border-l-4 border-blue-400 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 sm:p-4">
-            <div className="flex-1">
-              <CardTitle className="text-xs sm:text-sm group-hover:text-blue-400 transition-colors">In Progress</CardTitle>
-              <div className="text-2xl sm:text-3xl text-[#0B4F6C] mt-1">{stats['in-progress']}</div>
-            </div>
-            <Activity className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400 group-hover:scale-110 transition-transform animate-pulse flex-shrink-0" />
-          </CardHeader>
-        </Card>
-
-        <Card className="border-l-4 border-blue-600 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 sm:p-4">
-            <div className="flex-1">
-              <CardTitle className="text-xs sm:text-sm group-hover:text-blue-600 transition-colors">Confirmed</CardTitle>
-              <div className="text-2xl sm:text-3xl text-[#0B4F6C] mt-1">{stats.confirmed}</div>
-            </div>
-            <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 group-hover:scale-110 transition-transform flex-shrink-0" />
-          </CardHeader>
-        </Card>
-
-        <Card className="border-l-4 border-green-500 hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 p-3 sm:p-4">
-            <div className="flex-1">
-              <CardTitle className="text-xs sm:text-sm group-hover:text-green-600 transition-colors">Completed</CardTitle>
-              <div className="text-2xl sm:text-3xl text-[#0B4F6C] mt-1">{stats.completed}</div>
-            </div>
-            <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 group-hover:scale-110 transition-transform flex-shrink-0" />
-          </CardHeader>
-        </Card>
+        <StatCard 
+          title="Pending" 
+          value={stats.pending} 
+          icon={Clock} 
+          color="#F97316" 
+        />
+        <StatCard 
+          title="In Progress" 
+          value={stats['in-progress']} 
+          icon={Activity} 
+          color="#3B82F6" 
+        />
+        <StatCard 
+          title="Confirmed" 
+          value={stats.confirmed} 
+          icon={CheckCircle} 
+          color="#2563EB" 
+        />
+        <StatCard 
+          title="Completed" 
+          value={stats.completed} 
+          icon={TrendingUp} 
+          color="#22C55E" 
+        />
       </div>
 
       {/* Widgets Row - More Compact */}
@@ -272,6 +272,21 @@ export function Dashboard({ onAppointmentClick }: DashboardProps) {
           </div>
         </CardContent>
       </Card>
+
+      <AddAppointmentDialog 
+        open={isAddDialogOpen} 
+        onOpenChange={setIsAddDialogOpen}
+        onAddAppointment={(newAppointment) => console.log('Add appointment', newAppointment)}
+      />
+
+      {selectedAppointment && (
+        <AppointmentDetailsDialog
+          open={isDetailsOpen}
+          onOpenChange={setIsDetailsOpen}
+          appointment={selectedAppointment}
+          onUpdateAppointment={(updatedAppointment) => console.log('Update appointment', updatedAppointment)}
+        />
+      )}
     </div>
   );
 }

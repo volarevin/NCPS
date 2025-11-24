@@ -157,7 +157,7 @@ export default function TechnicianPage() {
       value: appointments.length,
       subtitle: "Current appointments",
       icon: <Calendar className="w-5 h-5" />,
-      color: "bg-blue-50 border-blue-200",
+      color: "border-blue-500",
       iconColor: "text-blue-600"
     },
     {
@@ -165,7 +165,7 @@ export default function TechnicianPage() {
       value: appointments.filter(a => a.status === "Pending").length,
       subtitle: "Awaiting action",
       icon: <Clock className="w-5 h-5" />,
-      color: "bg-orange-50 border-orange-200",
+      color: "border-orange-500",
       iconColor: "text-orange-600"
     },
     {
@@ -173,7 +173,7 @@ export default function TechnicianPage() {
       value: appointments.filter(a => a.status === "In Progress").length,
       subtitle: "Currently working",
       icon: <PlayCircle className="w-5 h-5" />,
-      color: "bg-blue-50 border-blue-200",
+      color: "border-blue-600",
       iconColor: "text-blue-600"
     },
     {
@@ -181,7 +181,7 @@ export default function TechnicianPage() {
       value: appointmentHistory.filter(a => a.status === "Completed").length,
       subtitle: "Successfully finished",
       icon: <CheckCircle className="w-5 h-5" />,
-      color: "bg-green-50 border-green-200",
+      color: "border-green-500",
       iconColor: "text-green-600"
     }
   ];

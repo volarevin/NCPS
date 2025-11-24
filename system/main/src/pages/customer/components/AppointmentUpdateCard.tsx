@@ -24,17 +24,17 @@ export function AppointmentUpdateCard({ update }: AppointmentUpdateCardProps) {
   };
 
   return (
-    <div className="border border-gray-200 rounded-lg p-3 hover:border-[#3FA9BC] hover:shadow-sm transition-all duration-200">
+    <div className="border border-gray-200 rounded-lg p-3 hover:border-[#4DBDCC] hover:shadow-sm transition-all duration-200 bg-white">
       <div className="flex items-start justify-between mb-1.5 md:mb-2">
         <div className="flex-1 min-w-0">
-          <h4 className="text-[#1A5560] text-sm md:text-base truncate">{update.service}</h4>
+          <h4 className="text-[#0B4F6C] font-medium text-sm md:text-base truncate">{update.service}</h4>
           <div className="flex flex-wrap items-center gap-2 md:gap-3 mt-1">
-            <div className="flex items-center gap-1 text-[10px] md:text-xs text-[#1A5560]/70">
-              <Calendar className="w-3 h-3" />
+            <div className="flex items-center gap-1 text-[10px] md:text-xs text-gray-500">
+              <Calendar className="w-3 h-3 text-[#4DBDCC]" />
               <span>{update.date}</span>
             </div>
-            <div className="flex items-center gap-1 text-[10px] md:text-xs text-[#1A5560]/70">
-              <Clock className="w-3 h-3" />
+            <div className="flex items-center gap-1 text-[10px] md:text-xs text-gray-500">
+              <Clock className="w-3 h-3 text-[#4DBDCC]" />
               <span>{update.time}</span>
             </div>
           </div>
@@ -43,7 +43,7 @@ export function AppointmentUpdateCard({ update }: AppointmentUpdateCardProps) {
           {statusLabels[update.status]}
         </span>
       </div>
-      <p className="text-xs md:text-sm text-[#1A5560]/60 mt-1.5 md:mt-2">{update.message}</p>
+      <p className="text-xs md:text-sm text-gray-600 mt-1.5 md:mt-2">{update.message}</p>
     </div>
   );
 }
