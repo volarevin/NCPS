@@ -1,115 +1,178 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Calendar, 
   Clock, 
   CheckCircle, 
   Users,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Check,
+  X,
+  Settings,
+  Wrench,
+  Sparkles,
+  Box,
+  Menu
 } from 'lucide-react';
+import { toast } from "sonner";
 import { AddAppointmentDialog } from './AddAppointmentDialog';
 import { AppointmentDetailsDialog } from './AppointmentDetailsDialog';
+import { StatusChangeDialog } from './StatusChangeDialog';
 import { StatCard } from './StatCard';
 import { Appointment } from './AppointmentSchedule';
-
-// Mock data - In production, this would come from your backend
-const mockAppointments: Appointment[] = [
-  {
-    id: '1',
-    clientName: 'Maria Santos',
-    phone: '+63 917 345 6789',
-    email: 'maria.santos@email.com',
-    address: '123 Main St, Quezon City, Metro Manila',
-    service: 'Laptop Repair',
-    date: 'November 22, 2025',
-    time: '10:00 AM',
-    technician: 'Tech John Doe',
-    status: 'pending',
-    notes: "Laptop won't turn on. Client mentioned water damage last week.",
-  },
-  {
-    id: '2',
-    clientName: 'Juan Dela Cruz',
-    phone: '+63 918 234 5678',
-    email: 'juan.delacruz@email.com',
-    address: '456 Rizal Ave, Nasugbu, Batangas',
-    service: 'CCTV Installation',
-    date: 'November 22, 2025',
-    time: '2:00 PM',
-    technician: 'Tech Jane Smith',
-    status: 'in-progress',
-    notes: 'Installation of 4-camera CCTV system for home security.',
-  },
-  {
-    id: '3',
-    clientName: 'Ana Reyes',
-    phone: '+63 919 876 5432',
-    email: 'ana.reyes@email.com',
-    address: '789 Bonifacio St, Lipa City, Batangas',
-    service: 'CCTV Upgrade',
-    date: 'November 23, 2025',
-    time: '9:00 AM',
-    technician: 'Tech Mike Johnson',
-    status: 'confirmed',
-    notes: 'Upgrade existing CCTV system to HD cameras.',
-  },
-  {
-    id: '4',
-    clientName: 'Pedro Garcia',
-    phone: '+63 920 123 4567',
-    email: 'pedro.garcia@email.com',
-    address: '321 Luna St, Taal, Batangas',
-    service: 'LCD Replacement',
-    date: 'November 22, 2025',
-    time: '11:00 AM',
-    technician: 'Tech Sarah Lee',
-    status: 'completed',
-    notes: 'LCD screen replacement for laptop. Completed successfully.',
-  },
-  {
-    id: '5',
-    clientName: 'Rosa Mendoza',
-    phone: '+63 921 987 6543',
-    email: 'rosa.mendoza@email.com',
-    address: '654 Del Pilar St, Nasugbu, Batangas',
-    service: 'CCTV Repair',
-    date: 'November 23, 2025',
-    time: '3:00 PM',
-    technician: 'Tech John Doe',
-    status: 'confirmed',
-    notes: 'Camera 2 not recording. Check wiring and DVR connection.',
-  },
-];
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 import { PageHeader } from './PageHeader';
+
+// Icon map for dynamic rendering
+const iconMap: Record<string, any> = {
+  Settings,
+  Wrench,
+  Sparkles,
+  Box,
+  Menu
+};
 
 interface DashboardProps {
   onAppointmentClick?: (appointment: Appointment) => void;
 }
 
 export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: DashboardProps) {
-  const [appointments] = useState<Appointment[]>(mockAppointments);
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    'in-progress': 0,
+    confirmed: 0,
+    completed: 0,
+  });
+  const [todayAppointments, setTodayAppointments] = useState<Appointment[]>([]);
+  const [pendingAppointments, setPendingAppointments] = useState<Appointment[]>([]);
+  const [serviceSummary, setServiceSummary] = useState<{
+    name: string, 
+    count: number, 
+    icon: string, 
+    color: string,
+    services: { name: string, count: number }[]
+  }[]>([]);
+  
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  
+  const [statusDialog, setStatusDialog] = useState<{
+    open: boolean;
+    type: 'reject' | 'cancel';
+    appointmentId?: string;
+  }>({ open: false, type: 'cancel' });
 
-  const onAppointmentClick = (appointment: Appointment) => {
-    if (propOnAppointmentClick) {
-      propOnAppointmentClick(appointment);
-    } else {
-      setSelectedAppointment(appointment);
-      setIsDetailsOpen(true);
+  const [selectedCategory, setSelectedCategory] = useState<{
+    name: string, 
+    count: number, 
+    icon: string, 
+    color: string,
+    services: { name: string, count: number }[]
+  } | null>(null);
+
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/dashboard-stats', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.stats) setStats(data.stats);
+      if (data.todayAppointments) setTodayAppointments(data.todayAppointments);
+      if (data.pendingAppointments) setPendingAppointments(data.pendingAppointments);
+      if (data.serviceSummary) setServiceSummary(data.serviceSummary);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
     }
   };
 
-  const stats = {
-    total: appointments.length,
-    pending: appointments.filter(apt => apt.status === 'pending').length,
-    'in-progress': appointments.filter(apt => apt.status === 'in-progress').length,
-    confirmed: appointments.filter(apt => apt.status === 'confirmed').length,
-    completed: appointments.filter(apt => apt.status === 'completed').length,
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const onAppointmentClick = (appointment: Appointment) => {
+    // Always open details dialog instead of redirecting
+    setSelectedAppointment(appointment);
+    setIsDetailsOpen(true);
+  };
+
+  const handleStatusUpdate = async (id: string, status: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    
+    if (status === 'rejected') {
+      setStatusDialog({ open: true, type: 'reject', appointmentId: id });
+      return;
+    }
+    
+    if (status === 'cancelled') {
+      setStatusDialog({ open: true, type: 'cancel', appointmentId: id });
+      return;
+    }
+
+    // For quick approve, we now need to open the details dialog to assign a technician
+    if (status === 'confirmed') {
+      const appointment = pendingAppointments.find(a => a.id === id) || todayAppointments.find(a => a.id === id);
+      if (appointment) {
+        setSelectedAppointment(appointment);
+        setIsDetailsOpen(true);
+      }
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ status })
+      });
+      
+      toast.success(`Appointment ${status}`);
+      fetchDashboardData();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleStatusConfirm = async (reason: string, category: string) => {
+    if (!statusDialog.appointmentId) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const status = statusDialog.type === 'reject' ? 'rejected' : 'cancelled';
+      
+      await fetch(`http://localhost:5000/api/receptionist/appointments/${statusDialog.appointmentId}/status`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ status, reason, category })
+      });
+      
+      toast.success(`Appointment ${status}`);
+      setStatusDialog({ ...statusDialog, open: false });
+      fetchDashboardData();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status");
+    }
   };
 
   const today = new Date().toLocaleDateString('en-US', { 
@@ -135,15 +198,6 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         return 'bg-gray-500';
     }
   };
-
-  // Service summary
-  const serviceSummary = appointments.reduce((acc, apt) => {
-    acc[apt.service] = (acc[apt.service] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
-  const todayAppointments = appointments.filter(apt => apt.date === 'November 22, 2025'); // Mock date check
-  const upcomingAppointments = appointments.filter(apt => apt.date !== 'November 22, 2025');
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -208,11 +262,22 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                       <p className="text-xs sm:text-sm text-[#0B4F6C] group-hover:text-[#4DBDCC] transition-colors truncate">{appointment.clientName}</p>
                       <p className="text-xs text-gray-600 truncate">{appointment.service}</p>
                     </div>
-                    <div className="text-right ml-2 flex-shrink-0">
+                    <div className="text-right ml-2 flex-shrink-0 flex flex-col items-end gap-1">
                       <p className="text-xs text-[#0B4F6C]">{appointment.time}</p>
-                      <Badge className={`${getStatusColor(appointment.status)} text-white text-xs mt-1`}>
-                        {appointment.status === 'in-progress' ? 'In Progress' : appointment.status}
-                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Badge className={`${getStatusColor(appointment.status)} text-white text-xs`}>
+                          {appointment.status === 'in-progress' ? 'In Progress' : appointment.status}
+                        </Badge>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-5 w-5 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={(e) => handleStatusUpdate(appointment.id, 'cancelled', e)}
+                          title="Cancel Appointment"
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -221,38 +286,52 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
           </CardContent>
         </Card>
 
-        {/* Upcoming Appointments */}
+        {/* Pending Appointments */}
         <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC]">
           <CardHeader className="p-3 sm:p-4">
             <CardTitle className="text-sm sm:text-base text-[#0B4F6C] flex items-center gap-2">
-              <Users className="h-4 w-4 text-[#4DBDCC]" />
-              Upcoming Appointments
+              <Clock className="h-4 w-4 text-[#F97316]" />
+              Pending Appointments
             </CardTitle>
             <CardDescription className="text-xs">
-              Next scheduled bookings
+              Waiting for approval
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 pt-0">
-            {upcomingAppointments.length === 0 ? (
-              <p className="text-gray-500 text-center py-3 text-xs sm:text-sm">No upcoming appointments</p>
+            {pendingAppointments.length === 0 ? (
+              <p className="text-gray-500 text-center py-3 text-xs sm:text-sm">No pending appointments</p>
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto">
-                {upcomingAppointments.map((appointment) => (
+                {pendingAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
                     onClick={() => onAppointmentClick(appointment)}
-                    className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-[#E5F4F5] to-white rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer group"
+                    className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-[#FFF7ED] to-white rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer group border border-orange-100"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-[#0B4F6C] group-hover:text-[#4DBDCC] transition-colors truncate">{appointment.clientName}</p>
+                      <p className="text-xs sm:text-sm text-[#0B4F6C] font-medium truncate">{appointment.clientName}</p>
                       <p className="text-xs text-gray-600 truncate">{appointment.service}</p>
+                      <p className="text-xs text-gray-500">{appointment.date} • {appointment.time}</p>
                     </div>
-                    <div className="text-right ml-2 flex-shrink-0">
-                      <p className="text-xs text-[#0B4F6C]">{appointment.date}</p>
-                      <p className="text-xs text-gray-600">{appointment.time}</p>
-                      <Badge className={`${getStatusColor(appointment.status)} text-white text-xs mt-1`}>
-                        {appointment.status === 'in-progress' ? 'In Progress' : appointment.status}
-                      </Badge>
+                    <div className="flex items-center gap-1 ml-2">
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-green-600 hover:text-green-700 hover:bg-green-50"
+                        onClick={(e) => handleStatusUpdate(appointment.id, 'confirmed', e)}
+                        title="Approve"
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={(e) => handleStatusUpdate(appointment.id, 'rejected', e)}
+                        title="Reject"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -269,16 +348,35 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
           <CardDescription className="text-xs">Breakdown of services requested</CardDescription>
         </CardHeader>
         <CardContent className="p-3 sm:p-4 pt-0">
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-            {Object.entries(serviceSummary).map(([service, count]) => (
-              <div 
-                key={service} 
-                className="bg-gradient-to-br from-[#E5F4F5] to-white rounded-lg p-3 sm:p-4 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-[#4DBDCC]"
-              >
-                <div className="text-xl sm:text-2xl text-[#0B4F6C] mb-1 group-hover:text-[#4DBDCC] transition-colors">{count}</div>
-                <div className="text-xs text-gray-600 group-hover:text-[#0B4F6C] transition-colors line-clamp-2">{service}</div>
-              </div>
-            ))}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            {serviceSummary
+              .sort((a, b) => {
+                if (a.name === 'Others') return 1;
+                if (b.name === 'Others') return -1;
+                return 0;
+              })
+              .map((category) => {
+              const IconComponent = iconMap[category.icon] || Box;
+              return (
+                <div 
+                  key={category.name} 
+                  onClick={() => setSelectedCategory(category)}
+                  className="bg-white rounded-lg p-3 sm:p-4 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-[#4DBDCC]"
+                  style={{ backgroundColor: `${category.color}15` }} // 10% opacity background
+                >
+                  <div 
+                    className="mx-auto w-10 h-10 rounded-full flex items-center justify-center mb-2 transition-transform group-hover:scale-110"
+                    style={{ backgroundColor: `${category.color}20`, color: category.color }}
+                  >
+                    <IconComponent className="w-5 h-5" />
+                  </div>
+                  <div className="text-xl sm:text-2xl font-bold mb-1" style={{ color: category.color }}>
+                    {category.count}
+                  </div>
+                  <div className="text-xs text-gray-600 font-medium line-clamp-2">{category.name}</div>
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
@@ -286,7 +384,10 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
       <AddAppointmentDialog 
         open={isAddDialogOpen} 
         onOpenChange={setIsAddDialogOpen}
-        onAddAppointment={(newAppointment) => console.log('Add appointment', newAppointment)}
+        onAddAppointment={(newAppointment) => {
+          console.log('Add appointment', newAppointment);
+          fetchDashboardData();
+        }}
       />
 
       {selectedAppointment && (
@@ -294,9 +395,94 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
           open={isDetailsOpen}
           onOpenChange={setIsDetailsOpen}
           appointment={selectedAppointment}
-          onUpdateAppointment={(updatedAppointment) => console.log('Update appointment', updatedAppointment)}
+          onStatusUpdate={async (id, status, technicianId) => {
+            // Handle status update from dialog
+            try {
+                const token = localStorage.getItem('token');
+                const body: any = { status };
+                if (status === 'confirmed' && technicianId) {
+                    body.technicianId = technicianId;
+                }
+                
+                await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(body)
+                });
+                
+                toast.success(`Appointment ${status}`);
+                setIsDetailsOpen(false);
+                fetchDashboardData();
+            } catch (error) {
+                console.error("Error updating status:", error);
+                toast.error("Failed to update status");
+            }
+          }}
+          onUpdateDetails={async (id, date, time, technicianId) => {
+            try {
+              const token = localStorage.getItem('token');
+              await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
+                method: 'PUT',
+                headers: { 
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ date, time, technicianId })
+              });
+              toast.success("Appointment details updated");
+              fetchDashboardData();
+            } catch (error) {
+              console.error("Error updating details:", error);
+              toast.error("Failed to update details");
+            }
+          }}
         />
       )}
+
+      <StatusChangeDialog
+        open={statusDialog.open}
+        onOpenChange={(open) => setStatusDialog({ ...statusDialog, open })}
+        title={statusDialog.type === 'reject' ? "Reject Appointment" : "Cancel Appointment"}
+        description={statusDialog.type === 'reject' 
+          ? "Please provide a reason for rejecting this appointment." 
+          : "Please provide a reason for cancelling this appointment."}
+        actionLabel={statusDialog.type === 'reject' ? "Reject Appointment" : "Cancel Appointment"}
+        onConfirm={handleStatusConfirm}
+        variant="destructive"
+        role="staff"
+      />
+
+      <Dialog open={!!selectedCategory} onOpenChange={(open) => !open && setSelectedCategory(null)}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-[#0B4F6C]">
+              {selectedCategory && (() => {
+                const Icon = iconMap[selectedCategory.icon] || Box;
+                return <Icon className="w-5 h-5" style={{ color: selectedCategory.color }} />;
+              })()}
+              {selectedCategory?.name} Services
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="space-y-3">
+              {selectedCategory?.services.map((service, index) => (
+                <div 
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"
+                >
+                  <span className="font-medium text-gray-700">{service.name}</span>
+                  <Badge variant="secondary" className="bg-white border border-gray-200 text-gray-600">
+                    {service.count} request{service.count !== 1 ? 's' : ''}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

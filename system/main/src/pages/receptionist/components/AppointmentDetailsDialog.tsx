@@ -1,278 +1,412 @@
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Label } from "../../../components/ui/label";
-import { Textarea } from "../../../components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { User, Phone, Mail, MapPin, Wrench, Calendar, Clock, UserCheck, FileText, Save } from 'lucide-react';
-import { Appointment } from './AppointmentSchedule';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, User, Phone, Mail, MapPin, Wrench, Star, AlertCircle, MessageSquare } from "lucide-react";
+
+interface Appointment {
+  id: string;
+  clientName: string;
+  service: string;
+  date: string;
+  time: string;
+  status: string;
+  phone: string;
+  email: string;
+  address: string;
+  notes: string;
+  technician?: string;
+  technician_id?: number;
+  rating?: number;
+  feedback?: string;
+  cancellationReason?: string;
+  cancellationCategory?: string;
+  rejectionReason?: string;
+  cancelledByRole?: string;
+  cancelledById?: string;
+}
 
 interface AppointmentDetailsDialogProps {
-  appointment: Appointment;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onUpdateAppointment: (appointment: Appointment) => void;
+  appointment: Appointment | null;
+  onStatusUpdate: (id: string, status: string, technicianId?: string) => void;
+  onUpdateDetails?: (id: string, date: string, time: string, technicianId: string) => Promise<void>;
+  onCancel?: () => void;
 }
 
 export function AppointmentDetailsDialog({
-  appointment,
   open,
   onOpenChange,
-  onUpdateAppointment,
+  appointment,
+  onStatusUpdate,
+  onUpdateDetails,
+  onCancel
 }: AppointmentDetailsDialogProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedAppointment, setEditedAppointment] = useState<Appointment>(appointment);
+  const [editDate, setEditDate] = useState("");
+  const [editTime, setEditTime] = useState("");
+  const [selectedTechnician, setSelectedTechnician] = useState<string>("");
+  const [technicians, setTechnicians] = useState<any[]>([]);
 
-  const handleSave = () => {
-    onUpdateAppointment(editedAppointment);
-    setIsEditing(false);
-    toast.success('Appointment updated successfully');
+  useEffect(() => {
+    if (appointment) {
+      // Parse date properly
+      const dateObj = new Date(appointment.date);
+      if (!isNaN(dateObj.getTime())) {
+          setEditDate(dateObj.toISOString().split('T')[0]);
+      }
+
+      // Parse time properly (convert 12h to 24h for input)
+      if (appointment.time) {
+          const [timeStr, modifier] = appointment.time.split(' ');
+          let [hours, minutes] = timeStr.split(':');
+          if (hours === '12') {
+              hours = '00';
+          }
+          if (modifier === 'PM') {
+              hours = (parseInt(hours, 10) + 12).toString();
+          }
+          setEditTime(`${hours.padStart(2, '0')}:${minutes}`);
+      }
+
+      setSelectedTechnician(appointment.technician_id?.toString() || "");
+      setIsEditing(false);
+    }
+  }, [appointment]);
+
+  useEffect(() => {
+    if (open) {
+      fetchTechnicians();
+    }
+  }, [open]);
+
+  const fetchTechnicians = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/technicians', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setTechnicians(data);
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (onUpdateDetails && appointment) {
+      await onUpdateDetails(appointment.id, editDate, editTime, selectedTechnician);
+      setIsEditing(false);
+    }
+  };
+
+  if (!appointment) return null;
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "upcoming":
+      case "confirmed":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "cancelled":
+      case "rejected":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "in-progress":
+        return "bg-purple-100 text-purple-800 border-purple-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-[#0B4F6C]">
-            {isEditing ? 'Edit Appointment' : 'Appointment Details'}
-          </DialogTitle>
-          <DialogDescription>
-            {isEditing ? 'Update appointment information' : 'View and manage appointment details'}
-          </DialogDescription>
+          <div className="flex items-center justify-between pr-8">
+            <DialogTitle className="text-xl font-bold text-[#0B4F6C]">
+              Appointment Details
+            </DialogTitle>
+            <Badge className={`${getStatusColor(appointment.status)} text-white`}>
+              {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+            </Badge>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Client Information */}
-          <div className="bg-gradient-to-r from-[#E5F4F5] to-white rounded-lg p-4 hover:shadow-md transition-all">
-            <h3 className="text-[#0B4F6C] mb-4 flex items-center gap-2">
-              <User className="w-5 h-5" />
+        <div className="grid gap-6 py-4">
+          {/* Client Info Section */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <User className="w-4 h-4 text-[#0B4F6C]" />
               Client Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 pl-6">
               <div>
-                <Label htmlFor="clientName" className="text-[#0B4F6C]">Name</Label>
-                {isEditing ? (
-                  <Input
-                    id="clientName"
-                    value={editedAppointment.clientName}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, clientName: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
-                  />
-                ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.clientName}</p>
-                )}
+                <p className="text-sm text-gray-500">Name</p>
+                <p className="font-medium">{appointment.clientName}</p>
               </div>
               <div>
-                <Label htmlFor="phone" className="text-[#0B4F6C] flex items-center gap-1">
-                  <Phone className="w-4 h-4" /> Phone
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="phone"
-                    value={editedAppointment.phone}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, phone: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
-                  />
-                ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.phone}</p>
-                )}
+                <p className="text-sm text-gray-500">Phone</p>
+                <div className="flex items-center gap-2">
+                  <Phone className="w-3 h-3 text-gray-400" />
+                  <p className="font-medium">{appointment.phone}</p>
+                </div>
               </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="email" className="text-[#0B4F6C] flex items-center gap-1">
-                  <Mail className="w-4 h-4" /> Email
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="email"
-                    type="email"
-                    value={editedAppointment.email}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, email: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
-                  />
-                ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.email}</p>
-                )}
+              <div className="col-span-2">
+                <p className="text-sm text-gray-500">Email</p>
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3 h-3 text-gray-400" />
+                  <p className="font-medium">{appointment.email}</p>
+                </div>
               </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="address" className="text-[#0B4F6C] flex items-center gap-1">
-                  <MapPin className="w-4 h-4" /> Address
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="address"
-                    value={editedAppointment.address}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, address: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
-                  />
-                ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.address}</p>
-                )}
+              <div className="col-span-2">
+                <p className="text-sm text-gray-500">Address</p>
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3 h-3 text-gray-400" />
+                  <p className="font-medium">{appointment.address}</p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Service Details */}
-          <div className="bg-gradient-to-r from-[#E5F4F5] to-white rounded-lg p-4 hover:shadow-md transition-all">
-            <h3 className="text-[#0B4F6C] mb-4 flex items-center gap-2">
-              <Wrench className="w-5 h-5" />
+          <div className="border-t border-gray-100" />
+
+          {/* Service Info Section */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-[#0B4F6C]" />
               Service Details
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 pl-6">
               <div>
-                <Label htmlFor="service" className="text-[#0B4F6C]">Service</Label>
-                {isEditing ? (
-                  <Select
-                    value={editedAppointment.service}
-                    onValueChange={(value) => setEditedAppointment({ ...editedAppointment, service: value })}
-                  >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Laptop Repair">Laptop Repair</SelectItem>
-                      <SelectItem value="CCTV Installation">CCTV Installation</SelectItem>
-                      <SelectItem value="CCTV Repair">CCTV Repair</SelectItem>
-                      <SelectItem value="CCTV Upgrade">CCTV Upgrade</SelectItem>
-                      <SelectItem value="LCD Replacement">LCD Replacement</SelectItem>
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.service}</p>
-                )}
+                <p className="text-sm text-gray-500">Service</p>
+                <p className="font-medium">{appointment.service}</p>
               </div>
+              
+              {/* Technician Selection Logic */}
               <div>
-                <Label htmlFor="status" className="text-[#0B4F6C]">Status</Label>
-                {isEditing ? (
-                  <Select
-                    value={editedAppointment.status}
-                    onValueChange={(value: any) => setEditedAppointment({ ...editedAppointment, status: value })}
+                <p className="text-sm text-gray-500">Technician</p>
+                {isEditing || appointment.status === 'pending' ? (
+                  <Select 
+                    value={selectedTechnician} 
+                    onValueChange={setSelectedTechnician}
                   >
-                    <SelectTrigger className="mt-1">
-                      <SelectValue />
+                    <SelectTrigger className="h-8 mt-1">
+                      <SelectValue placeholder="Assign Technician" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="in-progress">In Progress</SelectItem>
-                      <SelectItem value="confirmed">Confirmed</SelectItem>
-                      <SelectItem value="completed">Completed</SelectItem>
-                      <SelectItem value="cancelled">Cancelled</SelectItem>
+                      {technicians.map((tech) => (
+                        <SelectItem key={tech.user_id} value={tech.user_id.toString()}>
+                          {tech.first_name} {tech.last_name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="mt-1 text-gray-700 capitalize p-2 rounded hover:bg-white transition-colors">
-                    {editedAppointment.status === 'in-progress' ? 'In Progress' : editedAppointment.status}
+                  <p className="font-medium text-[#0B4F6C]">
+                    {appointment.technician || "Not Assigned"}
                   </p>
                 )}
               </div>
+
+              {/* Date & Time Logic */}
               <div>
-                <Label htmlFor="date" className="text-[#0B4F6C] flex items-center gap-1">
-                  <Calendar className="w-4 h-4" /> Date
-                </Label>
+                <p className="text-sm text-gray-500">Date</p>
                 {isEditing ? (
-                  <Input
-                    id="date"
-                    value={editedAppointment.date}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, date: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
+                  <Input 
+                    type="date" 
+                    value={editDate} 
+                    onChange={(e) => setEditDate(e.target.value)}
+                    className="h-8 mt-1"
                   />
                 ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.date}</p>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-3 h-3 text-gray-400" />
+                    <p className="font-medium">{appointment.date}</p>
+                  </div>
                 )}
               </div>
               <div>
-                <Label htmlFor="time" className="text-[#0B4F6C] flex items-center gap-1">
-                  <Clock className="w-4 h-4" /> Time
-                </Label>
+                <p className="text-sm text-gray-500">Time</p>
                 {isEditing ? (
-                  <Input
-                    id="time"
-                    value={editedAppointment.time}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, time: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
+                  <Input 
+                    type="time" 
+                    value={editTime} 
+                    onChange={(e) => setEditTime(e.target.value)}
+                    className="h-8 mt-1"
                   />
                 ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.time}</p>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3 h-3 text-gray-400" />
+                    <p className="font-medium">{appointment.time}</p>
+                  </div>
                 )}
               </div>
-              <div className="md:col-span-2">
-                <Label htmlFor="technician" className="text-[#0B4F6C] flex items-center gap-1">
-                  <UserCheck className="w-4 h-4" /> Assigned Technician
-                </Label>
-                {isEditing ? (
-                  <Input
-                    id="technician"
-                    value={editedAppointment.technician}
-                    onChange={(e) => setEditedAppointment({ ...editedAppointment, technician: e.target.value })}
-                    className="mt-1 focus:ring-2 focus:ring-[#4DBDCC] transition-all"
-                  />
-                ) : (
-                  <p className="mt-1 text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.technician}</p>
-                )}
+              
+              <div className="col-span-2">
+                <p className="text-sm text-gray-500">Notes</p>
+                <p className="font-medium text-gray-700 bg-gray-50 p-3 rounded-lg mt-1">
+                  {appointment.notes}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Notes */}
-          <div className="bg-gradient-to-r from-[#E5F4F5] to-white rounded-lg p-4 hover:shadow-md transition-all">
-            <h3 className="text-[#0B4F6C] mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Notes
-            </h3>
-            {isEditing ? (
-              <Textarea
-                value={editedAppointment.notes}
-                onChange={(e) => setEditedAppointment({ ...editedAppointment, notes: e.target.value })}
-                rows={3}
-                className="w-full focus:ring-2 focus:ring-[#4DBDCC] transition-all"
-              />
-            ) : (
-              <p className="text-gray-700 p-2 rounded hover:bg-white transition-colors">{editedAppointment.notes || 'No notes available'}</p>
-            )}
-          </div>
+          {/* Cancellation/Rejection Info */}
+          {(appointment.status === 'cancelled' || appointment.status === 'rejected') && (
+            <>
+              <div className="border-t border-gray-100" />
+              <div className="space-y-4">
+                <h3 className="font-semibold text-red-600 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  {appointment.status === 'cancelled' ? 'Cancellation Details' : 'Rejection Details'}
+                </h3>
+                <div className="pl-6 space-y-3 bg-red-50 p-4 rounded-lg">
+                  {appointment.cancellationCategory && (
+                    <div>
+                      <p className="text-sm text-red-500 mb-1">Reason Category</p>
+                      <p className="font-medium text-gray-800">{appointment.cancellationCategory}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-red-500 mb-1">
+                      {appointment.status === 'cancelled' ? 'Cancellation Reason' : 'Rejection Reason'}
+                    </p>
+                    <p className="font-medium text-gray-800">
+                      {appointment.cancellationReason || appointment.rejectionReason || "No reason provided"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 justify-end pt-4 border-t">
-            {isEditing ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsEditing(false);
-                    setEditedAppointment(appointment);
-                  }}
-                  className="hover:bg-gray-100 transition-all"
+          {/* Completed Appointment Details */}
+          {appointment.status === 'completed' && (appointment.rating || appointment.feedback) && (
+            <>
+              <div className="border-t border-gray-100" />
+              <div className="space-y-4">
+                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-[#0B4F6C]" />
+                  Feedback & Rating
+                </h3>
+                <div className="pl-6 space-y-3">
+                  {appointment.rating && (
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Rating</p>
+                      <div className="flex gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-4 h-4 ${
+                              star <= appointment.rating!
+                                ? "fill-yellow-400 text-yellow-400"
+                                : "text-gray-300"
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {appointment.feedback && (
+                    <div>
+                      <p className="text-sm text-gray-500 mb-1">Customer Feedback</p>
+                      <div className="flex gap-2 items-start bg-gray-50 p-3 rounded-lg">
+                        <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
+                        <p className="text-gray-700 italic text-sm">"{appointment.feedback}"</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        <DialogFooter className="flex justify-end gap-2 pt-4 border-t">
+          {isEditing ? (
+            <>
+              <Button variant="outline" onClick={() => setIsEditing(false)}>
+                Cancel Edit
+              </Button>
+              <Button 
+                className="bg-[#0B4F6C] hover:bg-[#012A4A]"
+                onClick={handleSaveChanges}
+              >
+                Save Changes
+              </Button>
+            </>
+          ) : (
+            <>
+              {appointment.status === 'pending' && (
+                <>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => onCancel?.()}
+                  >
+                    Reject
+                  </Button>
+                  <Button 
+                    className="bg-[#0B4F6C] hover:bg-[#012A4A]"
+                    onClick={() => onStatusUpdate(appointment.id, 'confirmed', selectedTechnician)}
+                    disabled={!selectedTechnician}
+                  >
+                    Approve
+                  </Button>
+                </>
+              )}
+
+              {(appointment.status === 'confirmed' || appointment.status === 'upcoming') && (
+                <>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => onCancel?.()}
+                  >
+                    Cancel Appointment
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit Details
+                  </Button>
+                </>
+              )}
+
+              {appointment.status === 'in-progress' && (
+                <Button 
+                  className="bg-green-600 hover:bg-green-700"
+                  onClick={() => onStatusUpdate(appointment.id, 'completed')}
                 >
-                  Cancel
+                  Mark as Completed
                 </Button>
-                <Button
-                  onClick={handleSave}
-                  className="bg-[#0B4F6C] hover:bg-[#145A75] hover:scale-105 transition-all duration-200"
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Changes
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => onOpenChange(false)}
-                  className="hover:bg-gray-100 transition-all"
-                >
+              )}
+              
+              {(appointment.status === 'completed' || appointment.status === 'cancelled' || appointment.status === 'rejected') && (
+                <Button variant="outline" onClick={() => onOpenChange(false)}>
                   Close
                 </Button>
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-[#4DBDCC] hover:bg-[#3AACBB] hover:scale-105 transition-all duration-200"
-                >
-                  Edit Details
-                </Button>
-              </>
-            )}
-          </div>
-        </div>
+              )}
+            </>
+          )}
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

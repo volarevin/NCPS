@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
@@ -14,6 +14,18 @@ interface AddAppointmentDialogProps {
   onAddAppointment: (appointment: Appointment) => void;
 }
 
+interface Service {
+  service_id: number;
+  name: string;
+  category_name?: string;
+}
+
+interface Technician {
+  user_id: number;
+  first_name: string;
+  last_name: string;
+}
+
 export function AddAppointmentDialog({
   open,
   onOpenChange,
@@ -24,53 +36,94 @@ export function AddAppointmentDialog({
     phone: '',
     email: '',
     address: '',
-    service: '',
+    serviceId: '',
     date: '',
     time: '',
-    technician: '',
+    technicianId: '',
     notes: '',
   });
+  const [services, setServices] = useState<Service[]>([]);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (open) {
+      fetchServices();
+      fetchTechnicians();
+    }
+  }, [open]);
+
+  const fetchServices = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/services', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setServices(data);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    }
+  };
+
+  const fetchTechnicians = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/technicians', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setTechnicians(data);
+    } catch (error) {
+      console.error('Error fetching technicians:', error);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validation
-    if (!formData.clientName || !formData.phone || !formData.service || !formData.date || !formData.time) {
+    if (!formData.clientName || !formData.phone || !formData.serviceId || !formData.date || !formData.time) {
       toast.error('Please fill in all required fields');
       return;
     }
 
-    const newAppointment: Appointment = {
-      id: Date.now().toString(),
-      clientName: formData.clientName,
-      phone: formData.phone,
-      email: formData.email,
-      address: formData.address,
-      service: formData.service,
-      date: formData.date,
-      time: formData.time,
-      technician: formData.technician || 'Unassigned',
-      status: 'pending',
-      notes: formData.notes,
-    };
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/appointments', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(formData)
+      });
 
-    onAddAppointment(newAppointment);
-    toast.success('Walk-in appointment added successfully');
-    
-    // Reset form
-    setFormData({
-      clientName: '',
-      phone: '',
-      email: '',
-      address: '',
-      service: '',
-      date: '',
-      time: '',
-      technician: '',
-      notes: '',
-    });
-    
-    onOpenChange(false);
+      if (response.ok) {
+        toast.success('Walk-in appointment added successfully');
+        onAddAppointment({} as any); // Trigger refresh in parent
+        
+        // Reset form
+        setFormData({
+          clientName: '',
+          phone: '',
+          email: '',
+          address: '',
+          serviceId: '',
+          date: '',
+          time: '',
+          technicianId: '',
+          notes: '',
+        });
+        
+        onOpenChange(false);
+      } else {
+        const error = await response.json();
+        toast.error(error.message || 'Failed to add appointment');
+      }
+    } catch (error) {
+      console.error('Error adding appointment:', error);
+      toast.error('Failed to add appointment');
+    }
   };
 
   return (
@@ -147,39 +200,37 @@ export function AddAppointmentDialog({
                   Service <span className="text-red-500">*</span>
                 </Label>
                 <Select
-                  value={formData.service}
-                  onValueChange={(value) => setFormData({ ...formData, service: value })}
+                  value={formData.serviceId}
+                  onValueChange={(value) => setFormData({ ...formData, serviceId: value })}
                   required
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select service" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Laptop Repair">Laptop Repair</SelectItem>
-                    <SelectItem value="CCTV Installation">CCTV Installation</SelectItem>
-                    <SelectItem value="CCTV Repair">CCTV Repair</SelectItem>
-                    <SelectItem value="CCTV Upgrade">CCTV Upgrade</SelectItem>
-                    <SelectItem value="LCD Replacement">LCD Replacement</SelectItem>
-                    <SelectItem value="Desktop Repair">Desktop Repair</SelectItem>
-                    <SelectItem value="Network Setup">Network Setup</SelectItem>
-                    <SelectItem value="Data Recovery">Data Recovery</SelectItem>
+                    {services.map((service) => (
+                      <SelectItem key={service.service_id} value={service.service_id.toString()}>
+                        {service.category_name ? `${service.name} - ${service.category_name}` : service.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
                 <Label htmlFor="technician" className="text-[#0B4F6C]">Assign Technician</Label>
                 <Select
-                  value={formData.technician}
-                  onValueChange={(value) => setFormData({ ...formData, technician: value })}
+                  value={formData.technicianId}
+                  onValueChange={(value) => setFormData({ ...formData, technicianId: value })}
                 >
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="Select technician" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Tech John Doe">Tech John Doe</SelectItem>
-                    <SelectItem value="Tech Jane Smith">Tech Jane Smith</SelectItem>
-                    <SelectItem value="Tech Mike Johnson">Tech Mike Johnson</SelectItem>
-                    <SelectItem value="Tech Sarah Lee">Tech Sarah Lee</SelectItem>
+                    {technicians.map((tech) => (
+                      <SelectItem key={tech.user_id} value={tech.user_id.toString()}>
+                        {tech.first_name} {tech.last_name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

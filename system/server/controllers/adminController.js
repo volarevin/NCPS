@@ -14,9 +14,16 @@ exports.getDashboardStats = (req, res) => {
 };
 
 exports.getAllUsers = (req, res) => {
-  const query = 'SELECT user_id, username, first_name, last_name, email, phone_number, address, role, status, created_at FROM users';
+  const { role } = req.query;
+  let query = 'SELECT user_id, username, first_name, last_name, email, phone_number, address, role, status, created_at FROM users';
+  const params = [];
+
+  if (role) {
+    query += ' WHERE role = ?';
+    params.push(role);
+  }
   
-  db.query(query, (err, results) => {
+  db.query(query, params, (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error fetching users.' });
@@ -31,13 +38,14 @@ exports.getAllAppointments = (req, res) => {
            u.first_name as customer_first_name, u.last_name as customer_last_name,
            u.email as customer_email, u.phone_number as customer_phone,
            t.first_name as tech_first_name, t.last_name as tech_last_name,
-           s.name as service_name,
+           s.name as service_name, sc.name as category_name,
            r.rating, r.feedback_text,
            cb.role as cancelled_by_role, cb.user_id as cancelled_by_id
     FROM appointments a
     JOIN users u ON a.customer_id = u.user_id
     LEFT JOIN users t ON a.technician_id = t.user_id
     JOIN services s ON a.service_id = s.service_id
+    LEFT JOIN service_categories sc ON s.category_id = sc.category_id
     LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
     LEFT JOIN users cb ON a.cancelled_by = cb.user_id
     WHERE a.marked_for_deletion = 0 OR a.marked_for_deletion IS NULL
@@ -160,13 +168,13 @@ exports.getReportsData = (req, res) => {
     `,
     monthly: `
       SELECT 
-          DATE_FORMAT(appointment_date, '%b') as month,
+          DATE_FORMAT(appointment_date, '%b %Y') as month,
           COUNT(*) as appointments,
           SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed,
           SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
           COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as revenue
       FROM appointments
-      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 10 MONTH)
+      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
       GROUP BY YEAR(appointment_date), MONTH(appointment_date)
       ORDER BY YEAR(appointment_date), MONTH(appointment_date)
     `,
@@ -174,21 +182,23 @@ exports.getReportsData = (req, res) => {
       SELECT 
           s.name,
           COUNT(*) as requests,
-          COALESCE(SUM(a.total_cost), 0) as revenue,
+          COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN a.total_cost ELSE 0 END), 0) as revenue,
           COALESCE(AVG(r.rating), 0) as rating
-      FROM appointments a
-      JOIN services s ON a.service_id = s.service_id
+      FROM services s
+      LEFT JOIN appointments a ON s.service_id = a.service_id
       LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
       GROUP BY s.service_id
     `,
     staff: `
       SELECT 
           u.first_name, u.last_name,
-          tp.total_jobs_completed as totalHandled,
-          tp.average_rating as rating
+          COUNT(CASE WHEN a.status = 'Completed' THEN 1 END) as totalHandled,
+          COALESCE(AVG(r.rating), 0) as rating
       FROM users u
-      JOIN technician_profiles tp ON u.user_id = tp.user_id
+      LEFT JOIN appointments a ON u.user_id = a.technician_id
+      LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
       WHERE u.role = 'Technician'
+      GROUP BY u.user_id
     `,
     peakHours: `
       SELECT 
@@ -216,10 +226,9 @@ exports.getReportsData = (req, res) => {
     `,
     revenueStats: `
       SELECT 
-        COALESCE(SUM(total_cost), 0) as totalRevenue,
-        COALESCE(AVG(total_cost), 0) as avgPerAppointment,
-        COALESCE(SUM(CASE WHEN payment_status = 'Paid' THEN total_cost ELSE 0 END), 0) as totalPaid,
-        COALESCE(SUM(CASE WHEN payment_status = 'Unpaid' THEN total_cost ELSE 0 END), 0) as totalUnpaid
+        COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as totalRevenue,
+        COALESCE(AVG(CASE WHEN status = 'Completed' THEN total_cost ELSE NULL END), 0) as avgPerAppointment,
+        COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as totalPaid
       FROM appointments
       WHERE status != 'Cancelled' AND status != 'Rejected'
     `
@@ -505,19 +514,25 @@ exports.getAppointmentDetails = (req, res) => {
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status, reason, category } = req.body;
+  const { status, reason, category, technicianId } = req.body;
   const userId = req.userId || req.body.userId; // Use authenticated user ID
 
-  let query = 'UPDATE appointments SET status = ? WHERE appointment_id = ?';
-  let params = [status, id];
+  let query = 'UPDATE appointments SET status = ?';
+  let params = [status];
 
   if (status === 'Cancelled') {
-    query = 'UPDATE appointments SET status = ?, cancellation_reason = ?, cancellation_category = ?, cancelled_by = ? WHERE appointment_id = ?';
-    params = [status, reason, category, userId, id];
+    query += ', cancellation_reason = ?, cancellation_category = ?, cancelled_by = ?';
+    params.push(reason, category, userId);
   } else if (status === 'Rejected') {
-      query = 'UPDATE appointments SET status = ?, rejection_reason = ?, cancellation_category = ?, cancelled_by = ? WHERE appointment_id = ?';
-      params = [status, reason, category, userId, id];
+      query += ', rejection_reason = ?, cancellation_category = ?, cancelled_by = ?';
+      params.push(reason, category, userId);
+  } else if ((status === 'Confirmed' || status === 'upcoming') && technicianId) {
+      query += ', technician_id = ?';
+      params.push(technicianId);
   }
+
+  query += ' WHERE appointment_id = ?';
+  params.push(id);
 
   db.query(query, params, (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -532,9 +547,22 @@ exports.updateAppointmentStatus = (req, res) => {
   });
 };
 
+exports.updateAppointmentDetails = (req, res) => {
+  const { id } = req.params;
+  const { date, time, technicianId } = req.body;
+  
+  const appointmentDate = `${date} ${time}`;
+  const query = 'UPDATE appointments SET appointment_date = ?, technician_id = ? WHERE appointment_id = ?';
+  
+  db.query(query, [appointmentDate, technicianId || null, id], (err, result) => {
+    if (err) return res.status(500).json({ error: err.message });
+    res.json({ message: 'Appointment details updated successfully' });
+  });
+};
+
 exports.deleteAppointment = (req, res) => {
   const { id } = req.params;
-  const userId = req.user ? req.user.id : null; // Assuming auth middleware adds user to req
+  const userId = req.userId || null; // Assuming auth middleware adds user to req
 
   // Soft delete (Mark for deletion)
   const query = 'UPDATE appointments SET marked_for_deletion = 1, deletion_marked_at = NOW(), deletion_marked_by = ? WHERE appointment_id = ?';
@@ -585,7 +613,7 @@ exports.createAppointment = (req, res) => {
         }
         
         // Log activity
-        const userId = req.user ? req.user.id : null;
+        const userId = req.userId || null;
         const action = 'Create Appointment';
         const desc = `Created appointment #${result.insertId}`;
         if (userId) {
@@ -607,7 +635,7 @@ exports.getRecycleBinCount = (req, res) => {
 
 exports.bulkDeleteAppointments = (req, res) => {
     const { ids } = req.body;
-    const userId = req.user ? req.user.id : null;
+    const userId = req.userId || null;
 
     if (!ids || !Array.isArray(ids) || ids.length === 0) {
         return res.status(400).json({ message: 'No appointment IDs provided' });
@@ -623,7 +651,7 @@ exports.bulkDeleteAppointments = (req, res) => {
 
 exports.getMarkedForDeletion = (req, res) => {
     const query = `
-        SELECT a.*, 
+        SELECT a.appointment_id, a.appointment_date, a.deletion_marked_at, a.marked_for_deletion,
                u.first_name as marked_by_first, u.last_name as marked_by_last,
                c.first_name as customer_first, c.last_name as customer_last,
                s.name as service_name
@@ -631,11 +659,14 @@ exports.getMarkedForDeletion = (req, res) => {
         LEFT JOIN users u ON a.deletion_marked_by = u.user_id
         LEFT JOIN users c ON a.customer_id = c.user_id
         LEFT JOIN services s ON a.service_id = s.service_id
-        WHERE a.marked_for_deletion = TRUE
+        WHERE a.marked_for_deletion = 1
         ORDER BY a.deletion_marked_at DESC
     `;
     db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
+        if (err) {
+            console.error("Error fetching marked for deletion:", err);
+            return res.status(500).json({ error: err.message });
+        }
         res.json(results);
     });
 };

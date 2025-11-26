@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 24, 2025 at 04:38 PM
+-- Generation Time: Nov 26, 2025 at 07:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -493,7 +493,7 @@ INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `s
 (77, 28, 12, 6, '2025-10-02 09:25:25', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (78, 2, 10, 2, '2025-12-11 17:48:42', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
 (79, 26, NULL, 7, '2025-12-24 05:08:34', 'Pending', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(80, 14, 4, 7, '2025-12-23 16:48:52', 'Cancelled', 500.00, NULL, 'sorry bud, there are conflicts in the sched lmao', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 12:56:47', 'Unpaid', NULL, 1, '2025-11-24 20:56:47', NULL),
+(80, 14, 4, 7, '2025-12-23 16:48:52', 'Cancelled', 500.00, NULL, 'sorry bud, there are conflicts in the sched lmao', NULL, 'Scheduling conflict', 0, '2025-11-24 09:18:17', '2025-11-26 06:01:31', 'Unpaid', NULL, 1, '2025-11-24 20:56:47', NULL),
 (81, 32, 11, 6, '2025-11-11 11:46:59', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (82, 19, 11, 4, '2025-10-07 16:16:19', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (83, 17, 8, 8, '2025-07-12 12:08:04', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
@@ -1040,12 +1040,12 @@ CREATE TABLE `technician_profiles` (
 --
 
 INSERT INTO `technician_profiles` (`profile_id`, `user_id`, `specialty`, `bio`, `availability_status`, `total_jobs_completed`, `average_rating`) VALUES
-(1, 4, '', NULL, 'Available', 0, 3.53),
-(2, 8, '', NULL, 'Available', 0, 3.22),
-(3, 9, '', NULL, 'Available', 0, 3.25),
-(4, 10, '', NULL, 'Available', 0, 3.92),
-(5, 11, '', NULL, 'Available', 0, 4.29),
-(6, 12, '', NULL, 'Available', 0, 4.11),
+(1, 4, 'General', NULL, 'Available', 0, 3.53),
+(2, 8, 'System Maintenance', NULL, 'Available', 0, 3.22),
+(3, 9, 'Data Recovery', NULL, 'Available', 0, 3.25),
+(4, 10, 'Network Setup', NULL, 'Available', 0, 3.92),
+(5, 11, 'Consultation', NULL, 'Available', 0, 4.29),
+(6, 12, 'Hardware Repair', NULL, 'Available', 0, 4.11),
 (7, 32, 'Network Setup', NULL, 'Available', 0, 0.00);
 
 -- --------------------------------------------------------
@@ -1077,15 +1077,15 @@ INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, 
 (1, 'sherwin', 'Sherwin', 'Arizobal', 'sherwin@gmail.com', '09634045671', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Admin', 'Active', '2025-10-30 08:32:06', '2025-11-24 09:18:17'),
 (2, 'edrian', 'Edrian', 'Balingbing', 'edrian@gmail.com', '09955824197', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 08:34:33', '2025-11-24 09:18:17'),
 (3, 'ishi', 'Ishi', 'Ganda', 'ishi@gmail.com', '09999999999', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-07 08:35:44', '2025-11-24 09:18:17'),
-(4, 'frank', 'frank', 'ocean', 'blonded@gmail.com', '09783813287', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-01 08:35:44', '2025-11-24 09:18:17'),
+(4, 'frank', 'Frank', 'Ocean', 'blonded@gmail.com', '09783813287', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-01 08:35:44', '2025-11-24 16:19:36'),
 (5, 'lunamarie', 'Luna', 'Marie', 'luna.marie@example.com', '09806367741', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (6, 'sarahconnor', 'Sarah', 'Connor', 'sarah.connor@example.com', '09329465187', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (7, 'pambeesly', 'Pam', 'Beesly', 'pam.beesly@example.com', '09211063703', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(8, 'bobbuilder', 'Bob', 'Builder', 'bobbuilder@example.com', '09532562007', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(9, 'fixit', 'Fix', 'It', 'fixit@example.com', '09802843386', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(10, 'handymanny', 'Handy', 'Manny', 'handymanny@example.com', '09882602529', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(11, 'timtaylor', 'Tim', 'Taylor', 'timtaylor@example.com', '09425547033', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(12, 'alborland', 'Al', 'Borland', 'alborland@example.com', '09911773013', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(8, 'bobbuilder', 'Bob', 'Builder', 'bobbuilder@example.com', '09532562007', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:49'),
+(9, 'fixit', 'Fix', 'It', 'fixit@example.com', '09802843386', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:52'),
+(10, 'handymanny', 'Handy', 'Manny', 'handymanny@example.com', '09882602529', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:56'),
+(11, 'timtaylor', 'Tim', 'Taylor', 'timtaylor@example.com', '09425547033', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:20:04'),
+(12, 'alborland', 'Al', 'Borland', 'alborland@example.com', '09911773013', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:44'),
 (13, 'patriciataylor0', 'Patricia', 'Taylor', 'patriciataylor0@example.com', '09322981200', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (14, 'lindawilliams1', 'Linda', 'Williams', 'lindawilliams1@example.com', '099907278', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (15, 'sarahwilliams2', 'Sarah', 'Williams', 'sarahwilliams2@example.com', '0946698306', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
@@ -1105,7 +1105,7 @@ INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, 
 (29, 'karenjohnson16', 'Karen', 'Johnson', 'karenjohnson16@example.com', '09536186144', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (30, 'richarddavis17', 'Richard', 'Davis', 'richarddavis17@example.com', '09822468053', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (31, 'elizabethmartinez18', 'Elizabeth', 'Martinez', 'elizabethmartinez18@example.com', '09143091841', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(32, 'davidmiller19', 'David', 'Miller', 'davidmiller19@example.com', '09500137252', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 15:32:49');
+(32, 'davidmiller19', 'David', 'Miller', 'davidmiller19@example.com', '09500137252', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:01');
 
 --
 -- Indexes for dumped tables
@@ -1164,7 +1164,7 @@ ALTER TABLE `service_categories`
 --
 ALTER TABLE `technician_profiles`
   ADD PRIMARY KEY (`profile_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD UNIQUE KEY `uq_technician_user_id` (`user_id`);
 
 --
 -- Indexes for table `users`

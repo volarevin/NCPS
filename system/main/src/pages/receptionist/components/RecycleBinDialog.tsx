@@ -7,7 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, RefreshCw, AlertTriangle, X } from "lucide-react";
+import { Trash2, RefreshCw, X } from "lucide-react";
 import { toast } from "sonner";
 
 interface DeletedAppointment {
@@ -27,7 +27,7 @@ interface RecycleBinDialogProps {
 }
 
 export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) {
-  const [deletedItems, setDeletedItems] = useState<any[]>([]);
+  const [deletedItems, setDeletedItems] = useState<DeletedAppointment[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchDeletedItems = async () => {
@@ -36,19 +36,22 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      const response = await fetch('http://localhost:5000/api/admin/appointments/marked-deletion', {
+      const response = await fetch('http://localhost:5000/api/receptionist/appointments/marked-deletion', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (!response.ok) throw new Error('Failed to fetch');
+      
       const data = await response.json();
       if (Array.isArray(data)) {
         setDeletedItems(data);
       } else {
-        console.error("Received non-array data:", data);
         setDeletedItems([]);
       }
     } catch (error) {
       console.error('Error fetching deleted items:', error);
       toast.error('Failed to load recycle bin');
+      setDeletedItems([]);
     } finally {
       setLoading(false);
     }
@@ -65,7 +68,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      await fetch(`http://localhost:5000/api/admin/appointments/${id}/restore`, {
+      await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/restore`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -85,7 +88,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      await fetch(`http://localhost:5000/api/admin/appointments/${id}/permanent`, {
+      await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/permanent`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -105,7 +108,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      await fetch('http://localhost:5000/api/admin/appointments/recycle-bin', {
+      await fetch('http://localhost:5000/api/receptionist/appointments/recycle-bin', {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -132,19 +135,12 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
         </DialogHeader>
 
         <div className="mt-4">
-          {deletedItems.length > 0 && (
-            <div className="flex justify-end mb-4">
-              <Button 
-                variant="destructive" 
-                size="sm" 
-                onClick={handleEmptyBin}
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                Empty Bin
-              </Button>
-            </div>
-          )}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <p className="text-sm text-blue-800 flex items-center gap-2">
+              <RefreshCw className="w-4 h-4" />
+              These appointments are marked for deletion. Admins will review and take action for actual deletion.
+            </p>
+          </div>
 
           <div className="border rounded-lg overflow-hidden">
             <table className="w-full text-sm text-left">
@@ -186,26 +182,15 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
                         </div>
                       </td>
                       <td className="p-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleRestore(item.appointment_id)}
-                            className="h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
-                          >
-                            <RefreshCw className="w-3.5 h-3.5 mr-1" />
-                            Restore
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handlePermanentDelete(item.appointment_id)}
-                            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                          >
-                            <X className="w-3.5 h-3.5 mr-1" />
-                            Delete
-                          </Button>
-                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleRestore(item.appointment_id)}
+                          className="h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                        >
+                          <RefreshCw className="w-3.5 h-3.5 mr-1" />
+                          Restore
+                        </Button>
                       </td>
                     </tr>
                   ))

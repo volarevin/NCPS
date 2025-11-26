@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Appointment {
   id: string;
@@ -42,6 +43,9 @@ interface Appointment {
   rejectionReason?: string;
   cancelledByRole?: string;
   cancelledById?: string;
+  category?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export function Appointments() {
@@ -61,13 +65,31 @@ export function Appointments() {
     appointmentId: string | null;
   }>({ open: false, type: null, appointmentId: null });
 
-  const [sortBy, setSortBy] = useState<"date" | "name">("date");
+  const [sortBy, setSortBy] = useState<"date" | "name" | "created" | "updated">("created");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
     fetchAppointments();
     fetchRecycleBinCount();
-  }, [isRecycleBinOpen]); // Refresh when recycle bin closes
+    fetchCategories();
+  }, [isRecycleBinOpen]);
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/admin/categories', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setCategories(data.map((c: any) => c.name));
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
 
   const fetchRecycleBinCount = async () => {
     try {
@@ -112,7 +134,10 @@ export function Appointments() {
         cancellationCategory: appt.cancellation_category,
         rejectionReason: appt.rejection_reason,
         cancelledByRole: appt.cancelled_by_role,
-        cancelledById: appt.cancelled_by_id
+        cancelledById: appt.cancelled_by_id,
+        category: appt.category_name,
+        createdAt: new Date(appt.created_at),
+        updatedAt: new Date(appt.updated_at)
       }));
 
       setAppointments(formatted);
@@ -136,17 +161,28 @@ export function Appointments() {
         matchesStatus = appointment.status === statusFilter;
     }
 
-    return matchesSearch && matchesStatus;
+    const matchesCategory = categoryFilter === "all" || appointment.category === categoryFilter;
+
+    return matchesSearch && matchesStatus && matchesCategory;
   }).sort((a, b) => {
       if (sortBy === 'date') {
           return sortOrder === 'asc' 
             ? a.rawDate.getTime() - b.rawDate.getTime() 
             : b.rawDate.getTime() - a.rawDate.getTime();
-      } else {
+      } else if (sortBy === 'name') {
           return sortOrder === 'asc'
             ? a.clientName.localeCompare(b.clientName)
             : b.clientName.localeCompare(a.clientName);
+      } else if (sortBy === 'created') {
+          return sortOrder === 'asc'
+            ? (a.createdAt?.getTime() || 0) - (b.createdAt?.getTime() || 0)
+            : (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+      } else if (sortBy === 'updated') {
+          return sortOrder === 'asc'
+            ? (a.updatedAt?.getTime() || 0) - (b.updatedAt?.getTime() || 0)
+            : (b.updatedAt?.getTime() || 0) - (a.updatedAt?.getTime() || 0);
       }
+      return 0;
   });
 
   const getStatusColor = (status: string) => {
@@ -223,7 +259,29 @@ export function Appointments() {
     }
   };
 
-  const handleStatusUpdate = async (id: string, newStatus: Appointment["status"] | 'deleted', reason?: string, category?: string) => {
+  const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      await fetch(`http://localhost:5000/api/admin/appointments/${id}/details`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ date, time, technicianId })
+      });
+
+      toast.success("Appointment details updated successfully");
+      fetchAppointments();
+    } catch (error) {
+      console.error("Error updating details:", error);
+      toast.error("Failed to update appointment details");
+    }
+  };
+
+  const handleStatusUpdate = async (id: string, newStatus: Appointment["status"] | 'deleted', arg3?: string, arg4?: string) => {
     try {
         const token = localStorage.getItem('token');
         if (!token) return;
@@ -243,13 +301,21 @@ export function Appointments() {
         // Map frontend status to backend status (Capitalized)
         const backendStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
         
+        const body: any = { status: backendStatus };
+        if (newStatus === 'confirmed' && arg3) {
+            body.technicianId = arg3;
+        } else if ((newStatus === 'rejected' || newStatus === 'cancelled') && arg3) {
+            body.reason = arg3;
+            if (arg4) body.category = arg4;
+        }
+
         await fetch(`http://localhost:5000/api/admin/appointments/${id}/status`, {
             method: 'PUT',
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ status: backendStatus, reason: reason, category: category })
+            body: JSON.stringify(body)
         });
 
         setAppointments(appointments.map(app => 
@@ -307,13 +373,26 @@ export function Appointments() {
             </div>
             
             <div className="flex items-center gap-2">
+                 <select
+                    className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] outline-none transition-all hover:border-[#0B4F6C]"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                 >
+                    <option value="all">All Categories</option>
+                    {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                    ))}
+                 </select>
+
                  <select 
                     className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] outline-none transition-all hover:border-[#0B4F6C]"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
                  >
-                     <option value="date">Sort by Date</option>
-                     <option value="name">Sort by Name</option>
+                     <option value="created">Date Created</option>
+                     <option value="updated">Date Updated</option>
+                     <option value="date">Appointment Date</option>
+                     <option value="name">Client Name</option>
                  </select>
                  <button 
                     className="bg-white border border-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
@@ -332,7 +411,8 @@ export function Appointments() {
               { id: "upcoming", label: "Confirmed" },
               { id: "in-progress", label: "In Progress" },
               { id: "completed", label: "Completed" },
-              { id: "cancelled", label: "Cancelled" }
+              { id: "cancelled", label: "Cancelled" },
+              { id: "rejected", label: "Rejected" }
           ].map((filter) => (
               <button
                 key={filter.id}
@@ -409,7 +489,15 @@ export function Appointments() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-end justify-between gap-4 min-w-[140px]">
+                <div className="flex flex-col items-end justify-between gap-4 min-w-[140px]">
+                <div className="flex flex-col items-end text-xs text-gray-400">
+                    {appointment.createdAt && (
+                        <span>Created: {appointment.createdAt.toLocaleDateString()}</span>
+                    )}
+                    {appointment.updatedAt && (
+                        <span>Updated: {appointment.updatedAt.toLocaleDateString()}</span>
+                    )}
+                </div>
                 <Badge
                   className={`${getStatusColor(
                     appointment.status
@@ -434,7 +522,10 @@ export function Appointments() {
                       <Button 
                         size="sm" 
                         className="h-8 px-4 bg-green-600 hover:bg-green-700 text-white shadow-sm border-0"
-                        onClick={() => handleStatusUpdate(appointment.id, 'confirmed')}
+                        onClick={() => {
+                            setSelectedAppointment(appointment);
+                            setIsDetailsOpen(true);
+                        }}
                       >
                         Approve
                       </Button>
@@ -487,12 +578,10 @@ export function Appointments() {
         onOpenChange={setIsDetailsOpen}
         appointment={selectedAppointment}
         onUpdateStatus={handleStatusUpdate}
-        onCancel={() => {
-            setIsDetailsOpen(false);
-            if (selectedAppointment) {
-                setStatusDialog({ open: true, type: 'cancel', appointmentId: selectedAppointment.id });
-            }
-        }}
+        onUpdateDetails={handleUpdateDetails}
+        onApprove={(id, technicianId) => handleStatusUpdate(id, 'confirmed', technicianId)}
+        onReject={(id) => setStatusDialog({ open: true, type: 'reject', appointmentId: id })}
+        onCancel={(id) => setStatusDialog({ open: true, type: 'cancel', appointmentId: id })}
       />
 
       <RecycleBinDialog 

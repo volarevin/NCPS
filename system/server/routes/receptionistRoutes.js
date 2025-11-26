@@ -1,0 +1,24 @@
+const express = require('express');
+const router = express.Router();
+const receptionistController = require('../controllers/receptionistController');
+const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+
+// Protect all routes
+router.use(verifyToken);
+router.use(checkRole(['Receptionist', 'Admin']));
+
+router.get('/dashboard-stats', receptionistController.getDashboardStats);
+router.get('/appointments', receptionistController.getAllAppointments);
+router.post('/appointments', receptionistController.createAppointment);
+router.put('/appointments/:id/status', receptionistController.updateAppointmentStatus);
+router.put('/appointments/:id/details', receptionistController.updateAppointmentDetails);
+router.delete('/appointments/:id/soft', receptionistController.softDeleteAppointment);
+router.get('/appointments/marked-deletion', receptionistController.getDeletedAppointments);
+router.post('/appointments/:id/restore', receptionistController.restoreAppointment);
+router.delete('/appointments/:id/permanent', receptionistController.permanentDeleteAppointment);
+router.delete('/appointments/recycle-bin', receptionistController.emptyRecycleBin);
+router.get('/services', receptionistController.getServices);
+router.get('/technicians', receptionistController.getTechnicians);
+router.get('/categories', receptionistController.getAllCategories);
+
+module.exports = router;

@@ -33,16 +33,18 @@ router.get('/technicians/:techId', adminController.getTechnicianDetails);
 router.put('/technicians/:techId/profile', adminController.updateTechnicianProfile);
 router.put('/technicians/:techId/status', adminController.updateTechnicianStatus);
 
+router.get('/appointments/recycle-bin/count', adminController.getRecycleBinCount);
+router.delete('/appointments/recycle-bin', adminController.emptyRecycleBin);
+router.get('/appointments/marked-deletion', adminController.getMarkedForDeletion);
+router.post('/appointments/bulk-delete', adminController.bulkDeleteAppointments); // Add this line
+
 router.get('/appointments/:id', adminController.getAppointmentDetails); // Add this line
 router.put('/appointments/:id/status', adminController.updateAppointmentStatus);
+router.put('/appointments/:id/details', adminController.updateAppointmentDetails);
 router.post('/appointments', adminController.createAppointment);
 router.delete('/appointments/:id', adminController.deleteAppointment); // Soft delete
 router.post('/appointments/:id/restore', adminController.restoreAppointment);
 router.delete('/appointments/:id/permanent', adminController.permanentDeleteAppointment);
-router.post('/appointments/bulk-delete', adminController.bulkDeleteAppointments); // Add this line
-router.get('/appointments/recycle-bin/count', adminController.getRecycleBinCount);
-router.delete('/appointments/recycle-bin', adminController.emptyRecycleBin);
-router.get('/appointments/marked-deletion', adminController.getMarkedForDeletion);
 router.post('/technicians/promote', adminController.promoteToTechnician);
 
 module.exports = router;

@@ -1,94 +1,38 @@
-import { useState, useEffect } from 'react';
-import { Calendar, Clock, User, Phone, Wrench, Search, Filter, Plus, Trash2, CheckCircle, XCircle, Eye } from 'lucide-react';
-import { Button } from "../../../components/ui/button";
-import { Input } from "../../../components/ui/input";
-import { Badge } from "../../../components/ui/badge";
-import { AppointmentDetailsDialog } from './AppointmentDetailsDialog';
-import { AddAppointmentDialog } from './AddAppointmentDialog';
-import { toast } from 'sonner';
-import { PageHeader } from './PageHeader';
+import { useState, useEffect } from "react";
+import { Search, Filter, Trash2, Calendar, Clock, User, Phone, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
+import { RecycleBinDialog } from "./RecycleBinDialog";
+import { StatusChangeDialog } from "./StatusChangeDialog";
+import { AddAppointmentDialog } from "./AddAppointmentDialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export interface Appointment {
   id: string;
   clientName: string;
-  phone: string;
-  email: string;
-  address: string;
   service: string;
   date: string;
   time: string;
-  technician: string;
-  status: 'pending' | 'in-progress' | 'confirmed' | 'completed' | 'cancelled';
+  status: "pending" | "upcoming" | "completed" | "cancelled" | "in-progress" | "confirmed" | "rejected";
+  phone: string;
+  email: string;
+  address: string;
   notes: string;
+  technician?: string;
+  rating?: number;
+  feedback?: string;
+  cancellationReason?: string;
+  cancellationCategory?: string;
+  rejectionReason?: string;
+  cancelledByRole?: string;
+  cancelledById?: string;
+  category?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
-
-const mockAppointments: Appointment[] = [
-  {
-    id: '1',
-    clientName: 'Maria Santos',
-    phone: '+63 917 345 6789',
-    email: 'maria.santos@email.com',
-    address: '123 Main St, Quezon City, Metro Manila',
-    service: 'Laptop Repair',
-    date: 'November 27, 2025',
-    time: '10:00 AM',
-    technician: 'Tech John Doe',
-    status: 'pending',
-    notes: "Laptop won't turn on. Client mentioned water damage last week.",
-  },
-  {
-    id: '2',
-    clientName: 'Juan Dela Cruz',
-    phone: '+63 918 234 5678',
-    email: 'juan.delacruz@email.com',
-    address: '456 Rizal Ave, Nasugbu, Batangas',
-    service: 'CCTV Installation',
-    date: 'November 28, 2025',
-    time: '2:00 PM',
-    technician: 'Tech Jane Smith',
-    status: 'in-progress',
-    notes: 'Installation of 4-camera CCTV system for home security.',
-  },
-  {
-    id: '3',
-    clientName: 'Ana Reyes',
-    phone: '+63 919 876 5432',
-    email: 'ana.reyes@email.com',
-    address: '789 Bonifacio St, Lipa City, Batangas',
-    service: 'CCTV Upgrade',
-    date: 'November 29, 2025',
-    time: '9:00 AM',
-    technician: 'Tech Mike Johnson',
-    status: 'confirmed',
-    notes: 'Upgrade existing CCTV system to HD cameras.',
-  },
-  {
-    id: '4',
-    clientName: 'Pedro Garcia',
-    phone: '+63 920 123 4567',
-    email: 'pedro.garcia@email.com',
-    address: '321 Luna St, Taal, Batangas',
-    service: 'LCD Replacement',
-    date: 'November 30, 2025',
-    time: '11:00 AM',
-    technician: 'Tech Sarah Lee',
-    status: 'completed',
-    notes: 'LCD screen replacement for laptop. Completed successfully.',
-  },
-  {
-    id: '5',
-    clientName: 'Rosa Mendoza',
-    phone: '+63 921 987 6543',
-    email: 'rosa.mendoza@email.com',
-    address: '654 Del Pilar St, Nasugbu, Batangas',
-    service: 'CCTV Repair',
-    date: 'December 1, 2025',
-    time: '3:00 PM',
-    technician: 'Tech John Doe',
-    status: 'pending',
-    notes: 'Camera 2 not recording. Check wiring and DVR connection.',
-  },
-];
 
 interface AppointmentScheduleProps {
   selectedAppointmentFromDashboard?: Appointment | null;
@@ -96,330 +40,532 @@ interface AppointmentScheduleProps {
 }
 
 export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearSelection }: AppointmentScheduleProps) {
-  const [appointments, setAppointments] = useState<Appointment[]>(mockAppointments);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "name" | "created" | "updated">("created");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [categories, setCategories] = useState<string[]>([]);
+  
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [addDialogOpen, setAddDialogOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [isRecycleBinOpen, setIsRecycleBinOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [statusDialog, setStatusDialog] = useState<{
+    open: boolean;
+    type: 'reject' | 'cancel';
+    appointmentId?: string;
+  }>({ open: false, type: 'cancel' });
+  const [recycleBinCount, setRecycleBinCount] = useState(0);
 
-  // Handle appointment selection from dashboard
+  const filters = [
+    { id: "all", label: "All" },
+    { id: "pending", label: "Pending" },
+    { id: "confirmed", label: "Confirmed" },
+    { id: "in-progress", label: "In Progress" },
+    { id: "completed", label: "Completed" },
+    { id: "cancelled", label: "Cancelled" },
+    { id: "rejected", label: "Rejected" }
+  ];
+
+  useEffect(() => {
+    fetchAppointments();
+    fetchRecycleBinCount();
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/categories', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setCategories(data.map((c: any) => c.name));
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
   useEffect(() => {
     if (selectedAppointmentFromDashboard) {
       setSelectedAppointment(selectedAppointmentFromDashboard);
-      setDialogOpen(true);
+      setIsDetailsOpen(true);
     }
   }, [selectedAppointmentFromDashboard]);
 
-  const handleDialogClose = (open: boolean) => {
-    setDialogOpen(open);
-    if (!open && onClearSelection) {
-      onClearSelection();
+  const fetchRecycleBinCount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/appointments/marked-deletion', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setRecycleBinCount(data.length);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching recycle bin count:", error);
+    }
+  };
+
+  const fetchAppointments = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/receptionist/appointments', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch appointments');
+      }
+
+      const data = await response.json();
+      console.log("Fetched appointments:", data);
+      
+      if (Array.isArray(data)) {
+        const mappedData = data.map((appt: any) => ({
+          ...appt,
+          service: appt.category ? `${appt.service} - ${appt.category}` : appt.service
+        }));
+        setAppointments(mappedData);
+      } else {
+        console.error("Received non-array data:", data);
+        setAppointments([]);
+        toast.error("Received invalid data format");
+      }
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      toast.error("Failed to load appointments");
+      setAppointments([]);
+    }
+  };
+
+  const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ date, time, technicianId })
+      });
+
+      toast.success("Appointment details updated successfully");
+      fetchAppointments();
+    } catch (error) {
+      console.error("Error updating details:", error);
+      toast.error("Failed to update appointment details");
+    }
+  };
+
+  const handleStatusUpdate = async (id: string, status: string, arg3?: string, arg4?: string) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (status === 'deleted') {
+        await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/soft`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        toast.success("Appointment moved to recycle bin");
+      } else {
+        const body: any = { status };
+        if (status === 'confirmed' && arg3) {
+            body.technicianId = arg3;
+        } else if ((status === 'rejected' || status === 'cancelled') && arg3) {
+            body.reason = arg3;
+            if (arg4) body.category = arg4;
+        }
+
+        await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
+          method: 'PUT',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}` 
+          },
+          body: JSON.stringify(body)
+        });
+        toast.success(`Appointment ${status}`);
+      }
+      
+      fetchAppointments();
+      setIsDetailsOpen(false);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to move ${filteredAppointments.length} appointments to the recycle bin?`)) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      await Promise.all(filteredAppointments.map(apt => 
+        fetch(`http://localhost:5000/api/receptionist/appointments/${apt.id}/soft`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ));
+      
+      toast.success("Appointments moved to recycle bin");
+      fetchAppointments();
+    } catch (error) {
+      console.error("Error deleting appointments:", error);
+      toast.error("Failed to delete appointments");
     }
   };
 
   const handleViewDetails = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
-    setDialogOpen(true);
-  };
-
-  const handleUpdateAppointment = (updatedAppointment: Appointment) => {
-    setAppointments(appointments.map(apt => 
-      apt.id === updatedAppointment.id ? updatedAppointment : apt
-    ));
-  };
-
-  const handleAddAppointment = (appointment: Appointment) => {
-    setAppointments([...appointments, appointment]);
-  };
-
-  const handleApproveAppointment = (id: string) => {
-    setAppointments(appointments.map(apt =>
-      apt.id === id ? { ...apt, status: 'confirmed' as const } : apt
-    ));
-    toast.success('Appointment approved');
-  };
-
-  const handleRejectAppointment = (id: string) => {
-    if (window.confirm('Are you sure you want to reject this appointment?')) {
-      setAppointments(appointments.map(apt =>
-        apt.id === id ? { ...apt, status: 'cancelled' as const } : apt
-      ));
-      toast.success('Appointment rejected');
-    }
-  };
-
-  const handleDeleteAppointment = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this appointment? This action cannot be undone.')) {
-      setAppointments(appointments.filter(apt => apt.id !== id));
-      toast.success('Appointment deleted');
-    }
+    setIsDetailsOpen(true);
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending':
-        return 'bg-orange-500';
-      case 'in-progress':
-        return 'bg-blue-400';
-      case 'confirmed':
-        return 'bg-blue-600';
-      case 'completed':
-        return 'bg-green-500';
-      case 'cancelled':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
+      case "pending": return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "upcoming":
+      case "confirmed": return "bg-blue-100 text-blue-800 border-blue-200";
+      case "completed": return "bg-green-100 text-green-800 border-green-200";
+      case "cancelled":
+      case "rejected": return "bg-red-100 text-red-800 border-red-200";
+      case "in-progress": return "bg-purple-100 text-purple-800 border-purple-200";
+      default: return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
-  const filteredAppointments = appointments.filter(apt => {
-    const matchesSearch = apt.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         apt.service.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         apt.phone.includes(searchQuery);
-    const matchesFilter = filterStatus === 'all' || apt.status === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
-
-  const statusCounts = {
-    all: appointments.length,
-    pending: appointments.filter(apt => apt.status === 'pending').length,
-    'in-progress': appointments.filter(apt => apt.status === 'in-progress').length,
-    confirmed: appointments.filter(apt => apt.status === 'confirmed').length,
-    completed: appointments.filter(apt => apt.status === 'completed').length,
-    cancelled: appointments.filter(apt => apt.status === 'cancelled').length,
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "pending": return <Clock className="w-3 h-3 mr-1" />;
+      case "upcoming":
+      case "confirmed": return <Calendar className="w-3 h-3 mr-1" />;
+      case "completed": return <User className="w-3 h-3 mr-1" />;
+      case "cancelled":
+      case "rejected": return <Trash2 className="w-3 h-3 mr-1" />;
+      default: return <Clock className="w-3 h-3 mr-1" />;
+    }
   };
+
+  const filteredAppointments = appointments
+    .filter((apt: any) => {
+      const matchesSearch = 
+        apt.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        apt.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        apt.id.includes(searchTerm);
+      
+      const matchesStatus = statusFilter === "all" || apt.status === statusFilter;
+      const matchesCategory = categoryFilter === "all" || apt.category === categoryFilter;
+      
+      return matchesSearch && matchesStatus && matchesCategory;
+    })
+    .sort((a: any, b: any) => {
+      let comparison = 0;
+      if (sortBy === "date") {
+        comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else if (sortBy === "name") {
+        comparison = a.clientName.localeCompare(b.clientName);
+      } else if (sortBy === "created") {
+        comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+      } else if (sortBy === "updated") {
+        comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+      }
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <PageHeader 
-        title="Appointments" 
-        description="Manage and track customer appointments"
-        action={
-          <Button
-            onClick={() => setAddDialogOpen(true)}
-            className="bg-[#0B4F6C] hover:bg-[#093e54] text-white"
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-[#0B4F6C]">Appointments</h1>
+          <p className="text-gray-500">Manage and track all appointments</p>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsRecycleBinOpen(true)}
+            className="border-gray-200 hover:bg-gray-50 text-gray-600 relative"
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Recycle Bin
+            {recycleBinCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {recycleBinCount}
+              </span>
+            )}
+          </Button>
+          <Button 
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="bg-[#0B4F6C] hover:bg-[#093e54] text-white shadow-lg shadow-blue-900/20 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Appointment
+            New Appointment
           </Button>
-        }
-      />
-
-      {/* Stats Overview with Icons */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 mb-6">
-        <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md border-l-4 border-blue-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-gray-600 text-xs sm:text-sm">Total</div>
-            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-          </div>
-          <div className="text-xl sm:text-2xl text-[#0B4F6C]">{statusCounts.all}</div>
-        </div>
-
-        <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md border-l-4 border-orange-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-gray-600 text-xs sm:text-sm">Pending</div>
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-          </div>
-          <div className="text-xl sm:text-2xl text-[#0B4F6C]">{statusCounts.pending}</div>
-        </div>
-
-        <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md border-l-4 border-blue-400 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-gray-600 text-xs sm:text-sm truncate">In Progress</div>
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400 animate-pulse" />
-          </div>
-          <div className="text-xl sm:text-2xl text-[#0B4F6C]">{statusCounts['in-progress']}</div>
-        </div>
-
-        <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md border-l-4 border-blue-600 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-gray-600 text-xs sm:text-sm">Confirmed</div>
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
-          </div>
-          <div className="text-xl sm:text-2xl text-[#0B4F6C]">{statusCounts.confirmed}</div>
-        </div>
-
-        <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md border-l-4 border-green-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-gray-600 text-xs sm:text-sm">Completed</div>
-            <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-          </div>
-          <div className="text-xl sm:text-2xl text-[#0B4F6C]">{statusCounts.completed}</div>
-        </div>
-
-        <div className="bg-white rounded-lg p-3 sm:p-4 shadow-md border-l-4 border-red-500 hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
-          <div className="flex items-center justify-between mb-2">
-            <div className="text-gray-600 text-xs sm:text-sm">Cancelled</div>
-            <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500" />
-          </div>
-          <div className="text-xl sm:text-2xl text-[#0B4F6C]">{statusCounts.cancelled}</div>
         </div>
       </div>
 
-      {/* Search and Filter */}
-      <div className="bg-white rounded-lg p-3 sm:p-4 mb-6 shadow-md hover:shadow-xl transition-all duration-300">
-        <div className="flex flex-col gap-3 sm:gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Search by name, service, or phone..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 focus:ring-2 focus:ring-[#4DBDCC] transition-all text-sm sm:text-base"
-            />
-          </div>
-          <div className="flex gap-2 items-center flex-wrap">
-            <Filter className="w-4 h-4 text-gray-400 hidden sm:block" />
-            <Button
-              variant={filterStatus === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus('all')}
-              className={`hover:scale-105 transition-transform text-xs sm:text-sm ${filterStatus === 'all' ? 'bg-[#0B4F6C]' : ''}`}
-            >
-              All
-            </Button>
-            <Button
-              variant={filterStatus === 'pending' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus('pending')}
-              className={`hover:scale-105 transition-transform text-xs sm:text-sm ${filterStatus === 'pending' ? 'bg-orange-500' : ''}`}
-            >
-              Pending
-            </Button>
-            <Button
-              variant={filterStatus === 'in-progress' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus('in-progress')}
-              className={`hover:scale-105 transition-transform text-xs sm:text-sm ${filterStatus === 'in-progress' ? 'bg-blue-400' : ''}`}
-            >
-              In Progress
-            </Button>
-            <Button
-              variant={filterStatus === 'confirmed' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus('confirmed')}
-              className={`hover:scale-105 transition-transform text-xs sm:text-sm ${filterStatus === 'confirmed' ? 'bg-blue-600' : ''}`}
-            >
-              Confirmed
-            </Button>
-            <Button
-              variant={filterStatus === 'completed' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus('completed')}
-              className={`hover:scale-105 transition-transform text-xs sm:text-sm ${filterStatus === 'completed' ? 'bg-green-500' : ''}`}
-            >
-              Completed
-            </Button>
-          </div>
+      {/* Filters & Search */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+            <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                    placeholder="Search client, service, or ID..."
+                    className="pl-10 border-gray-200 focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            
+            <div className="flex items-center gap-2">
+                 <select
+                    className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] outline-none transition-all hover:border-[#0B4F6C]"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value)}
+                 >
+                    <option value="all">All Categories</option>
+                    {categories.map((category) => (
+                        <option key={category} value={category}>{category}</option>
+                    ))}
+                 </select>
+
+                 <select 
+                    className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] outline-none transition-all hover:border-[#0B4F6C]"
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as any)}
+                 >
+                     <option value="created">Date Created</option>
+                     <option value="updated">Date Updated</option>
+                     <option value="date">Appointment Date</option>
+                     <option value="name">Client Name</option>
+                 </select>
+                 <button 
+                    className="bg-white border border-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                 >
+                     {sortOrder === 'asc' ? '↑' : '↓'}
+                 </button>
+            </div>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+          <Filter className="w-4 h-4 text-gray-500 shrink-0" />
+          {filters.map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => setStatusFilter(filter.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
+                  statusFilter === filter.id
+                    ? "bg-[#0B4F6C] text-white border-[#0B4F6C] shadow-md"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
+                }`}
+              >
+                {filter.label}
+              </button>
+            )
+          )}
+          
+          <div className="h-6 w-px bg-gray-300 mx-2" />
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleBulkDelete}
+            disabled={filteredAppointments.length === 0}
+            className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 whitespace-nowrap"
+          >
+            <Trash2 className="w-3.5 h-3.5 mr-2" />
+            Move All {statusFilter === 'all' ? '' : statusFilter === 'upcoming' ? 'Confirmed' : statusFilter.replace('-', ' ')} to Bin
+          </Button>
         </div>
       </div>
 
       {/* Appointments List */}
-      <div className="space-y-3 sm:space-y-4">
-        {filteredAppointments.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 text-center shadow-md">
-            <p className="text-gray-500">No appointments found</p>
-          </div>
-        ) : (
-          filteredAppointments.map((appointment) => (
-            <div
-              key={appointment.id}
-              className="bg-white rounded-lg p-4 sm:p-6 shadow-md hover:shadow-2xl transition-all duration-300 border-l-4 hover:scale-[1.02] group"
-              style={{ borderLeftColor: getStatusColor(appointment.status).replace('bg-', '#') }}
-            >
-              <div className="flex flex-col gap-4">
-                <div className="flex-1">
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
-                    <h3 className="text-[#0B4F6C] group-hover:text-[#4DBDCC] transition-colors text-sm sm:text-base">{appointment.clientName}</h3>
-                    <Badge className={`${getStatusColor(appointment.status)} text-white text-xs`}>
-                      {appointment.status === 'in-progress' ? 'In Progress' : appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
+      <div className="grid gap-4">
+        {filteredAppointments.map((appointment) => (
+          <div
+            key={appointment.id}
+            className="group bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 cursor-pointer relative overflow-hidden"
+            onClick={() => handleViewDetails(appointment)}
+          >
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#0B4F6C] opacity-0 group-hover:opacity-100 transition-opacity" />
+            
+            <div className="flex flex-col md:flex-row justify-between gap-6">
+              <div className="flex items-start gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E6F0F4] to-[#F0F7FA] flex items-center justify-center text-[#0B4F6C] shrink-0 shadow-inner">
+                  <User className="w-7 h-7" />
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-lg text-gray-800 group-hover:text-[#0B4F6C] transition-colors">
+                        {appointment.clientName}
+                    </h3>
+                    <Badge variant="outline" className="text-xs font-normal text-gray-500 border-gray-200">
+                        #{appointment.id}
                     </Badge>
                   </div>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600">
-                    <div className="flex items-center gap-2 group-hover:text-[#0B4F6C] transition-colors">
-                      <Wrench className="w-3 h-3 sm:w-4 sm:h-4 text-[#4DBDCC] flex-shrink-0" />
-                      <span className="truncate">{appointment.service}</span>
+                  <p className="text-[#0B4F6C] font-medium flex items-center gap-2">
+                    {appointment.service}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
+                      <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                      {appointment.date}
                     </div>
-                    <div className="flex items-center gap-2 group-hover:text-[#0B4F6C] transition-colors">
-                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-[#4DBDCC] flex-shrink-0" />
-                      <span className="truncate">{appointment.date}</span>
+                    <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
+                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                      {appointment.time}
                     </div>
-                    <div className="flex items-center gap-2 group-hover:text-[#0B4F6C] transition-colors">
-                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-[#4DBDCC] flex-shrink-0" />
-                      <span>{appointment.time}</span>
-                    </div>
-                    <div className="flex items-center gap-2 group-hover:text-[#0B4F6C] transition-colors">
-                      <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-[#4DBDCC] flex-shrink-0" />
-                      <span className="truncate">{appointment.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2 group-hover:text-[#0B4F6C] transition-colors sm:col-span-2">
-                      <User className="w-3 h-3 sm:w-4 sm:h-4 text-[#4DBDCC] flex-shrink-0" />
-                      <span className="truncate">{appointment.technician}</span>
-                    </div>
+                    {appointment.phone !== 'N/A' && (
+                        <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
+                            <Phone className="w-3.5 h-3.5 text-gray-400" />
+                            {appointment.phone}
+                        </div>
+                    )}
                   </div>
                 </div>
+              </div>
+
+              <div className="flex flex-col items-end justify-between gap-4 min-w-[140px]">
+                <div className="flex flex-col items-end text-xs text-gray-400">
+                    {appointment.createdAt && (
+                        <span>Created: {new Date(appointment.createdAt).toLocaleDateString()}</span>
+                    )}
+                    {appointment.updatedAt && (
+                        <span>Updated: {new Date(appointment.updatedAt).toLocaleDateString()}</span>
+                    )}
+                </div>
+                <Badge
+                  className={`${getStatusColor(
+                    appointment.status
+                  )} flex items-center px-3 py-1.5 text-xs font-semibold shadow-sm`}
+                >
+                  {getStatusIcon(appointment.status)}
+                  <span className="capitalize">
+                    {appointment.status === 'upcoming' ? 'Confirmed' : appointment.status.replace("-", " ")}
+                  </span>
+                </Badge>
                 
-                <div className="flex flex-wrap gap-2">
+                {appointment.technician && (
+                  <div className="text-right">
+                    <p className="text-xs text-gray-400 mb-0.5">Technician</p>
+                    <p className="text-sm font-medium text-gray-700">{appointment.technician}</p>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
                   {appointment.status === 'pending' && (
                     <>
-                      <Button
-                        onClick={() => handleApproveAppointment(appointment.id)}
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 hover:scale-105 transition-all duration-200 text-xs sm:text-sm flex-1 sm:flex-none"
+                      <Button 
+                        size="sm" 
+                        className="h-8 px-4 bg-green-600 hover:bg-green-700 text-white shadow-sm border-0"
+                        onClick={() => {
+                            setSelectedAppointment(appointment);
+                            setIsDetailsOpen(true);
+                        }}
                       >
-                        <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                         Approve
                       </Button>
-                      <Button
-                        onClick={() => handleRejectAppointment(appointment.id)}
-                        size="sm"
-                        variant="outline"
-                        className="text-red-600 border-red-600 hover:bg-red-50 hover:scale-105 transition-all duration-200 text-xs sm:text-sm flex-1 sm:flex-none"
+                      <Button 
+                        size="sm" 
+                        className="h-8 px-4 bg-red-600 hover:bg-red-700 text-white shadow-sm border-0"
+                        onClick={() => setStatusDialog({ open: true, type: 'reject', appointmentId: appointment.id })}
                       >
-                        <XCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
                         Reject
                       </Button>
                     </>
                   )}
-                  <Button
-                    onClick={() => handleViewDetails(appointment)}
-                    size="sm"
-                    className="bg-[#0B4F6C] hover:bg-[#145A75] hover:scale-105 transition-all duration-200 text-xs sm:text-sm flex-1 sm:flex-none"
+                  {(appointment.status === 'upcoming' || appointment.status === 'confirmed') && (
+                      <Button 
+                        size="sm" 
+                        className="h-8 px-4 bg-orange-600 text-white hover:bg-orange-700 shadow-sm border-0"
+                        onClick={() => setStatusDialog({ open: true, type: 'cancel', appointmentId: appointment.id })}
+                      >
+                        Cancel
+                      </Button>
+                  )}
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-full"
+                    onClick={() => handleStatusUpdate(appointment.id, 'deleted')}
+                    title="Move to Recycle Bin"
                   >
-                    <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
-                    View
-                  </Button>
-                  <Button
-                    onClick={() => handleDeleteAppointment(appointment.id)}
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 hover:scale-105 transition-all duration-200 text-xs sm:text-sm"
-                  >
-                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             </div>
-          ))
+          </div>
+        ))}
+
+        {filteredAppointments.length === 0 && (
+          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-gray-300" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-1">No appointments found</h3>
+            <p className="text-gray-500">Try adjusting your search or filters.</p>
+          </div>
         )}
       </div>
 
-      {selectedAppointment && (
-        <AppointmentDetailsDialog
-          appointment={selectedAppointment}
-          open={dialogOpen}
-          onOpenChange={handleDialogClose}
-          onUpdateAppointment={handleUpdateAppointment}
-        />
-      )}
+      <AppointmentDetailsDialog
+        open={isDetailsOpen}
+        onOpenChange={(open) => {
+          setIsDetailsOpen(open);
+          if (!open && onClearSelection) {
+            onClearSelection();
+          }
+        }}
+        appointment={selectedAppointment}
+        onStatusUpdate={handleStatusUpdate}
+        onUpdateDetails={handleUpdateDetails}
+        onCancel={() => {
+            if (selectedAppointment) {
+                setStatusDialog({ open: true, type: selectedAppointment.status === 'pending' ? 'reject' : 'cancel', appointmentId: selectedAppointment.id });
+            }
+        }}
+      />
 
-      <AddAppointmentDialog
-        open={addDialogOpen}
-        onOpenChange={setAddDialogOpen}
-        onAddAppointment={handleAddAppointment}
+      <RecycleBinDialog 
+        open={isRecycleBinOpen}
+        onOpenChange={setIsRecycleBinOpen}
+      />
+
+      <AddAppointmentDialog 
+        open={isCreateDialogOpen} 
+        onOpenChange={setIsCreateDialogOpen}
+        onAddAppointment={() => {
+            fetchAppointments();
+        }}
+      />
+
+      <StatusChangeDialog 
+        open={statusDialog.open}
+        onOpenChange={(open) => setStatusDialog(prev => ({ ...prev, open }))}
+        title={statusDialog.type === 'reject' ? "Reject Appointment" : "Cancel Appointment"}
+        description={statusDialog.type === 'reject' 
+            ? "Are you sure you want to reject this appointment? This action cannot be undone." 
+            : "Are you sure you want to cancel this confirmed appointment?"}
+        actionLabel={statusDialog.type === 'reject' ? "Reject Appointment" : "Cancel Appointment"}
+        variant="destructive"
+        role="staff"
+        onConfirm={async (reason, category) => {
+            if (statusDialog.appointmentId) {
+                const status = statusDialog.type === 'reject' ? 'rejected' : 'cancelled';
+                await handleStatusUpdate(statusDialog.appointmentId, status, reason, category);
+            }
+        }}
       />
     </div>
   );

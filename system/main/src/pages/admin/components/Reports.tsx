@@ -69,8 +69,7 @@ export function Reports() {
   const [revenueStats, setRevenueStats] = useState<any>({
     totalRevenue: 0,
     avgPerAppointment: 0,
-    totalPaid: 0,
-    totalUnpaid: 0
+    totalPaid: 0
   });
 
   useEffect(() => {
@@ -123,8 +122,7 @@ export function Reports() {
   const staffPerformanceData = staffData;
   const monthlyRevenue = monthlyData.map(m => ({
       month: m.month,
-      paid: m.revenue || 0,
-      unpaid: 0
+      paid: m.revenue || 0
   }));
   const peakHoursData = peakHours;
   const peakDaysData = peakDays;
@@ -263,7 +261,7 @@ export function Reports() {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={100} />
+                  <YAxis dataKey="name" type="category" width={150} />
                   <Tooltip />
                   <Bar dataKey="requests" fill="#5B8FFF" name="Requests" />
                 </BarChart>
@@ -284,7 +282,7 @@ export function Reports() {
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis type="number" domain={[0, 5]} />
-                  <YAxis dataKey="name" type="category" width={100} />
+                  <YAxis dataKey="name" type="category" width={150} />
                   <Tooltip />
                   <Bar dataKey="rating" fill="#FFB366" name="Rating" />
                 </BarChart>
@@ -328,7 +326,7 @@ export function Reports() {
                       <div className="flex items-center gap-1">
                         <span className="text-yellow-500">★</span>
                         <span className="text-sm text-gray-600">
-                          {staff.rating}
+                          {staff.rating.toFixed(1)}
                         </span>
                       </div>
                     </div>
@@ -353,7 +351,7 @@ export function Reports() {
 
         {/* Revenue Report Tab */}
         <TabsContent value="revenue" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <StatCard
               icon={<DollarSign className="w-6 h-6" />}
               label="Total Revenue"
@@ -372,12 +370,6 @@ export function Reports() {
               value={`₱${(revenueData.totalPaid / 1000).toFixed(1)}K`}
               color="#7B9B7C"
             />
-            <StatCard
-              icon={<Clock className="w-6 h-6" />}
-              label="Total Unpaid"
-              value={`₱${(revenueData.totalUnpaid / 1000).toFixed(1)}K`}
-              color="#FFA07A"
-            />
           </div>
 
           {/* Monthly Revenue Chart */}
@@ -393,13 +385,7 @@ export function Reports() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="paid" fill="#5DD37C" name="Paid" stackId="a" />
-                <Bar
-                  dataKey="unpaid"
-                  fill="#FFA07A"
-                  name="Unpaid"
-                  stackId="a"
-                />
+                <Bar dataKey="paid" fill="#5DD37C" name="Paid" />
               </BarChart>
             </ResponsiveContainer>
           </div>
