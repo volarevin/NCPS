@@ -1,4 +1,4 @@
-import { Calendar, Clock, History, User, MapPin, Star, AlertCircle, Search, Filter, ArrowUpDown } from "lucide-react";
+import { Calendar, Clock, History, User, MapPin, Star, AlertCircle, Search, Filter, ArrowUpDown, List } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Separator } from "../../../components/ui/separator";
@@ -7,6 +7,7 @@ import { PageHeader } from "./PageHeader";
 import { useState } from "react";
 import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { TechnicianCalendar } from "./TechnicianCalendar";
 
 interface TechnicianAppointmentsProps {
   appointments: any[];
@@ -25,6 +26,7 @@ export function TechnicianAppointments({
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"date" | "created" | "updated" | "name">("created");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   const filteredAppointments = appointments
     .filter((apt) => {
@@ -54,6 +56,30 @@ export function TechnicianAppointments({
       return sortOrder === "asc" ? comparison : -comparison;
     });
 
+  const completedAppointments = appointments.filter(a => a.status === "Completed");
+  const completedCount = completedAppointments.length;
+  
+  const ratedAppointments = completedAppointments.filter(a => typeof a.rating === 'number' && a.rating > 0);
+  const averageRating = ratedAppointments.length > 0 
+    ? ratedAppointments.reduce((acc, curr) => acc + curr.rating, 0) / ratedAppointments.length 
+    : 0;
+
+  const recentActivity = [...appointments]
+    .sort((a, b) => {
+        const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : new Date(a.rawDate).getTime();
+        const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : new Date(b.rawDate).getTime();
+        return dateB - dateA;
+    })
+    .slice(0, 5);
+
+  const isToday = (dateInput: string | Date) => {
+    const date = new Date(dateInput);
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+           date.getMonth() === today.getMonth() &&
+           date.getFullYear() === today.getFullYear();
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
       <PageHeader 
@@ -61,9 +87,12 @@ export function TechnicianAppointments({
         description="Manage your assigned service appointments."
         action={
           <div className="flex gap-2">
-            <Button className="bg-[#0B4F6C] hover:bg-[#145A75] gap-2 shadow-md hover:shadow-lg transition-all">
-              <Calendar className="w-4 h-4" />
-              Calendar View
+            <Button 
+              className="bg-[#0B4F6C] hover:bg-[#145A75] gap-2 shadow-md hover:shadow-lg transition-all"
+              onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')}
+            >
+              {viewMode === 'list' ? <Calendar className="w-4 h-4" /> : <List className="w-4 h-4" />}
+              {viewMode === 'list' ? "Calendar View" : "List View"}
             </Button>
           </div>
         }
@@ -137,6 +166,8 @@ export function TechnicianAppointments({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointment List */}
         <div className="lg:col-span-2 space-y-4">
+          {viewMode === 'list' ? (
+          <div className="max-h-[600px] overflow-y-auto pr-2 space-y-4 custom-scrollbar">
           {filteredAppointments.length > 0 ? (
             filteredAppointments.map((apt) => (
             <Card 
@@ -188,7 +219,7 @@ export function TechnicianAppointments({
                       >
                         View Details
                       </Button>
-                      {(apt.status === "Pending" || apt.status === "Confirmed") && (
+                      {(apt.status === "Pending" || apt.status === "Confirmed") && isToday(apt.rawDate) && (
                         <Button 
                           size="sm" 
                           className="flex-1 sm:w-full bg-blue-500 hover:bg-blue-600 shadow-sm"
@@ -223,6 +254,13 @@ export function TechnicianAppointments({
                 <p className="text-gray-500">No appointments found matching your criteria.</p>
             </div>
           )}
+          </div>
+          ) : (
+            <TechnicianCalendar 
+              appointments={filteredAppointments} 
+              setSelectedAppointment={setSelectedAppointment} 
+            />
+          )}
         </div>
 
         {/* Quick Stats / Summary */}
@@ -233,18 +271,18 @@ export function TechnicianAppointments({
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <span className="text-white/80">Completed Jobs</span>
-                  <span className="font-bold text-2xl">12</span>
+                  <span className="font-bold text-2xl">{completedCount}</span>
                 </div>
                 <Separator className="bg-white/20" />
                 <div className="flex justify-between items-center">
-                  <span className="text-white/80">Hours Worked</span>
-                  <span className="font-bold text-2xl">34h</span>
+                  <span className="text-white/80">Total Assigned</span>
+                  <span className="font-bold text-2xl">{appointments.length}</span>
                 </div>
                 <Separator className="bg-white/20" />
                 <div className="flex justify-between items-center">
                   <span className="text-white/80">Customer Rating</span>
                   <div className="flex items-center gap-1">
-                    <span className="font-bold text-2xl">4.9</span>
+                    <span className="font-bold text-2xl">{averageRating.toFixed(1)}</span>
                     <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
                   </div>
                 </div>
@@ -254,21 +292,33 @@ export function TechnicianAppointments({
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg text-[#0B4F6C]">Pending Actions</CardTitle>
+              <CardTitle className="text-lg text-[#0B4F6C] flex items-center gap-2">
+                <History className="w-5 h-5" />
+                Recent Activity
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Alert variant="destructive" className="bg-red-50 border-red-200">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-700">
-                  Urgent: Laptop Repair for Maria Santos is overdue by 2 hours.
-                </AlertDescription>
-              </Alert>
-              <Alert className="bg-blue-50 border-blue-200">
-                <AlertCircle className="h-4 w-4 text-blue-600" />
-                <AlertDescription className="text-blue-700">
-                  Reminder: Submit weekly report by Friday 5PM.
-                </AlertDescription>
-              </Alert>
+            <CardContent className="space-y-4">
+              {recentActivity.length > 0 ? (
+                recentActivity.map((apt, idx) => (
+                  <div key={idx} className="flex gap-3 items-start pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                    <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
+                      apt.status === 'Completed' ? 'bg-green-500' :
+                      apt.status === 'In Progress' ? 'bg-blue-500' :
+                      apt.status === 'Cancelled' ? 'bg-red-500' : 'bg-orange-500'
+                    }`} />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-gray-900">
+                        {apt.service} - <span className="text-gray-600">{apt.status}</span>
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {apt.customerName} • {apt.updatedAt ? new Date(apt.updatedAt).toLocaleDateString() : apt.date}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+              )}
             </CardContent>
           </Card>
         </div>

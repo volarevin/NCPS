@@ -6,10 +6,14 @@ exports.getAssignedJobs = (req, res) => {
   const query = `
     SELECT a.*, u.first_name as customer_first_name, u.last_name as customer_last_name, 
            u.email as customer_email, u.phone_number as customer_phone,
-           s.name as service_name
+           s.name as service_name,
+           r.rating, r.feedback_text,
+           cb.role as cancelled_by_role, cb.user_id as cancelled_by_id
     FROM appointments a
     JOIN users u ON a.customer_id = u.user_id
     JOIN services s ON a.service_id = s.service_id
+    LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
+    LEFT JOIN users cb ON a.cancelled_by = cb.user_id
     WHERE a.technician_id = ?
     ORDER BY a.appointment_date ASC
   `;
@@ -27,7 +31,7 @@ exports.getProfile = (req, res) => {
   const userId = req.userId;
   
   const query = `
-    SELECT tp.*, u.first_name, u.last_name, u.email, u.phone_number
+    SELECT tp.*, u.first_name, u.last_name, u.email, u.phone_number, u.address, u.created_at
     FROM users u
     LEFT JOIN technician_profiles tp ON u.user_id = tp.user_id
     WHERE u.user_id = ?
@@ -45,7 +49,7 @@ exports.getProfile = (req, res) => {
     const data = results[0];
     // Provide defaults if profile is missing
     if (!data.specialty) {
-        data.specialty = 'General Technician';
+        data.specialty = 'General';
         data.availability_status = 'Available';
         data.average_rating = 0;
         data.total_jobs_completed = 0;
@@ -72,7 +76,7 @@ exports.updateAvailability = (req, res) => {
 
 exports.updateProfile = (req, res) => {
   const userId = req.userId;
-  const { name, email, phone, specialization } = req.body;
+  const { name, email, phone, specialization, address, bio } = req.body;
   
   // Split name into first and last (simple split)
   const nameParts = name.split(' ');
@@ -83,8 +87,8 @@ exports.updateProfile = (req, res) => {
     if (err) return res.status(500).json({ message: 'Database transaction error.' });
 
     // Update users table
-    const userQuery = 'UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ? WHERE user_id = ?';
-    db.query(userQuery, [firstName, lastName, email, phone, userId], (err, result) => {
+    const userQuery = 'UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ? WHERE user_id = ?';
+    db.query(userQuery, [firstName, lastName, email, phone, address, userId], (err, result) => {
       if (err) {
         return db.rollback(() => {
           res.status(500).json({ message: 'Error updating user info.' });
@@ -92,8 +96,8 @@ exports.updateProfile = (req, res) => {
       }
 
       // Update technician_profiles table
-      const techQuery = 'UPDATE technician_profiles SET specialty = ? WHERE user_id = ?';
-      db.query(techQuery, [specialization, userId], (err, result) => {
+      const techQuery = 'UPDATE technician_profiles SET specialty = ?, bio = ? WHERE user_id = ?';
+      db.query(techQuery, [specialization, bio, userId], (err, result) => {
         if (err) {
           return db.rollback(() => {
             res.status(500).json({ message: 'Error updating technician info.' });

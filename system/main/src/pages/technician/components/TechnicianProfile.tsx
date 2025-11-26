@@ -1,9 +1,15 @@
 import { useState } from "react";
-import { Edit, Mail, Phone, MapPin, Trash2 } from "lucide-react";
+import { Edit, Mail, Phone, MapPin, Trash2, Save, X, User, Briefcase, FileText, Shield } from "lucide-react";
 import { Button } from "../../../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../components/ui/card";
 import { Avatar, AvatarFallback } from "../../../components/ui/avatar";
 import { PageHeader } from "./PageHeader";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { Textarea } from "../../../components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { Separator } from "../../../components/ui/separator";
+import { Badge } from "../../../components/ui/badge";
 
 interface TechnicianProfileProps {
   technicianProfile: any;
@@ -14,182 +20,263 @@ interface TechnicianProfileProps {
   renderStars: (rating: number) => JSX.Element[];
 }
 
+const SPECIALIZATIONS = [
+  'Hardware Repair',
+  'Software Support',
+  'Network Setup',
+  'Data Recovery',
+  'System Maintenance',
+  'Virus Removal',
+  'Custom Build',
+  'Consultation',
+  'General'
+];
+
 export function TechnicianProfile({
   technicianProfile,
   setTechnicianProfile,
   updateProfile,
-  technicianRatings,
   handleDeleteAccount,
   renderStars
 }: TechnicianProfileProps) {
   const [editingProfile, setEditingProfile] = useState(false);
+  const [formData, setFormData] = useState(technicianProfile);
+
+  const handleSave = async () => {
+    await updateProfile(formData);
+    setEditingProfile(false);
+  };
+
+  const handleCancel = () => {
+    setFormData(technicianProfile);
+    setEditingProfile(false);
+  };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 animate-fade-in">
+    <div className="max-w-5xl mx-auto space-y-8 animate-fade-in pb-10">
       <PageHeader 
         title="My Profile"
         description="Manage your personal information and account settings."
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Profile Card */}
-        <Card className="lg:col-span-1 shadow-md hover:shadow-lg transition-all duration-300">
-          <CardContent className="pt-6 text-center">
-            <div className="relative inline-block mb-4 group">
-              <Avatar className="w-32 h-32 mx-auto border-4 border-[#E5F4F5] group-hover:border-[#4DBDCC] transition-colors duration-300">
-                <AvatarFallback className="text-4xl bg-[#0B4F6C] text-white">
-                  {technicianProfile.name.split(' ').map((n: string) => n[0]).join('')}
-                </AvatarFallback>
-              </Avatar>
-              <Button 
-                size="icon" 
-                variant="secondary" 
-                className="absolute bottom-0 right-0 rounded-full shadow-lg hover:bg-[#4DBDCC] hover:text-white transition-colors"
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Profile Card */}
+        <div className="lg:col-span-4 space-y-6">
+          <Card className="overflow-hidden border-none shadow-lg bg-gradient-to-b from-white to-gray-50">
+            <div className="h-32 bg-[#0B4F6C] relative">
+              <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
+                <Avatar className="w-32 h-32 border-4 border-white shadow-md">
+                  <AvatarFallback className="text-4xl bg-[#E5F4F5] text-[#0B4F6C] font-bold">
+                    {technicianProfile.name.split(' ').map((n: string) => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
             </div>
-            <h2 className="text-xl font-bold text-[#0B4F6C]">{technicianProfile.name}</h2>
-            <p className="text-gray-500 mb-4">Senior Technician</p>
-            
-            <div className="flex justify-center gap-1 mb-2">
-              {renderStars(technicianProfile.rating)}
-            </div>
-            <p className="text-sm text-gray-500 mb-6">
-              {technicianProfile.rating} ({technicianProfile.totalJobs} jobs)
-            </p>
+            <CardContent className="pt-20 pb-8 text-center space-y-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">{technicianProfile.name}</h2>
+                <Badge variant="secondary" className="mt-2 bg-[#E5F4F5] text-[#0B4F6C] hover:bg-[#d0eff2]">
+                  {technicianProfile.specialization}
+                </Badge>
+              </div>
+              
+              <div className="flex justify-center items-center gap-2 py-2">
+                <div className="flex gap-0.5">
+                  {renderStars(technicianProfile.rating)}
+                </div>
+                <span className="text-sm font-medium text-gray-600">
+                  ({technicianProfile.rating.toFixed(1)})
+                </span>
+              </div>
 
-            <div className="text-left space-y-3 bg-[#E5F4F5] p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="w-4 h-4 text-[#0B4F6C]" />
-                <span className="truncate">{technicianProfile.email}</span>
+              <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-100 py-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-[#0B4F6C]">{technicianProfile.totalJobs}</p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Jobs Done</p>
+                </div>
+                <div className="text-center border-l border-gray-100">
+                  <p className="text-2xl font-bold text-[#0B4F6C]">
+                    {new Date().getFullYear() - new Date(technicianProfile.created_at || Date.now()).getFullYear() + 1}
+                  </p>
+                  <p className="text-xs text-gray-500 uppercase tracking-wide">Years Exp.</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="w-4 h-4 text-[#0B4F6C]" />
-                <span>{technicianProfile.phone}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <MapPin className="w-4 h-4 text-[#0B4F6C]" />
-                <span className="truncate">{technicianProfile.address}</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Details & Settings */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card className="shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-[#0B4F6C]">Personal Information</CardTitle>
-              <Button 
-                variant={editingProfile ? "default" : "outline"}
-                onClick={() => {
-                  if (editingProfile) {
-                    updateProfile(technicianProfile);
-                  }
-                  setEditingProfile(!editingProfile);
-                }}
-                className={editingProfile ? "bg-[#0B4F6C] hover:bg-[#145A75]" : "border-[#0B4F6C] text-[#0B4F6C] hover:bg-[#E8F5F4]"}
-              >
-                {editingProfile ? "Save Changes" : "Edit Profile"}
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-500">Full Name</label>
-                  {editingProfile ? (
-                    <input 
-                      type="text" 
-                      value={technicianProfile.name}
-                      onChange={(e) => setTechnicianProfile({...technicianProfile, name: e.target.value})}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-[#0B4F6C] focus:border-transparent outline-none transition-all"
-                    />
-                  ) : (
-                    <p className="font-medium text-gray-900">{technicianProfile.name}</p>
-                  )}
+              <div className="space-y-3 text-left px-2">
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Mail className="w-4 h-4 text-[#0B4F6C]" />
+                  <span className="truncate">{technicianProfile.email}</span>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-500">Specialization</label>
-                  {editingProfile ? (
-                    <input 
-                      type="text" 
-                      value={technicianProfile.specialization}
-                      onChange={(e) => setTechnicianProfile({...technicianProfile, specialization: e.target.value})}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-[#0B4F6C] focus:border-transparent outline-none transition-all"
-                    />
-                  ) : (
-                    <p className="font-medium text-gray-900">{technicianProfile.specialization}</p>
-                  )}
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Phone className="w-4 h-4 text-[#0B4F6C]" />
+                  <span>{technicianProfile.phone}</span>
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-500">Email</label>
-                  {editingProfile ? (
-                    <input 
-                      type="email" 
-                      value={technicianProfile.email}
-                      onChange={(e) => setTechnicianProfile({...technicianProfile, email: e.target.value})}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-[#0B4F6C] focus:border-transparent outline-none transition-all"
-                    />
-                  ) : (
-                    <p className="font-medium text-gray-900">{technicianProfile.email}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-500">Phone</label>
-                  {editingProfile ? (
-                    <input 
-                      type="tel" 
-                      value={technicianProfile.phone}
-                      onChange={(e) => setTechnicianProfile({...technicianProfile, phone: e.target.value})}
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-[#0B4F6C] focus:border-transparent outline-none transition-all"
-                    />
-                  ) : (
-                    <p className="font-medium text-gray-900">{technicianProfile.phone}</p>
-                  )}
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <MapPin className="w-4 h-4 text-[#0B4F6C]" />
+                  <span className="truncate">{technicianProfile.address || "No address provided"}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="shadow-md">
-            <CardHeader>
-              <CardTitle className="text-[#0B4F6C]">Recent Reviews</CardTitle>
+          <Card className="border-red-100 shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-red-600 flex items-center gap-2 text-base">
+                <Shield className="w-4 h-4" />
+                Danger Zone
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {technicianRatings.map((review) => (
-                  <div key={review.id} className="border-b last:border-0 pb-4 last:pb-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">{review.customerName}</h4>
-                        <p className="text-xs text-gray-500">{review.service} • {review.date}</p>
-                      </div>
-                      <div className="flex">
-                        {renderStars(review.rating)}
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-600 italic">"{review.feedback}"</p>
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm text-gray-500 mb-4">
+                Permanently delete your account and all associated data. This action cannot be undone.
+              </p>
+              <Button variant="destructive" onClick={handleDeleteAccount} className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-none">
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Account
+              </Button>
             </CardContent>
           </Card>
+        </div>
 
-          <Card className="border-red-200 shadow-sm hover:shadow-md transition-all">
-            <CardHeader>
-              <CardTitle className="text-red-600">Danger Zone</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="font-medium text-gray-900">Delete Account</h4>
-                  <p className="text-sm text-gray-500">Permanently delete your account and all data.</p>
-                </div>
-                <Button variant="destructive" onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete Account
+        {/* Right Column: Edit Form */}
+        <div className="lg:col-span-8 space-y-6">
+          <Card className="shadow-md border-none">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-gray-50 pb-6">
+              <div>
+                <CardTitle className="text-xl text-[#0B4F6C]">Profile Settings</CardTitle>
+                <CardDescription>Update your personal details and public profile.</CardDescription>
+              </div>
+              {!editingProfile ? (
+                <Button onClick={() => {
+                  setFormData(technicianProfile);
+                  setEditingProfile(true);
+                }} className="bg-[#0B4F6C] hover:bg-[#145A75]">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit Profile
                 </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={handleCancel}>
+                    <X className="w-4 h-4 mr-2" />
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </Button>
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className="pt-6 space-y-8">
+              {/* Personal Info Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+                  <User className="w-5 h-5 text-[#0B4F6C]" />
+                  Personal Information
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Full Name</Label>
+                    <Input
+                      id="name"
+                      value={editingProfile ? formData.name : technicianProfile.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      disabled={!editingProfile}
+                      className="bg-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email Address</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={editingProfile ? formData.email : technicianProfile.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      disabled={!editingProfile}
+                      className="bg-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={editingProfile ? formData.phone : technicianProfile.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      disabled={!editingProfile}
+                      className="bg-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="address">Address</Label>
+                    <Input
+                      id="address"
+                      value={editingProfile ? (formData.address || "") : (technicianProfile.address || "")}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      disabled={!editingProfile}
+                      placeholder="Enter your address"
+                      className="bg-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Professional Info Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+                  <Briefcase className="w-5 h-5 text-[#0B4F6C]" />
+                  Professional Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="specialization">Specialization</Label>
+                    {editingProfile ? (
+                      <Select 
+                        value={formData.specialization} 
+                        onValueChange={(value) => setFormData({ ...formData, specialization: value })}
+                      >
+                        <SelectTrigger className="bg-white">
+                          <SelectValue placeholder="Select specialization" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {SPECIALIZATIONS.map((spec) => (
+                            <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="flex h-10 w-full items-center rounded-md border border-input bg-gray-50 px-3 py-2 text-sm text-gray-500">
+                        {technicianProfile.specialization}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Bio Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+                  <FileText className="w-5 h-5 text-[#0B4F6C]" />
+                  Professional Bio
+                </h3>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">About Me</Label>
+                  <Textarea
+                    id="bio"
+                    value={editingProfile ? (formData.bio || "") : (technicianProfile.bio || "No bio provided yet.")}
+                    onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                    disabled={!editingProfile}
+                    placeholder="Tell customers about your experience and expertise..."
+                    className={`min-h-[150px] resize-none ${!editingProfile ? "bg-gray-50 text-gray-500" : "bg-white"}`}
+                  />
+                  <p className="text-xs text-gray-500 text-right">
+                    {formData.bio ? formData.bio.length : 0}/500 characters
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>

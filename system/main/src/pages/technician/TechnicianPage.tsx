@@ -23,6 +23,14 @@ interface Appointment {
   status: "Pending" | "In Progress" | "Completed" | "Cancelled";
   notes: string;
   rawDate: Date;
+  rating?: number;
+  feedback?: string;
+  cancellationReason?: string;
+  cancellationCategory?: string;
+  rejectionReason?: string;
+  cancelledByRole?: string;
+  cancelledById?: string;
+  updatedAt?: Date;
 }
 
 export default function TechnicianPage() {
@@ -111,7 +119,14 @@ export default function TechnicianPage() {
           address: 'N/A', // TODO
           status: status,
           notes: job.customer_notes || '',
-          rawDate: new Date(job.appointment_date)
+          rawDate: new Date(job.appointment_date),
+          rating: job.rating,
+          feedback: job.feedback_text,
+          cancellationReason: job.cancellation_reason,
+          cancellationCategory: job.cancellation_category,
+          cancelledByRole: job.cancelled_by_role,
+          cancelledById: job.cancelled_by_id,
+          updatedAt: new Date(job.updated_at)
         };
       });
 
@@ -146,10 +161,12 @@ export default function TechnicianPage() {
           name: `${data.first_name} ${data.last_name}`,
           email: data.email,
           phone: data.phone_number,
-          address: "N/A", // TODO
-          specialization: data.specialty || "General Technician",
+          address: data.address || "",
+          specialization: data.specialty || "General",
           rating: parseFloat(data.average_rating) || 0,
-          totalJobs: data.total_jobs_completed || 0
+          totalJobs: data.total_jobs_completed || 0,
+          bio: data.bio || "",
+          created_at: data.created_at
         });
       }
     } catch (error) {
@@ -157,32 +174,18 @@ export default function TechnicianPage() {
     }
   };
 
-  const technicianRatings = [
-    {
-      id: "1",
-      customerName: "Maria Santos",
-      service: "Laptop Repair",
-      rating: 5,
-      feedback: "Excellent service! My laptop is working perfectly now. Very professional and quick.",
-      date: "November 20, 2025"
-    },
-    {
-      id: "2",
-      customerName: "Juan Dela Cruz",
-      service: "CCTV Installation",
-      rating: 5,
-      feedback: "Great work! The CCTV system was installed professionally and explained everything clearly.",
-      date: "November 18, 2025"
-    },
-    {
-      id: "3",
-      customerName: "Ana Reyes",
-      service: "PC Upgrade",
-      rating: 4,
-      feedback: "Good service, very knowledgeable. Could have been a bit faster but overall satisfied.",
-      date: "November 15, 2025"
-    }
-  ];
+  const technicianRatings = appointments
+    .filter(apt => typeof apt.rating === 'number' && apt.rating > 0)
+    .map(apt => ({
+      id: apt.id,
+      customerName: apt.customerName,
+      service: apt.service,
+      rating: apt.rating as number,
+      feedback: apt.feedback || "No written feedback provided.",
+      date: apt.date,
+      rawDate: apt.rawDate
+    }))
+    .sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => {
     try {
