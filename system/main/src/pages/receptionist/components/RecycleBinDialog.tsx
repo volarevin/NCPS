@@ -33,7 +33,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
   const fetchDeletedItems = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       const response = await fetch('http://localhost:5000/api/receptionist/appointments/marked-deletion', {
@@ -65,7 +65,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
 
   const handleRestore = async (id: number) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/restore`, {
@@ -85,7 +85,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
     if (!confirm('Are you sure? This cannot be undone.')) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/permanent`, {
@@ -105,7 +105,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
     if (!confirm('Are you sure you want to empty the recycle bin? All items will be permanently lost.')) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       await fetch('http://localhost:5000/api/receptionist/appointments/recycle-bin', {

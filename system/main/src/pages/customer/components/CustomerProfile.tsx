@@ -36,7 +36,7 @@ export function CustomerProfile() {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       const response = await fetch('http://localhost:5000/api/customer/profile', {
@@ -66,7 +66,7 @@ export function CustomerProfile() {
 
   const handleSave = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       const response = await fetch('http://localhost:5000/api/customer/profile', {
@@ -82,8 +82,8 @@ export function CustomerProfile() {
         toast.success('Profile updated successfully');
         setIsEditing(false);
         // Update local storage user info if needed
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        localStorage.setItem('user', JSON.stringify({ ...user, firstName: formData.firstName, lastName: formData.lastName }));
+        const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+        sessionStorage.setItem('user', JSON.stringify({ ...user, firstName: formData.firstName, lastName: formData.lastName }));
       } else {
         toast.error('Failed to update profile');
       }

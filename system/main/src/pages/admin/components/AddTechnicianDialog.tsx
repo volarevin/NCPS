@@ -53,7 +53,7 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
 
   const fetchUsers = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/admin/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -70,7 +70,7 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/admin/technicians/promote', {
         method: 'POST',
         headers: { 

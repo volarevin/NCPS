@@ -16,7 +16,7 @@ exports.getDashboardStats = (req, res) => {
 exports.getAppointments = (req, res) => {
   const userId = req.userId;
   const query = `
-    SELECT a.*, s.service_name, u.first_name as tech_first_name, u.last_name as tech_last_name
+    SELECT a.*, s.name as service_name, u.first_name as tech_first_name, u.last_name as tech_last_name
     FROM appointments a
     JOIN services s ON a.service_id = s.service_id
     LEFT JOIN users u ON a.technician_id = u.user_id

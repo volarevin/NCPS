@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Filter, Trash2, Calendar, Clock, User, Phone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ interface AppointmentScheduleProps {
 }
 
 export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearSelection }: AppointmentScheduleProps) {
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -77,10 +79,22 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
       const response = await fetch('http://localhost:5000/api/receptionist/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
       const data = await response.json();
       if (Array.isArray(data)) {
         setCategories(data.map((c: any) => c.name));
@@ -99,10 +113,22 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
 
   const fetchRecycleBinCount = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
       const response = await fetch('http://localhost:5000/api/receptionist/appointments/marked-deletion', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
@@ -116,10 +142,21 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
 
   const fetchAppointments = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
       const response = await fetch('http://localhost:5000/api/receptionist/appointments', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
       
       if (!response.ok) {
         throw new Error('Failed to fetch appointments');
@@ -131,6 +168,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
       if (Array.isArray(data)) {
         const mappedData = data.map((appt: any) => ({
           ...appt,
+          status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-'),
           service: appt.category ? `${appt.service} - ${appt.category}` : appt.service
         }));
         setAppointments(mappedData);
@@ -148,7 +186,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
 
   const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
@@ -170,7 +208,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
 
   const handleStatusUpdate = async (id: string, status: string, arg3?: string, arg4?: string) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       
       if (status === 'deleted') {
         await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/soft`, {
@@ -179,7 +217,12 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
         });
         toast.success("Appointment moved to recycle bin");
       } else {
-        const body: any = { status };
+        let backendStatus = status.charAt(0).toUpperCase() + status.slice(1);
+        if (status === 'in-progress') {
+            backendStatus = 'In Progress';
+        }
+
+        const body: any = { status: backendStatus };
         if (status === 'confirmed' && arg3) {
             body.technicianId = arg3;
         } else if ((status === 'rejected' || status === 'cancelled') && arg3) {
@@ -210,7 +253,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
     if (!confirm(`Are you sure you want to move ${filteredAppointments.length} appointments to the recycle bin?`)) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       await Promise.all(filteredAppointments.map(apt => 
         fetch(`http://localhost:5000/api/receptionist/appointments/${apt.id}/soft`, {
           method: 'DELETE',

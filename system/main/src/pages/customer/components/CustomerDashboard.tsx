@@ -7,8 +7,10 @@ import { ViewAppointmentDialog } from './ViewAppointmentDialog';
 import { EditAppointmentDialog } from './EditAppointmentDialog';
 import { PageHeader } from './PageHeader';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 export function CustomerDashboard() {
+  const navigate = useNavigate();
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [dashboardStats, setDashboardStats] = useState<any>(null);
@@ -16,25 +18,44 @@ export function CustomerDashboard() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
 
     const fetchDashboardData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
 
         const headers = { 'Authorization': `Bearer ${token}` };
 
         // Fetch Stats
         const statsRes = await fetch('http://localhost:5000/api/customer/stats', { headers });
+        
+        if (statsRes.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          navigate('/login');
+          return;
+        }
+
         const statsData = await statsRes.json();
         setDashboardStats(statsData);
 
         // Fetch Next Appointment (from appointments list)
         const apptRes = await fetch('http://localhost:5000/api/customer/appointments', { headers });
+        
+        if (apptRes.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          navigate('/login');
+          return;
+        }
+
         const apptData = await apptRes.json();
         
         // Find the first upcoming appointment

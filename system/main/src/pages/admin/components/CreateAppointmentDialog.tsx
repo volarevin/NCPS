@@ -48,7 +48,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const [usersRes, servicesRes] = await Promise.all([
         fetch('http://localhost:5000/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } }),
         fetch('http://localhost:5000/api/admin/services', { headers: { 'Authorization': `Bearer ${token}` } })
@@ -72,7 +72,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       
       // Combine date and time
       const dateTime = new Date(`${formData.appointment_date}T${formData.time}`);

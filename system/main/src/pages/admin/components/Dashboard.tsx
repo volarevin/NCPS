@@ -12,14 +12,16 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Calendar, Wrench, CheckCircle, Users, UserCheck, TrendingUp } from "lucide-react";
+import { Calendar, Wrench, CheckCircle, Users, UserCheck, TrendingUp, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PageHeader } from "./PageHeader";
 
 const COLORS = ["#5B8FFF", "#FFB366", "#5DD37C", "#FF6B6B", "#8884d8", "#9CA3AF"]; // Added Gray for Others
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [statsData, setStatsData] = useState<any>(null);
   const [monthlyStats, setMonthlyStats] = useState<any[]>([]);
   const [serviceStats, setServiceStats] = useState<any[]>([]);
@@ -28,8 +30,11 @@ export function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
 
         const headers = { 'Authorization': `Bearer ${token}` };
 
@@ -39,6 +44,13 @@ export function Dashboard() {
           fetch('http://localhost:5000/api/admin/service-distribution', { headers }),
           fetch('http://localhost:5000/api/admin/recent-activity', { headers })
         ]);
+
+        if (statsRes.status === 401 || monthlyRes.status === 401 || serviceRes.status === 401 || activityRes.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          navigate('/login');
+          return;
+        }
 
         const stats = await statsRes.json();
         const monthly = await monthlyRes.json();
@@ -115,6 +127,13 @@ export function Dashboard() {
       iconBg: "#FFB366",
     },
     {
+      icon: Activity,
+      value: formatNumber(statsData?.in_progress_count),
+      label: "In Progress",
+      bgColor: "#BFDBFE",
+      iconBg: "#3B82F6",
+    },
+    {
       icon: TrendingUp,
       value: formatCurrency(statsData?.monthly_revenue),
       label: "Monthly Revenue",
@@ -138,7 +157,7 @@ export function Dashboard() {
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {stats.map((stat, index) => (
           <div
             key={index}

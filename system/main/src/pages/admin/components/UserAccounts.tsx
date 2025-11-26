@@ -34,7 +34,7 @@ export function UserAccounts() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         const response = await fetch('http://localhost:5000/api/admin/users', {
@@ -86,7 +86,7 @@ export function UserAccounts() {
     setIsDetailsOpen(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
       const response = await fetch(`http://localhost:5000/api/admin/users/${user.id}/logs`, {
           headers: { 'Authorization': `Bearer ${token}` }

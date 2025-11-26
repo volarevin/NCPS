@@ -6,7 +6,7 @@ exports.getDashboardStats = (req, res) => {
       SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
-        SUM(CASE WHEN status = 'In Progress' THEN 1 ELSE 0 END) as in_progress,
+        SUM(CASE WHEN status IN ('In Progress', 'in-progress', 'in_progress', 'In-Progress') THEN 1 ELSE 0 END) as in_progress,
         SUM(CASE WHEN status = 'Confirmed' THEN 1 ELSE 0 END) as confirmed,
         SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed,
         SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled
@@ -162,7 +162,7 @@ exports.getAllAppointments = (req, res) => {
         hour: '2-digit', minute: '2-digit' 
       }),
       technician: row.tech_first ? `${row.tech_first} ${row.tech_last}` : 'Unassigned',
-      status: (row.status || 'Pending').toLowerCase().replace(' ', '-'),
+      status: (row.status || 'Pending').toLowerCase().replace(/[ _]/g, '-'),
       notes: row.customer_notes,
       rating: row.rating,
       feedback: row.feedback,

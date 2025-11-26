@@ -41,8 +41,8 @@ export function TechnicianSidebar({ currentPage, onNavigate, className = "" }: T
   };
 
   const confirmLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     toast.success('Logged out successfully');
     navigate('/login');
   };

@@ -75,7 +75,7 @@ export function Reports() {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         const response = await fetch('http://localhost:5000/api/admin/reports', {

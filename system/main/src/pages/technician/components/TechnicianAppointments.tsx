@@ -1,9 +1,12 @@
-import { Calendar, Clock, History, User, MapPin, Star, AlertCircle } from "lucide-react";
+import { Calendar, Clock, History, User, MapPin, Star, AlertCircle, Search, Filter, ArrowUpDown } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Separator } from "../../../components/ui/separator";
 import { Alert, AlertDescription } from "../../../components/ui/alert";
 import { PageHeader } from "./PageHeader";
+import { useState } from "react";
+import { Input } from "../../../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 interface TechnicianAppointmentsProps {
   appointments: any[];
@@ -18,6 +21,39 @@ export function TechnicianAppointments({
   updateAppointmentStatus,
   getStatusBadge
 }: TechnicianAppointmentsProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"date" | "created" | "updated" | "name">("created");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const filteredAppointments = appointments
+    .filter((apt) => {
+      const matchesSearch = 
+        apt.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        apt.service?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        apt.id?.toString().includes(searchTerm);
+      
+      const matchesStatus = statusFilter === "all" || apt.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      let comparison = 0;
+      if (sortBy === "date") {
+        comparison = new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime();
+      } else if (sortBy === "name") {
+        comparison = (a.clientName || "").localeCompare(b.clientName || "");
+      } else if (sortBy === "created") {
+        // Assuming id is somewhat chronological or we have createdAt, falling back to rawDate if not available
+        comparison = (a.createdAt ? new Date(a.createdAt).getTime() : 0) - (b.createdAt ? new Date(b.createdAt).getTime() : 0);
+        if (comparison === 0) comparison = parseInt(a.id) - parseInt(b.id);
+      } else if (sortBy === "updated") {
+         comparison = (a.updatedAt ? new Date(a.updatedAt).getTime() : 0) - (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+      }
+      
+      return sortOrder === "asc" ? comparison : -comparison;
+    });
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
       <PageHeader 
@@ -25,10 +61,6 @@ export function TechnicianAppointments({
         description="Manage your assigned service appointments."
         action={
           <div className="flex gap-2">
-            <Button variant="outline" className="gap-2 border-[#0B4F6C] text-[#0B4F6C] hover:bg-[#E8F5F4]">
-              <History className="w-4 h-4" />
-              History
-            </Button>
             <Button className="bg-[#0B4F6C] hover:bg-[#145A75] gap-2 shadow-md hover:shadow-lg transition-all">
               <Calendar className="w-4 h-4" />
               Calendar View
@@ -37,10 +69,76 @@ export function TechnicianAppointments({
         }
       />
 
+      {/* Filters & Search */}
+      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 justify-between">
+            <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                    placeholder="Search client, service, or ID..."
+                    className="pl-10 border-gray-200 focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+            
+            <div className="flex items-center gap-2">
+                 <Select 
+                    value={sortBy}
+                    onValueChange={(value: any) => setSortBy(value)}
+                 >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Sort by" />
+                    </SelectTrigger>
+                    <SelectContent>
+                     <SelectItem value="created">Date Created</SelectItem>
+                     <SelectItem value="updated">Date Updated</SelectItem>
+                     <SelectItem value="date">Appointment Date</SelectItem>
+                     <SelectItem value="name">Client Name</SelectItem>
+                    </SelectContent>
+                 </Select>
+
+                 <Button 
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="shrink-0"
+                 >
+                     <ArrowUpDown className="w-4 h-4" />
+                 </Button>
+            </div>
+        </div>
+
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+          <Filter className="w-4 h-4 text-gray-500 shrink-0" />
+          {[
+              { id: "all", label: "All" },
+              { id: "Confirmed", label: "Confirmed" },
+              { id: "In Progress", label: "In Progress" },
+              { id: "Completed", label: "Completed" },
+              { id: "Cancelled", label: "Cancelled" }
+          ].map((filter) => (
+              <button
+                key={filter.id}
+                onClick={() => setStatusFilter(filter.id)}
+                className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
+                  statusFilter === filter.id
+                    ? "bg-[#0B4F6C] text-white border-[#0B4F6C] shadow-md"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
+                }`}
+              >
+                {filter.label}
+              </button>
+            )
+          )}
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Appointment List */}
         <div className="lg:col-span-2 space-y-4">
-          {appointments.map((apt) => (
+          {filteredAppointments.length > 0 ? (
+            filteredAppointments.map((apt) => (
             <Card 
               key={apt.id}
               className="hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden group"
@@ -90,7 +188,7 @@ export function TechnicianAppointments({
                       >
                         View Details
                       </Button>
-                      {apt.status === "Pending" && (
+                      {(apt.status === "Pending" || apt.status === "Confirmed") && (
                         <Button 
                           size="sm" 
                           className="flex-1 sm:w-full bg-blue-500 hover:bg-blue-600 shadow-sm"
@@ -119,7 +217,12 @@ export function TechnicianAppointments({
                 </CardContent>
               </div>
             </Card>
-          ))}
+          ))
+          ) : (
+            <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
+                <p className="text-gray-500">No appointments found matching your criteria.</p>
+            </div>
+          )}
         </div>
 
         {/* Quick Stats / Summary */}

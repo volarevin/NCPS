@@ -233,8 +233,8 @@ export default function LoginPage() {
       }
 
       // Store token and user info
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      sessionStorage.setItem('token', data.token);
+      sessionStorage.setItem('user', JSON.stringify(data.user));
 
       toast.success(`Welcome back, ${data.user.firstName}!`);
 

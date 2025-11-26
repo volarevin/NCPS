@@ -10,10 +10,12 @@ import { CancelAppointmentDialog } from './CancelAppointmentDialog';
 import { RateTechnicianDialog } from './RateTechnicianDialog';
 import { PageHeader } from './PageHeader';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router-dom';
 
 type AppointmentStatus = 'all' | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 
 export function CustomerAppointments() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AppointmentStatus>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -27,12 +29,23 @@ export function CustomerAppointments() {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
 
         const response = await fetch('http://localhost:5000/api/customer/appointments', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (response.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          navigate('/login');
+          return;
+        }
+
         const data = await response.json();
 
         const formattedAppointments = data.map((appt: any) => ({
@@ -67,7 +80,7 @@ export function CustomerAppointments() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         },
         body: JSON.stringify({ status: 'Cancelled', reason })
       });

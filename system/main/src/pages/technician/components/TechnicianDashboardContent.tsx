@@ -8,6 +8,7 @@ interface TechnicianDashboardContentProps {
   stats: any[];
   todayAppointments: any[];
   upcomingAppointments: any[];
+  notifications: any[];
   setSelectedAppointment: (apt: any) => void;
   setActiveTab: (tab: "dashboard" | "appointments" | "profile" | "ratings") => void;
   getStatusBadge: (status: string) => JSX.Element;
@@ -18,6 +19,7 @@ export function TechnicianDashboardContent({
   stats,
   todayAppointments,
   upcomingAppointments,
+  notifications,
   setSelectedAppointment,
   setActiveTab,
   getStatusBadge
@@ -30,7 +32,7 @@ export function TechnicianDashboardContent({
       />
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {stats.map((stat, index) => (
           <Card key={index} className={`${stat.color} border-l-4 shadow-sm hover:shadow-md transition-all duration-200 bg-white`}>
             <CardContent className="p-4 lg:p-6">
@@ -139,43 +141,29 @@ export function TechnicianDashboardContent({
           <h2 className="text-xl font-bold text-[#0B4F6C]">Notifications</h2>
           <Card>
             <CardContent className="p-0">
-              <div className="divide-y">
-                <div className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex gap-3">
-                    <div className="mt-1">
-                      <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+              <div className="divide-y max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+                {notifications.length > 0 ? (
+                  notifications.map((notification) => (
+                    <div key={notification.id} className="p-4 hover:bg-gray-50 transition-colors">
+                      <div className="flex gap-3">
+                        <div className="mt-1">
+                          <div className={`w-2 h-2 rounded-full bg-${notification.color}-500 ${notification.type === 'assignment' ? 'animate-pulse' : ''}`}></div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{notification.title}</p>
+                          <p className="text-xs text-gray-500 mt-1">{notification.message}</p>
+                          <p className="text-xs text-gray-400 mt-2">
+                            {new Date(notification.time).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">New appointment assigned</p>
-                      <p className="text-xs text-gray-500 mt-1">Admin assigned you to a CCTV Installation on Nov 28.</p>
-                      <p className="text-xs text-gray-400 mt-2">2 hours ago</p>
-                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <p>No new notifications.</p>
                   </div>
-                </div>
-                <div className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex gap-3">
-                    <div className="mt-1">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">Job completed successfully</p>
-                      <p className="text-xs text-gray-500 mt-1">You marked "Laptop Repair" for Maria Santos as completed.</p>
-                      <p className="text-xs text-gray-400 mt-2">Yesterday</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex gap-3">
-                    <div className="mt-1">
-                      <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">New Rating Received</p>
-                      <p className="text-xs text-gray-500 mt-1">Maria Santos gave you 5 stars!</p>
-                      <p className="text-xs text-gray-400 mt-2">Yesterday</p>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

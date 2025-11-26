@@ -81,7 +81,7 @@ export function Technicians() {
 
   const fetchTechnicians = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       const response = await fetch('http://localhost:5000/api/admin/technicians', {
@@ -124,7 +124,7 @@ export function Technicians() {
 
   const handleViewDetails = async (techId: string) => {
     try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         const response = await fetch(`http://localhost:5000/api/admin/technicians/${techId}`, {
@@ -146,7 +146,7 @@ export function Technicians() {
 
   const handleViewAppointment = async (appointmentId: number) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
       
       const response = await fetch(`http://localhost:5000/api/admin/appointments/${appointmentId}`, {
@@ -169,7 +169,7 @@ export function Technicians() {
       variant: "destructive",
       onConfirm: async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
                 method: 'PUT',
                 headers: { 
@@ -197,7 +197,7 @@ export function Technicians() {
       variant: "destructive",
       onConfirm: async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
                 method: 'PUT',
                 headers: { 
@@ -218,7 +218,7 @@ export function Technicians() {
 
     const handleEdit = async (id: number, data: any) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await fetch(`http://localhost:5000/api/admin/technicians/${id}/profile`, {
         method: 'PUT',
         headers: { 

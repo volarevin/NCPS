@@ -1,5 +1,6 @@
 import { PageHeader } from "./PageHeader";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
 import { RecycleBinDialog } from "./RecycleBinDialog";
 import { CreateAppointmentDialog } from "./CreateAppointmentDialog";
@@ -49,6 +50,7 @@ interface Appointment {
 }
 
 export function Appointments() {
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -78,10 +80,22 @@ export function Appointments() {
 
   const fetchCategories = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
       const response = await fetch('http://localhost:5000/api/admin/categories', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
       const data = await response.json();
       if (Array.isArray(data)) {
         setCategories(data.map((c: any) => c.name));
@@ -93,11 +107,22 @@ export function Appointments() {
 
   const fetchRecycleBinCount = async () => {
     try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
+        const token = sessionStorage.getItem('token');
+        if (!token) {
+          navigate('/login');
+          return;
+        }
         const response = await fetch('http://localhost:5000/api/admin/appointments/recycle-bin/count', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
+
+        if (response.status === 401) {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('user');
+          navigate('/login');
+          return;
+        }
+
         const data = await response.json();
         setRecycleBinCount(data.count);
     } catch (error) {
@@ -107,12 +132,23 @@ export function Appointments() {
 
   const fetchAppointments = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
       const response = await fetch('http://localhost:5000/api/admin/appointments', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
       const data = await response.json();
 
       const formatted = data.map((appt: any) => ({
@@ -121,7 +157,7 @@ export function Appointments() {
         service: appt.service_name,
         date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        status: appt.status.toLowerCase(),
+        status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-'),
         phone: appt.customer_phone || 'N/A',
         email: appt.customer_email || 'N/A',
         address: 'N/A', 
@@ -236,7 +272,7 @@ export function Appointments() {
     }
 
     try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         const ids = filteredAppointments.map(a => a.id);
@@ -261,7 +297,7 @@ export function Appointments() {
 
   const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) return;
 
       await fetch(`http://localhost:5000/api/admin/appointments/${id}/details`, {
@@ -283,7 +319,7 @@ export function Appointments() {
 
   const handleStatusUpdate = async (id: string, newStatus: Appointment["status"] | 'deleted', arg3?: string, arg4?: string) => {
     try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         // If deleting (soft delete)
@@ -298,8 +334,11 @@ export function Appointments() {
             return;
         }
 
-        // Map frontend status to backend status (Capitalized)
-        const backendStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+        // Map frontend status to backend status
+        let backendStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+        if (newStatus === 'in-progress') {
+            backendStatus = 'In Progress';
+        }
         
         const body: any = { status: backendStatus };
         if (newStatus === 'confirmed' && arg3) {

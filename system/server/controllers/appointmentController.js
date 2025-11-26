@@ -27,16 +27,36 @@ exports.createAppointment = (req, res) => {
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status } = req.body;
+  const { status, reason, category } = req.body;
   const validStatuses = ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled', 'Rejected'];
 
   if (!validStatuses.includes(status)) {
     return res.status(400).json({ message: 'Invalid status.' });
   }
 
-  const query = 'UPDATE appointments SET status = ? WHERE appointment_id = ?';
+  let query = 'UPDATE appointments SET status = ?';
+  const params = [status];
 
-  db.query(query, [status, id], (err, result) => {
+  if (status === 'Cancelled' || status === 'Rejected') {
+    if (reason) {
+      query += ', cancellation_reason = ?';
+      params.push(reason);
+    }
+    if (category) {
+      query += ', cancellation_category = ?';
+      params.push(category);
+    }
+    // Also track who cancelled it if we have user info in request (from middleware)
+    if (req.userId) {
+        query += ', cancelled_by = ?';
+        params.push(req.userId);
+    }
+  }
+
+  query += ' WHERE appointment_id = ?';
+  params.push(id);
+
+  db.query(query, params, (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error updating appointment.' });

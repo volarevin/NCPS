@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,10 +47,11 @@ interface DashboardProps {
 }
 
 export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: DashboardProps) {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
-    'in-progress': 0,
+    in_progress: 0,
     confirmed: 0,
     completed: 0,
   });
@@ -83,15 +85,32 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
       const response = await fetch('http://localhost:5000/api/receptionist/dashboard-stats', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
       const data = await response.json();
       
+      const normalize = (appt: any) => ({
+          ...appt,
+          status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-')
+      });
+
       if (data.stats) setStats(data.stats);
-      if (data.todayAppointments) setTodayAppointments(data.todayAppointments);
-      if (data.pendingAppointments) setPendingAppointments(data.pendingAppointments);
+      if (data.todayAppointments) setTodayAppointments(data.todayAppointments.map(normalize));
+      if (data.pendingAppointments) setPendingAppointments(data.pendingAppointments.map(normalize));
       if (data.serviceSummary) setServiceSummary(data.serviceSummary);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -132,14 +151,17 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
     }
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
+      let backendStatus = status.charAt(0).toUpperCase() + status.slice(1);
+      if (status === 'in-progress') backendStatus = 'In Progress';
+
       await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status: backendStatus })
       });
       
       toast.success(`Appointment ${status}`);
@@ -154,7 +176,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
     if (!statusDialog.appointmentId) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const status = statusDialog.type === 'reject' ? 'rejected' : 'cancelled';
       
       await fetch(`http://localhost:5000/api/receptionist/appointments/${statusDialog.appointmentId}/status`, {
@@ -183,9 +205,10 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
   });
 
   const getStatusColor = (status: string) => {
-    switch (status) {
+    switch (status?.toLowerCase()) {
       case 'pending':
         return 'bg-orange-500';
+      case 'in progress':
       case 'in-progress':
         return 'bg-blue-400';
       case 'confirmed':
@@ -194,6 +217,8 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         return 'bg-green-500';
       case 'cancelled':
         return 'bg-red-500';
+      case 'rejected':
+        return 'bg-red-600';
       default:
         return 'bg-gray-500';
     }
@@ -216,7 +241,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         />
         <StatCard 
           title="In Progress" 
-          value={stats['in-progress']} 
+          value={stats.in_progress} 
           icon={Activity} 
           color="#3B82F6" 
         />
@@ -398,8 +423,11 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
           onStatusUpdate={async (id, status, technicianId) => {
             // Handle status update from dialog
             try {
-                const token = localStorage.getItem('token');
-                const body: any = { status };
+                const token = sessionStorage.getItem('token');
+                let backendStatus = status.charAt(0).toUpperCase() + status.slice(1);
+                if (status === 'in-progress') backendStatus = 'In Progress';
+
+                const body: any = { status: backendStatus };
                 if (status === 'confirmed' && technicianId) {
                     body.technicianId = technicianId;
                 }
@@ -423,7 +451,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
           }}
           onUpdateDetails={async (id, date, time, technicianId) => {
             try {
-              const token = localStorage.getItem('token');
+              const token = sessionStorage.getItem('token');
               await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
                 method: 'PUT',
                 headers: { 

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
@@ -21,47 +22,98 @@ interface Appointment {
   address: string;
   status: "Pending" | "In Progress" | "Completed" | "Cancelled";
   notes: string;
+  rawDate: Date;
 }
 
 export default function TechnicianPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"dashboard" | "appointments" | "profile" | "ratings">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [technicianProfile, setTechnicianProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     document.title = "Technician Dashboard";
     const init = async () => {
-      await Promise.all([fetchJobs(), fetchProfile()]);
+      await Promise.all([fetchJobs(), fetchProfile(), fetchNotifications()]);
       setIsLoading(false);
     };
     init();
   }, []);
 
+  const fetchNotifications = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+      const response = await fetch('http://localhost:5000/api/technician/notifications', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
+      const data = await response.json();
+      setNotifications(data);
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
+
   const fetchJobs = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
       const response = await fetch('http://localhost:5000/api/technician/jobs', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
       const data = await response.json();
 
-      const formatted = data.map((job: any) => ({
-        id: job.appointment_id.toString(),
-        customerName: `${job.customer_first_name} ${job.customer_last_name}`,
-        service: job.service_name,
-        date: new Date(job.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-        time: new Date(job.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-        phone: job.customer_phone || 'N/A',
-        email: job.customer_email || 'N/A',
-        address: 'N/A', // TODO
-        status: job.status,
-        notes: job.customer_notes || ''
-      }));
+      const formatted = data.map((job: any) => {
+        // Normalize status
+        let status = job.status;
+        const lowerStatus = status.toLowerCase();
+        if (lowerStatus === 'in-progress' || lowerStatus === 'in_progress' || lowerStatus === 'in progress') {
+          status = 'In Progress';
+        } else {
+          status = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+        }
+
+        return {
+          id: job.appointment_id.toString(),
+          customerName: `${job.customer_first_name} ${job.customer_last_name}`,
+          service: job.service_name,
+          date: new Date(job.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+          time: new Date(job.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+          phone: job.customer_phone || 'N/A',
+          email: job.customer_email || 'N/A',
+          address: 'N/A', // TODO
+          status: status,
+          notes: job.customer_notes || '',
+          rawDate: new Date(job.appointment_date)
+        };
+      });
 
       setAppointments(formatted);
     } catch (error) {
@@ -71,12 +123,22 @@ export default function TechnicianPage() {
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
       const response = await fetch('http://localhost:5000/api/technician/profile', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
       
       if (response.ok) {
         const data = await response.json();
@@ -121,57 +183,20 @@ export default function TechnicianPage() {
       date: "November 15, 2025"
     }
   ];
-  
 
-
-  const [appointmentHistory] = useState<Appointment[]>([
-    {
-      id: "4",
-      customerName: "Pedro Garcia",
-      service: "Computer Cleaning",
-      date: "November 20, 2025",
-      time: "11:00 AM",
-      phone: "+63 920 123 4567",
-      email: "pedro.garcia@email.com",
-      address: "321 Elm St, Taguig City, Metro Manila",
-      status: "Completed",
-      notes: "Full system cleaning and thermal paste replacement. All parts cleaned thoroughly."
-    },
-    {
-      id: "5",
-      customerName: "Lisa Mendoza",
-      service: "Virus Removal",
-      date: "November 18, 2025",
-      time: "3:00 PM",
-      phone: "+63 921 987 6543",
-      email: "lisa.mendoza@email.com",
-      address: "654 Maple Dr, Mandaluyong City, Metro Manila",
-      status: "Completed",
-      notes: "Removed malware and installed antivirus software. System running smoothly."
-    },
-    {
-      id: "6",
-      customerName: "Carlos Ramos",
-      service: "Network Setup",
-      date: "November 15, 2025",
-      time: "1:00 PM",
-      phone: "+63 922 456 7890",
-      email: "carlos.ramos@email.com",
-      address: "987 Cedar Ln, Paranaque City, Metro Manila",
-      status: "Cancelled",
-      notes: "Client cancelled due to schedule conflict."
-    }
-  ]);
-
-  const updateAppointmentStatus = async (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled") => {
+  const updateAppointmentStatus = async (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => {
     try {
+      const body: any = { status: newStatus };
+      if (reason) body.reason = reason;
+      if (category) body.category = category;
+
       const response = await fetch(`http://localhost:5000/api/appointments/${appointmentId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify(body)
       });
 
       if (!response.ok) throw new Error('Failed to update status');
@@ -197,7 +222,7 @@ export default function TechnicianPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         },
         body: JSON.stringify(updatedProfile)
       });
@@ -223,14 +248,6 @@ export default function TechnicianPage() {
       iconColor: "text-blue-600"
     },
     {
-      title: "Pending",
-      value: appointments.filter(a => a.status === "Pending").length,
-      subtitle: "Awaiting action",
-      icon: <Clock className="w-5 h-5" />,
-      color: "border-l-orange-500",
-      iconColor: "text-orange-600"
-    },
-    {
       title: "In Progress",
       value: appointments.filter(a => a.status === "In Progress").length,
       subtitle: "Currently working",
@@ -240,7 +257,7 @@ export default function TechnicianPage() {
     },
     {
       title: "Completed",
-      value: appointmentHistory.filter(a => a.status === "Completed").length,
+      value: appointments.filter(a => a.status === "Completed").length,
       subtitle: "Successfully finished",
       icon: <CheckCircle className="w-5 h-5" />,
       color: "border-l-green-500",
@@ -266,14 +283,17 @@ export default function TechnicianPage() {
   // Get today's appointments
   const todayAppointments = appointments.filter(a => {
     const today = new Date();
-    const appointmentDate = new Date(a.date);
+    const appointmentDate = new Date(a.rawDate);
     return appointmentDate.toDateString() === today.toDateString();
   });
 
   // Get upcoming appointments (next 7 days)
   const upcomingAppointments = appointments.filter(a => {
     const today = new Date();
-    const appointmentDate = new Date(a.date);
+    today.setHours(0, 0, 0, 0);
+    const appointmentDate = new Date(a.rawDate);
+    appointmentDate.setHours(0, 0, 0, 0);
+    
     const diffTime = appointmentDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     return diffDays > 0 && diffDays <= 7;
@@ -331,6 +351,7 @@ export default function TechnicianPage() {
             stats={stats}
             todayAppointments={todayAppointments}
             upcomingAppointments={upcomingAppointments}
+            notifications={notifications}
             setSelectedAppointment={setSelectedAppointment}
             setActiveTab={setActiveTab}
             getStatusBadge={getStatusBadge}

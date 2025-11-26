@@ -6,7 +6,7 @@ exports.getAssignedJobs = (req, res) => {
   const query = `
     SELECT a.*, u.first_name as customer_first_name, u.last_name as customer_last_name, 
            u.email as customer_email, u.phone_number as customer_phone,
-           s.service_name
+           s.name as service_name
     FROM appointments a
     JOIN users u ON a.customer_id = u.user_id
     JOIN services s ON a.service_id = s.service_id
@@ -28,8 +28,8 @@ exports.getProfile = (req, res) => {
   
   const query = `
     SELECT tp.*, u.first_name, u.last_name, u.email, u.phone_number
-    FROM technician_profiles tp
-    JOIN users u ON tp.user_id = u.user_id
+    FROM users u
+    LEFT JOIN technician_profiles tp ON u.user_id = tp.user_id
     WHERE u.user_id = ?
   `;
 
@@ -39,9 +39,19 @@ exports.getProfile = (req, res) => {
       return res.status(500).json({ message: 'Database error fetching profile.' });
     }
     if (results.length === 0) {
-      return res.status(404).json({ message: 'Profile not found.' });
+      return res.status(404).json({ message: 'User not found.' });
     }
-    res.json(results[0]);
+    
+    const data = results[0];
+    // Provide defaults if profile is missing
+    if (!data.specialty) {
+        data.specialty = 'General Technician';
+        data.availability_status = 'Available';
+        data.average_rating = 0;
+        data.total_jobs_completed = 0;
+    }
+    
+    res.json(data);
   });
 };
 
@@ -98,6 +108,77 @@ exports.updateProfile = (req, res) => {
           }
           res.json({ message: 'Profile updated successfully.' });
         });
+      });
+    });
+  });
+};
+
+exports.getNotifications = (req, res) => {
+  const technicianId = req.userId;
+
+  const queries = {
+    assignments: `
+      SELECT a.appointment_id, a.appointment_date, a.created_at, s.name as service_name
+      FROM appointments a
+      JOIN services s ON a.service_id = s.service_id
+      WHERE a.technician_id = ? AND a.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      ORDER BY a.created_at DESC
+    `,
+    reviews: `
+      SELECT r.rating, r.created_at, u.first_name, u.last_name
+      FROM reviews r
+      JOIN appointments a ON r.appointment_id = a.appointment_id
+      JOIN users u ON a.customer_id = u.user_id
+      WHERE a.technician_id = ? AND r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      ORDER BY r.created_at DESC
+    `,
+    completed: `
+      SELECT a.appointment_id, a.updated_at, s.name as service_name, u.first_name, u.last_name
+      FROM appointments a
+      JOIN services s ON a.service_id = s.service_id
+      JOIN users u ON a.customer_id = u.user_id
+      WHERE a.technician_id = ? AND a.status = 'Completed' AND a.updated_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      ORDER BY a.updated_at DESC
+    `
+  };
+
+  db.query(queries.assignments, [technicianId], (err, assignments) => {
+    if (err) return res.status(500).json({ error: err.message });
+
+    db.query(queries.reviews, [technicianId], (err, reviews) => {
+      if (err) return res.status(500).json({ error: err.message });
+
+      db.query(queries.completed, [technicianId], (err, completed) => {
+        if (err) return res.status(500).json({ error: err.message });
+
+        const notifications = [
+          ...assignments.map(a => ({
+            id: `assign-${a.appointment_id}`,
+            type: 'assignment',
+            title: 'New appointment assigned',
+            message: `You have been assigned to a ${a.service_name} on ${new Date(a.appointment_date).toLocaleDateString()}.`,
+            time: a.created_at,
+            color: 'blue'
+          })),
+          ...reviews.map(r => ({
+            id: `review-${r.created_at}`,
+            type: 'review',
+            title: 'New Rating Received',
+            message: `${r.first_name} ${r.last_name} gave you ${r.rating} stars!`,
+            time: r.created_at,
+            color: 'yellow'
+          })),
+          ...completed.map(c => ({
+            id: `complete-${c.appointment_id}`,
+            type: 'completed',
+            title: 'Job completed successfully',
+            message: `You marked "${c.service_name}" for ${c.first_name} ${c.last_name} as completed.`,
+            time: c.updated_at,
+            color: 'green'
+          }))
+        ].sort((a, b) => new Date(b.time) - new Date(a.time));
+
+        res.json(notifications);
       });
     });
   });

@@ -36,8 +36,8 @@ export function CustomerSidebar({ currentPage, onNavigate }: CustomerSidebarProp
   };
 
   const confirmLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     toast.success('Logged out successfully');
     navigate('/login');
   };

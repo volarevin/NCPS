@@ -4,6 +4,7 @@ import { Badge } from "../../../components/ui/badge";
 import { useState } from "react";
 import { Textarea } from "../../../components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 
 interface Appointment {
   id: string;
@@ -21,7 +22,7 @@ interface Appointment {
 interface AppointmentDetailsModalProps {
   appointment: Appointment;
   onClose: () => void;
-  onUpdateStatus: (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled") => void;
+  onUpdateStatus: (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => void;
   isTechnician?: boolean;
 }
 
@@ -33,6 +34,16 @@ export default function AppointmentDetailsModal({
 }: AppointmentDetailsModalProps) {
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
+  const [cancelCategory, setCancelCategory] = useState("");
+
+  const cancellationCategories = [
+    "No available technician",
+    "Scheduling conflict",
+    "Equipment failure",
+    "Emergency",
+    "Customer Request",
+    "Other"
+  ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -49,8 +60,8 @@ export default function AppointmentDetailsModal({
     }
   };
 
-  const handleStatusUpdate = (newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled") => {
-    onUpdateStatus(appointment.id, newStatus);
+  const handleStatusUpdate = (newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => {
+    onUpdateStatus(appointment.id, newStatus, reason, category);
   };
 
   const handleCancelAppointment = () => {
@@ -58,9 +69,14 @@ export default function AppointmentDetailsModal({
   };
 
   const confirmCancelAppointment = () => {
-    handleStatusUpdate("Cancelled");
+    if (!cancelCategory) {
+        alert("Please select a cancellation category");
+        return;
+    }
+    handleStatusUpdate("Cancelled", cancelReason, cancelCategory);
     setShowCancelDialog(false);
     setCancelReason("");
+    setCancelCategory("");
     alert(`Appointment cancelled${cancelReason ? ` with reason: ${cancelReason}` : ''}`);
     onClose();
   };
@@ -194,7 +210,7 @@ export default function AppointmentDetailsModal({
             {/* Action Buttons */}
             {isTechnician && appointment.status !== "Completed" && appointment.status !== "Cancelled" && (
               <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-                {appointment.status === "Pending" && (
+                {(appointment.status === "Pending" || appointment.status === "Confirmed") && (
                   <Button
                     onClick={() => {
                       handleStatusUpdate("In Progress");
@@ -267,6 +283,21 @@ export default function AppointmentDetailsModal({
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
+              <div>
+                <label className="text-sm text-gray-700 font-medium mb-2 block">
+                  Cancellation Category <span className="text-red-500">*</span>
+                </label>
+                <Select value={cancelCategory} onValueChange={setCancelCategory}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {cancellationCategories.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div>
                 <label className="text-sm text-gray-700 font-medium mb-2 block">
                   Cancellation Reason (Optional)

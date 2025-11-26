@@ -31,7 +31,7 @@ export function Services() {
 
   const fetchCategories = async () => {
     try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
         const response = await fetch('http://localhost:5000/api/admin/categories', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -45,7 +45,7 @@ export function Services() {
 
   const fetchServices = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         const response = await fetch('http://localhost:5000/api/admin/services', {
@@ -76,7 +76,7 @@ export function Services() {
 
   const handleUpdateCategory = async (id: number, color: string, icon: string) => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!token) return;
 
         await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
@@ -112,7 +112,7 @@ export function Services() {
   };
 
   const handleSaveService = async (service: Service) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return;
 
     try {
@@ -160,7 +160,7 @@ export function Services() {
   };
 
   const handleDeleteService = async (id: string) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (!token) return;
 
     try {

@@ -51,7 +51,7 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
     setIsLoading(true);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         toast.error('You must be logged in to book an appointment.');
         return;
