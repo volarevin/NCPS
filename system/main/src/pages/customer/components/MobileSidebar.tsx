@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LayoutDashboard, Calendar, User, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, Calendar, User, LogOut, X, Wrench } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -14,7 +14,7 @@ import {
   AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
 
-type Page = 'dashboard' | 'appointments' | 'profile';
+type Page = 'dashboard' | 'appointments' | 'profile' | 'services';
 
 interface MobileSidebarProps {
   currentPage: Page;
@@ -28,6 +28,7 @@ export function MobileSidebar({ currentPage, onNavigate, onClose }: MobileSideba
 
   const menuItems = [
     { id: 'dashboard' as Page, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'services' as Page, label: 'Services', icon: Wrench },
     { id: 'appointments' as Page, label: 'Appointments', icon: Calendar },
     { id: 'profile' as Page, label: 'My Account', icon: User },
   ];

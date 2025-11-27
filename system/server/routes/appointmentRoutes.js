@@ -13,4 +13,7 @@ router.post('/', checkRole(['Customer']), appointmentController.createAppointmen
 // Note: Customers might need to cancel, but we'll handle that separately or allow 'Cancelled' status update for them later if needed.
 router.put('/:id/status', checkRole(['Admin', 'Technician', 'Receptionist', 'Customer']), appointmentController.updateAppointmentStatus);
 
+// Update Appointment Details (Customer only, for Pending appointments)
+router.put('/:id', checkRole(['Customer']), appointmentController.updateAppointment);
+
 module.exports = router;

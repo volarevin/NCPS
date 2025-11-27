@@ -64,3 +64,49 @@ exports.updateAppointmentStatus = (req, res) => {
     res.json({ message: 'Appointment status updated successfully.' });
   });
 };
+
+exports.updateAppointment = (req, res) => {
+  const { id } = req.params;
+  const { serviceId, date, time, notes } = req.body;
+  const userId = req.userId;
+
+  // Only allow updating if status is Pending
+  const checkQuery = 'SELECT status, customer_id FROM appointments WHERE appointment_id = ?';
+  
+  db.query(checkQuery, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error checking appointment.' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Appointment not found.' });
+    }
+
+    const appointment = results[0];
+    
+    if (appointment.customer_id !== userId) {
+      return res.status(403).json({ message: 'Unauthorized to update this appointment.' });
+    }
+
+    if (appointment.status !== 'Pending') {
+      return res.status(400).json({ message: 'Only pending appointments can be updated.' });
+    }
+
+    const appointmentDate = `${date} ${time}:00`;
+    
+    const updateQuery = `
+      UPDATE appointments 
+      SET service_id = ?, appointment_date = ?, customer_notes = ?
+      WHERE appointment_id = ?
+    `;
+
+    db.query(updateQuery, [serviceId, appointmentDate, notes, id], (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Database error updating appointment.' });
+      }
+      res.json({ message: 'Appointment updated successfully.' });
+    });
+  });
+};

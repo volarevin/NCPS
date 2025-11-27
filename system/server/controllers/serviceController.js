@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 exports.getAllServices = (req, res) => {
-  const query = 'SELECT * FROM services ORDER BY service_name ASC';
+  const query = 'SELECT service_id, category_id, name as service_name, description, estimated_price as base_price, price_type, duration_minutes, is_active FROM services ORDER BY name ASC';
   
   db.query(query, (err, results) => {
     if (err) {

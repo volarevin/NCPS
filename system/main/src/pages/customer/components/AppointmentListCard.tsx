@@ -1,5 +1,6 @@
 import { Calendar, Clock, User, Eye, X, Star, Edit } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
+import { Badge } from "../../../components/ui/badge";
 
 interface AppointmentListCardProps {
   appointment: {
@@ -10,6 +11,12 @@ interface AppointmentListCardProps {
     time: string;
     status: 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
     technician: string;
+    technicianPhone?: string;
+    technicianEmail?: string;
+    address?: string;
+    notes?: string;
+    rating?: number;
+    feedback?: string;
   };
   onView: (appointment: any) => void;
   onCancel: (appointment: any) => void;
@@ -19,11 +26,11 @@ interface AppointmentListCardProps {
 
 export function AppointmentListCard({ appointment, onView, onCancel, onRate, onEdit }: AppointmentListCardProps) {
   const statusColors = {
-    pending: { bg: 'bg-orange-100', text: 'text-orange-700', badge: 'bg-orange-500' },
-    confirmed: { bg: 'bg-blue-100', text: 'text-blue-700', badge: 'bg-blue-500' },
-    in_progress: { bg: 'bg-blue-100', text: 'text-blue-700', badge: 'bg-blue-600' },
-    completed: { bg: 'bg-green-100', text: 'text-green-700', badge: 'bg-green-500' },
-    cancelled: { bg: 'bg-red-100', text: 'text-red-700', badge: 'bg-red-500' },
+    pending: { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', badge: 'bg-orange-100 text-orange-700 hover:bg-orange-200' },
+    confirmed: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', badge: 'bg-blue-100 text-blue-700 hover:bg-blue-200' },
+    in_progress: { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200', badge: 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200' },
+    completed: { bg: 'bg-green-50', text: 'text-green-700', border: 'border-green-200', badge: 'bg-green-100 text-green-700 hover:bg-green-200' },
+    cancelled: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', badge: 'bg-red-100 text-red-700 hover:bg-red-200' },
   };
 
   const statusLabels = {
@@ -34,84 +41,98 @@ export function AppointmentListCard({ appointment, onView, onCancel, onRate, onE
     cancelled: 'Cancelled',
   };
 
-  const colors = statusColors[appointment.status];
+  const colors = statusColors[appointment.status] || statusColors.pending;
 
   return (
-    <div className={`bg-white rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-all duration-200 border-l-4 ${colors.bg.replace('100', '300')}`}>
-      <div className="flex items-start justify-between mb-2 md:mb-4">
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-1.5 md:mb-2 gap-2">
-            <div className="flex-1 min-w-0">
-              <h3 className="text-[#1A5560] mb-0.5 md:mb-1 text-sm md:text-lg">{appointment.service}</h3>
-              <p className="text-xs md:text-sm text-[#1A5560]/60">{appointment.description}</p>
+    <div className={`bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 overflow-hidden group`}>
+      <div className="p-5">
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-2">
+              <Badge className={`${colors.badge} border-0 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide`}>
+                {statusLabels[appointment.status]}
+              </Badge>
+              <span className="text-xs text-gray-400 font-medium">#{appointment.id}</span>
             </div>
-            <span className={`${colors.badge} text-white px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-sm whitespace-nowrap self-start`}>
-              {statusLabels[appointment.status]}
-            </span>
+            <h3 className="text-lg font-bold text-[#1A5560] mb-1 group-hover:text-[#3FA9BC] transition-colors">
+              {appointment.service}
+            </h3>
+            <p className="text-sm text-gray-500 line-clamp-2">
+              {appointment.description}
+            </p>
           </div>
           
-          <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-1.5 sm:gap-4 mt-2">
-            <div className="flex items-center gap-1 text-xs md:text-sm text-[#1A5560]/70">
-              <Calendar className="w-3 h-3 md:w-4 md:h-4" />
-              <span>{appointment.date}</span>
+          <div className="flex flex-col sm:flex-row gap-3 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg border border-gray-100">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-[#3FA9BC]" />
+              <span className="font-medium">{appointment.date}</span>
             </div>
-            <div className="flex items-center gap-1 text-xs md:text-sm text-[#1A5560]/70">
-              <Clock className="w-3 h-3 md:w-4 md:h-4" />
-              <span>{appointment.time}</span>
-            </div>
-            <div className="flex items-center gap-1 text-xs md:text-sm text-[#1A5560]/70">
-              <User className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="truncate">{appointment.technician}</span>
+            <div className="hidden sm:block w-px h-4 bg-gray-300 self-center"></div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-[#3FA9BC]" />
+              <span className="font-medium">{appointment.time}</span>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 pt-2 md:pt-4 border-t border-gray-200">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onView(appointment)}
-          className="border-[#1A5560] text-[#1A5560] hover:bg-[#1A5560]/10 transition-colors duration-200 w-full sm:w-auto h-8 text-xs md:text-sm"
-        >
-          <Eye className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-          View
-        </Button>
-        
-        {(appointment.status === 'pending' || appointment.status === 'confirmed') && (
-          <>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onEdit && onEdit(appointment)}
-              className="border-[#3FA9BC] text-[#3FA9BC] hover:bg-[#3FA9BC]/10 transition-colors duration-200 w-full sm:w-auto h-8 text-xs md:text-sm"
+        <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+          <User className="w-4 h-4 text-gray-400" />
+          <span>Technician: <span className="font-medium text-gray-700">{appointment.technician}</span></span>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-50">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onView(appointment)}
+            className="text-gray-600 hover:text-[#1A5560] hover:bg-gray-50 border-gray-200"
+          >
+            <Eye className="w-3.5 h-3.5 mr-1.5" />
+            View Details
+          </Button>
+
+          {appointment.status === 'pending' && onEdit && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onEdit(appointment)}
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 border-blue-200"
             >
-              <Edit className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+              <Edit className="w-3.5 h-3.5 mr-1.5" />
               Edit
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
+          )}
+
+          {(appointment.status === 'pending' || appointment.status === 'confirmed') && (
+            <Button 
+              variant="outline" 
+              size="sm" 
               onClick={() => onCancel(appointment)}
-              className="border-red-500 text-red-600 hover:bg-red-50 transition-colors duration-200 w-full sm:w-auto h-8 text-xs md:text-sm"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 ml-auto"
             >
-              <X className="w-3 h-3 md:w-4 md:h-4 mr-1" />
+              <X className="w-3.5 h-3.5 mr-1.5" />
               Cancel
             </Button>
-          </>
-        )}
+          )}
 
-        {appointment.status === 'completed' && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => onRate(appointment)}
-            className="border-yellow-500 text-yellow-600 hover:bg-yellow-50 transition-colors duration-200 w-full sm:w-auto h-8 text-xs md:text-sm"
-          >
-            <Star className="w-3 h-3 md:w-4 md:h-4 mr-1" />
-            Rate
-          </Button>
-        )}
+          {appointment.status === 'completed' && !appointment.rating && (
+            <Button 
+              size="sm" 
+              onClick={() => onRate(appointment)}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white ml-auto shadow-sm"
+            >
+              <Star className="w-3.5 h-3.5 mr-1.5 fill-current" />
+              Rate Service
+            </Button>
+          )}
+          
+          {appointment.status === 'completed' && appointment.rating && (
+            <div className="ml-auto flex items-center gap-1 text-yellow-500 font-medium text-sm bg-yellow-50 px-3 py-1.5 rounded-full border border-yellow-100">
+              <Star className="w-3.5 h-3.5 fill-current" />
+              <span>{appointment.rating}/5</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

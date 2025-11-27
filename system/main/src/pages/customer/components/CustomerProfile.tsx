@@ -14,6 +14,14 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../../../components/ui/alert-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../../../components/ui/dialog";
 import { PageHeader } from './PageHeader';
 import { toast } from 'sonner';
 
@@ -27,7 +35,7 @@ export function CustomerProfile() {
     lastName: '',
     email: '',
     phone: '',
-    address: '123 Main St, Nasugbu, Batangas', // Hardcoded for now
+    address: '',
   });
 
   useEffect(() => {
@@ -50,7 +58,8 @@ export function CustomerProfile() {
           firstName: data.first_name,
           lastName: data.last_name,
           email: data.email,
-          phone: data.phone_number
+          phone: data.phone_number,
+          address: data.address || ''
         }));
       }
     } catch (error) {
@@ -93,17 +102,70 @@ export function CustomerProfile() {
     }
   };
 
-  const handlePasswordChange = () => {
-    // Handle password change
-    console.log('Changing password');
-    setShowPasswordDialog(false);
-    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const handlePasswordChange = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast.error('New passwords do not match');
+      return;
+    }
+
+    try {
+      const token = sessionStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/customer/change-password', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Password updated successfully');
+        setShowPasswordDialog(false);
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toast.error(data.message || 'Failed to update password');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      toast.error('An error occurred');
+    }
   };
 
-  const handleDeleteAccount = () => {
-    // Handle account deletion
-    console.log('Deleting account');
-    setShowDeleteDialog(false);
+  const handleDeleteAccount = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('http://localhost:5000/api/customer/account', {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${token}` 
+        }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Account deleted successfully');
+        sessionStorage.clear();
+        window.location.href = '/login';
+      } else {
+        toast.error(data.message || 'Failed to delete account');
+        setShowDeleteDialog(false);
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast.error('An error occurred');
+      setShowDeleteDialog(false);
+    }
   };
 
   return (
@@ -300,37 +362,52 @@ export function CustomerProfile() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Change Password Dialog - Simplified for demo */}
-      <AlertDialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Change Password</AlertDialogTitle>
-            <AlertDialogDescription>
+      {/* Change Password Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
               Enter your current password and new password below.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <div className="space-y-3 py-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="current" className="text-xs">Current Password</Label>
-              <Input type="password" id="current" className="h-8" />
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="current">Current Password</Label>
+              <Input 
+                type="password" 
+                id="current" 
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+              />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="new" className="text-xs">New Password</Label>
-              <Input type="password" id="new" className="h-8" />
+            <div className="space-y-2">
+              <Label htmlFor="new">New Password</Label>
+              <Input 
+                type="password" 
+                id="new" 
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+              />
             </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="confirm" className="text-xs">Confirm New Password</Label>
-              <Input type="password" id="confirm" className="h-8" />
+            <div className="space-y-2">
+              <Label htmlFor="confirm">Confirm New Password</Label>
+              <Input 
+                type="password" 
+                id="confirm" 
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+              />
             </div>
           </div>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handlePasswordChange}>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>Cancel</Button>
+            <Button onClick={handlePasswordChange} className="bg-[#3FA9BC] hover:bg-[#2A6570]">
               Update Password
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

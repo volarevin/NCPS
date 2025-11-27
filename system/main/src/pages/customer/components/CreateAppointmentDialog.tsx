@@ -16,14 +16,16 @@ import { toast } from 'sonner';
 interface CreateAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialServiceId?: string;
+  initialDate?: string;
 }
 
-export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmentDialogProps) {
+export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, initialDate }: CreateAppointmentDialogProps) {
   const [formData, setFormData] = useState({
-    serviceId: '',
-    date: '',
+    serviceId: initialServiceId || '',
+    date: initialDate || '',
     time: '',
-    address: '', // Note: Address is not yet in the backend schema for appointments, assuming it's part of user profile or notes for now.
+    address: '', 
     notes: '',
   });
   const [services, setServices] = useState<any[]>([]);
@@ -32,17 +34,29 @@ export function CreateAppointmentDialog({ open, onOpenChange }: CreateAppointmen
   useEffect(() => {
     if (open) {
       fetchServices();
+      setFormData(prev => ({
+        ...prev,
+        serviceId: initialServiceId || prev.serviceId,
+        date: initialDate || prev.date
+      }));
     }
-  }, [open]);
+  }, [open, initialServiceId, initialDate]);
 
   const fetchServices = async () => {
     try {
       const response = await fetch('http://localhost:5000/api/services');
       const data = await response.json();
-      setServices(data);
+      if (Array.isArray(data)) {
+        setServices(data);
+      } else {
+        console.error('Expected array of services, got:', data);
+        setServices([]);
+        toast.error('Failed to load services data');
+      }
     } catch (error) {
       console.error('Error fetching services:', error);
       toast.error('Failed to load services');
+      setServices([]);
     }
   };
 

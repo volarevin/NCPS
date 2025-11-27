@@ -4,7 +4,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../../components/ui/dialog";
-import { Calendar, Clock, MapPin, User, Phone, Mail, FileText } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Phone, Mail, FileText, Check, Circle } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 
 interface ViewAppointmentDialogProps {
@@ -34,6 +34,16 @@ export function ViewAppointmentDialog({ open, onOpenChange, appointment, onEdit,
     cancelled: 'Cancelled',
   };
 
+  const steps = [
+    { id: 'pending', label: 'Pending' },
+    { id: 'confirmed', label: 'Confirmed' },
+    { id: 'in_progress', label: 'In Progress' },
+    { id: 'completed', label: 'Completed' },
+  ];
+
+  const currentStepIndex = steps.findIndex(step => step.id === appointment.status);
+  const isCancelled = appointment.status === 'cancelled';
+
   const handleEdit = () => {
     if (onEdit) {
       onEdit(appointment);
@@ -61,6 +71,44 @@ export function ViewAppointmentDialog({ open, onOpenChange, appointment, onEdit,
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
+          {/* Order Status Stepper */}
+          {!isCancelled && (
+            <div className="relative flex items-center justify-between w-full px-2 mb-6">
+                <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 -z-10" />
+                <div 
+                    className="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-[#3FA9BC] -z-10 transition-all duration-500" 
+                    style={{ width: `${(currentStepIndex / (steps.length - 1)) * 100}%` }}
+                />
+                
+                {steps.map((step, index) => {
+                    const isCompleted = index <= currentStepIndex;
+                    
+                    return (
+                        <div key={step.id} className="flex flex-col items-center bg-white px-2">
+                            <div 
+                                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-colors duration-300 ${
+                                    isCompleted 
+                                        ? 'bg-[#3FA9BC] border-[#3FA9BC] text-white' 
+                                        : 'bg-white border-gray-300 text-gray-300'
+                                }`}
+                            >
+                                {isCompleted ? <Check className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                            </div>
+                            <span className={`text-xs mt-1 font-medium ${isCompleted ? 'text-[#3FA9BC]' : 'text-gray-400'}`}>
+                                {step.label}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+          )}
+
+          {isCancelled && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center mb-4">
+                  <p className="text-red-600 font-medium">This appointment has been cancelled.</p>
+              </div>
+          )}
+
           {/* Service Information */}
           <div>
             <h3 className="text-[#1A5560] mb-2 text-sm font-semibold">Service Information</h3>

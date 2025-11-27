@@ -11,5 +11,9 @@ router.get('/stats', customerController.getDashboardStats);
 router.get('/appointments', customerController.getAppointments);
 router.get('/profile', customerController.getProfile);
 router.put('/profile', customerController.updateProfile);
+router.put('/change-password', customerController.changePassword);
+router.delete('/account', customerController.deleteAccount);
+router.get('/featured-services', customerController.getFeaturedServices);
+router.get('/services', customerController.getAllServices);
 
 module.exports = router;

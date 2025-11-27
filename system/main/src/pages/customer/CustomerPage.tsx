@@ -3,10 +3,11 @@ import { CustomerSidebar } from './components/CustomerSidebar';
 import { CustomerDashboard } from './components/CustomerDashboard';
 import { CustomerAppointments } from './components/CustomerAppointments';
 import { CustomerProfile } from './components/CustomerProfile';
+import { CustomerServices } from './components/CustomerServices';
 import { MobileHeader } from './components/MobileHeader';
 import { MobileSidebar } from './components/MobileSidebar';
 
-export type Page = 'dashboard' | 'appointments' | 'profile';
+export type Page = 'dashboard' | 'appointments' | 'profile' | 'services';
 
 export default function CustomerPage() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
@@ -50,6 +51,7 @@ export default function CustomerPage() {
       
       <main className="flex-1 overflow-y-auto pt-16 lg:pt-0">
         {currentPage === 'dashboard' && <CustomerDashboard />}
+        {currentPage === 'services' && <CustomerServices />}
         {currentPage === 'appointments' && <CustomerAppointments />}
         {currentPage === 'profile' && <CustomerProfile />}
       </main>

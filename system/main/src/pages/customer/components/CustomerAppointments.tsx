@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, Search } from 'lucide-react';
+import { Plus, Calendar, Search, List } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { AppointmentListCard } from './AppointmentListCard';
@@ -8,15 +8,18 @@ import { ViewAppointmentDialog } from './ViewAppointmentDialog';
 import { EditAppointmentDialog } from './EditAppointmentDialog';
 import { CancelAppointmentDialog } from './CancelAppointmentDialog';
 import { RateTechnicianDialog } from './RateTechnicianDialog';
+import { CustomerCalendar } from './CustomerCalendar';
 import { PageHeader } from './PageHeader';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 type AppointmentStatus = 'all' | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
+type ViewMode = 'list' | 'calendar';
 
 export function CustomerAppointments() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AppointmentStatus>('all');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
@@ -25,50 +28,59 @@ export function CustomerAppointments() {
   const [isCancelDialogOpen, setIsCancelDialogOpen] = useState(false);
   const [isRateDialogOpen, setIsRateDialogOpen] = useState(false);
   const [appointments, setAppointments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedDateForBooking, setSelectedDateForBooking] = useState<string>('');
+
+  const fetchAppointments = async () => {
+    try {
+      setIsLoading(true);
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
+      const response = await fetch('http://localhost:5000/api/customer/appointments', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (response.status === 401) {
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        navigate('/login');
+        return;
+      }
+
+      const data = await response.json();
+
+      const formattedAppointments = data.map((appt: any) => ({
+        id: appt.appointment_id.toString(),
+        serviceId: appt.service_id,
+        service: appt.service_name,
+        description: appt.customer_notes || 'No description provided',
+        date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+        time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false }),
+        rawDate: appt.appointment_date.split('T')[0], // For edit form
+        status: appt.status.toLowerCase().replace(' ', '_'),
+        technician: appt.tech_first_name ? `${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
+        technicianPhone: appt.tech_phone || '',
+        technicianEmail: appt.tech_email || '',
+        address: '123 Main St, Nasugbu, Batangas', // TODO: Fetch from user profile
+        notes: appt.customer_notes,
+        rating: appt.rating,
+        feedback: appt.feedback_text
+      }));
+
+      setAppointments(formattedAppointments);
+    } catch (error) {
+      console.error('Error fetching appointments:', error);
+      toast.error('Failed to load appointments');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const token = sessionStorage.getItem('token');
-        if (!token) {
-          navigate('/login');
-          return;
-        }
-
-        const response = await fetch('http://localhost:5000/api/customer/appointments', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-
-        if (response.status === 401) {
-          sessionStorage.removeItem('token');
-          sessionStorage.removeItem('user');
-          navigate('/login');
-          return;
-        }
-
-        const data = await response.json();
-
-        const formattedAppointments = data.map((appt: any) => ({
-          id: appt.appointment_id.toString(),
-          service: appt.service_name,
-          description: appt.customer_notes || 'No description provided',
-          date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-          time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
-          status: appt.status.toLowerCase().replace(' ', '_'),
-          technician: appt.tech_first_name ? `Tech ${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
-          technicianPhone: '', // TODO
-          technicianEmail: '', // TODO
-          address: '123 Main St, Nasugbu, Batangas', // TODO
-          notes: appt.customer_notes,
-        }));
-
-        setAppointments(formattedAppointments);
-      } catch (error) {
-        console.error('Error fetching appointments:', error);
-        toast.error('Failed to load appointments');
-      }
-    };
-
     fetchAppointments();
   }, []);
 
@@ -82,7 +94,7 @@ export function CustomerAppointments() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         },
-        body: JSON.stringify({ status: 'Cancelled', reason })
+        body: JSON.stringify({ status: 'Cancelled', reason, category: 'Customer Request' })
       });
 
       if (!response.ok) throw new Error('Failed to cancel appointment');
@@ -93,6 +105,7 @@ export function CustomerAppointments() {
       
       toast.success('Appointment cancelled successfully');
       setIsCancelDialogOpen(false);
+      fetchAppointments(); // Refresh to get updated state
     } catch (error) {
       console.error('Error cancelling appointment:', error);
       toast.error('Failed to cancel appointment');
@@ -134,17 +147,8 @@ export function CustomerAppointments() {
       />
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm p-3 md:p-4 mb-4 md:mb-6">
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 text-gray-400" />
-            <Input
-              placeholder="Search appointments..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 md:pl-10 border-gray-200 focus:border-[#3FA9BC] focus:ring-[#3FA9BC] h-9 md:h-10 text-sm"
-            />
-          </div>
+      <div className="bg-white rounded-xl shadow-sm p-3 md:p-4 mb-4 md:mb-6 border border-gray-100">
+        <div className="flex flex-col lg:flex-row gap-4 justify-between">
           <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
             {tabs.map((tab) => (
               <button
@@ -153,48 +157,120 @@ export function CustomerAppointments() {
                 className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-[#1A5560] text-white shadow-md'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200'
                 }`}
               >
                 {tab.label}
               </button>
             ))}
           </div>
+          
+          <div className="flex gap-2 items-center">
+            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+              <button
+                onClick={() => setViewMode('list')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
+                  viewMode === 'list' 
+                    ? 'bg-white shadow-sm text-[#1A5560]' 
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                }`}
+              >
+                <List className="w-4 h-4" />
+                <span className="hidden sm:inline">List</span>
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
+                  viewMode === 'calendar' 
+                    ? 'bg-white shadow-sm text-[#1A5560]' 
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                }`}
+              >
+                <Calendar className="w-4 h-4" />
+                <span className="hidden sm:inline">Calendar</span>
+              </button>
+            </div>
+
+            <div className="relative w-full lg:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Input
+                placeholder="Search appointments..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 border-gray-200 focus:border-[#3FA9BC] focus:ring-[#3FA9BC] h-9 md:h-10 text-sm"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Appointments List */}
-      <div className="space-y-3 md:space-y-4">
-        {filteredAppointments.length > 0 ? (
-          filteredAppointments.map((appointment) => (
-            <AppointmentListCard
-              key={appointment.id}
-              appointment={appointment}
-              onView={(apt) => {
-                setSelectedAppointment(apt);
-                setIsViewDialogOpen(true);
-              }}
-              onCancel={(apt) => {
-                setSelectedAppointment(apt);
-                setIsCancelDialogOpen(true);
-              }}
-              onRate={(apt) => {
-                setSelectedAppointment(apt);
-                setIsRateDialogOpen(true);
-              }}
-              onEdit={(apt) => {
-                setSelectedAppointment(apt);
-                setIsEditDialogOpen(true);
-              }}
-            />
-          ))
+      {/* Appointments List or Calendar */}
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3FA9BC] mx-auto"></div>
+            <p className="mt-2 text-gray-500 text-sm">Loading appointments...</p>
+          </div>
+        ) : viewMode === 'calendar' ? (
+          <CustomerCalendar 
+            appointments={filteredAppointments}
+            setSelectedAppointment={setSelectedAppointment}
+            onViewAppointment={(apt) => {
+              setSelectedAppointment(apt);
+              setIsViewDialogOpen(true);
+            }}
+            onCreateAppointment={(date) => {
+              // Format date as YYYY-MM-DD for the input, adjusting for timezone offset
+              const offset = date.getTimezoneOffset();
+              const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+              const formattedDate = localDate.toISOString().split('T')[0];
+              setSelectedDateForBooking(formattedDate);
+              setIsCreateDialogOpen(true);
+            }}
+          />
+        ) : filteredAppointments.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4">
+            {filteredAppointments.map((appointment) => (
+              <AppointmentListCard
+                key={appointment.id}
+                appointment={appointment}
+                onView={(apt) => {
+                  setSelectedAppointment(apt);
+                  setIsViewDialogOpen(true);
+                }}
+                onCancel={(apt) => {
+                  setSelectedAppointment(apt);
+                  setIsCancelDialogOpen(true);
+                }}
+                onRate={(apt) => {
+                  setSelectedAppointment(apt);
+                  setIsRateDialogOpen(true);
+                }}
+                onEdit={(apt) => {
+                  setSelectedAppointment(apt);
+                  setIsEditDialogOpen(true);
+                }}
+              />
+            ))}
+          </div>
         ) : (
-          <div className="text-center py-8 md:py-12 bg-white rounded-xl border-2 border-dashed border-gray-200">
-            <div className="w-12 h-12 md:w-16 md:h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-              <Calendar className="w-6 h-6 md:w-8 md:h-8 text-gray-400" />
+          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-200">
+            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-[#1A5560] font-medium mb-1 text-sm md:text-base">No appointments found</h3>
-            <p className="text-gray-500 text-xs md:text-sm">Try adjusting your search or filters</p>
+            <h3 className="text-[#1A5560] font-medium mb-1 text-lg">No appointments found</h3>
+            <p className="text-gray-500 text-sm mb-6">
+              {searchQuery ? 'Try adjusting your search terms' : 'You haven\'t booked any appointments yet'}
+            </p>
+            {!searchQuery && (
+              <Button 
+                onClick={() => setIsCreateDialogOpen(true)}
+                variant="outline"
+                className="border-[#3FA9BC] text-[#3FA9BC] hover:bg-[#3FA9BC]/10"
+              >
+                Book Your First Appointment
+              </Button>
+            )}
           </div>
         )}
       </div>
@@ -202,7 +278,14 @@ export function CustomerAppointments() {
       {/* Dialogs */}
       <CreateAppointmentDialog
         open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        onOpenChange={(open) => {
+          setIsCreateDialogOpen(open);
+          if (!open) {
+            fetchAppointments();
+            setSelectedDateForBooking('');
+          }
+        }}
+        initialDate={selectedDateForBooking}
       />
 
       <ViewAppointmentDialog
@@ -223,7 +306,10 @@ export function CustomerAppointments() {
 
       <EditAppointmentDialog
         open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
+        onOpenChange={(open) => {
+          setIsEditDialogOpen(open);
+          if (!open) fetchAppointments();
+        }}
         appointment={selectedAppointment}
       />
 
@@ -236,9 +322,13 @@ export function CustomerAppointments() {
 
       <RateTechnicianDialog
         open={isRateDialogOpen}
-        onOpenChange={setIsRateDialogOpen}
+        onOpenChange={(open) => {
+          setIsRateDialogOpen(open);
+          if (!open) fetchAppointments();
+        }}
         appointment={selectedAppointment}
       />
     </div>
   );
 }
+
