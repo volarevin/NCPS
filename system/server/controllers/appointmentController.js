@@ -27,7 +27,7 @@ exports.createAppointment = (req, res) => {
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status, reason, category } = req.body;
+  const { status, reason, category, technicianId } = req.body;
   const validStatuses = ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled', 'Rejected'];
 
   if (!validStatuses.includes(status)) {
@@ -36,6 +36,11 @@ exports.updateAppointmentStatus = (req, res) => {
 
   let query = 'UPDATE appointments SET status = ?';
   const params = [status];
+
+  if (technicianId) {
+    query += ', technician_id = ?';
+    params.push(technicianId);
+  }
 
   if (status === 'Cancelled' || status === 'Rejected') {
     if (reason) {
