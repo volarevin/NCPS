@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2025 at 03:36 PM
+-- Generation Time: Nov 28, 2025 at 11:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -456,7 +456,7 @@ INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `s
 (21, 15, NULL, 7, '2025-11-28 05:26:44', 'Rejected', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 08:22:42', 'Unpaid', NULL, 0, NULL, NULL),
 (22, 2, 4, 1, '2025-06-05 21:59:33', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (23, 31, 9, 5, '2025-12-10 21:46:54', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(24, 30, 4, 2, '2025-12-19 01:57:10', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(24, 30, NULL, 2, '2025-11-26 01:57:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:43:13', 'Unpaid', NULL, 0, NULL, NULL),
 (25, 32, NULL, 5, '2025-12-19 19:36:10', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:29', 'Unpaid', 1, 0, NULL, NULL),
 (26, 17, 12, 2, '2025-09-04 09:13:37', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (27, 18, 8, 6, '2025-10-14 08:52:40', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
@@ -508,7 +508,7 @@ INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `s
 (73, 31, 4, 8, '2025-06-27 19:24:34', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (74, 2, 4, 7, '2025-08-02 06:33:36', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (75, 24, NULL, 3, '2025-09-01 13:20:42', 'Cancelled', 800.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(76, 21, 8, 5, '2025-12-19 19:35:52', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(76, 21, 4, 5, '2025-12-18 19:35:00', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:42:51', 'Unpaid', NULL, 0, NULL, NULL),
 (77, 28, 12, 6, '2025-10-02 09:25:25', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (78, 2, 10, 2, '2025-12-11 17:48:42', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
 (79, 26, NULL, 7, '2025-12-24 05:08:34', 'Cancelled', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:47', 'Unpaid', 1, 0, NULL, NULL),
@@ -519,7 +519,7 @@ INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `s
 (85, 30, 9, 1, '2025-09-19 12:46:23', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (86, 16, 10, 5, '2025-11-15 05:08:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (87, 32, 4, 7, '2025-07-16 02:58:25', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(88, 15, 4, 5, '2025-12-18 02:39:04', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 12:03:56', 'Unpaid', NULL, 0, NULL, NULL),
+(88, 15, 4, 5, '2025-11-26 23:39:00', 'In Progress', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 15:35:17', 'Unpaid', NULL, 0, NULL, NULL),
 (89, 26, 9, 1, '2025-06-14 09:16:56', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (90, 2, 11, 6, '2025-07-14 05:47:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (91, 25, 9, 7, '2025-12-22 09:24:29', 'Cancelled', 500.00, NULL, 'YOU\'RE GAY', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 12:57:34', 'Unpaid', NULL, 0, NULL, NULL),
@@ -577,15 +577,15 @@ INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `s
 (143, 20, NULL, 6, '2025-11-28 10:35:46', 'Pending', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
 (144, 19, 9, 7, '2025-08-31 15:57:03', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (145, 26, NULL, 2, '2025-08-04 03:04:56', 'Cancelled', 3000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(146, 27, 8, 7, '2025-11-04 12:39:08', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(146, 27, 8, 7, '2025-11-04 12:39:08', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-27 01:52:42', 'Paid', NULL, 1, '2025-11-27 09:52:42', 3),
 (147, 15, 12, 2, '2025-08-19 15:58:09', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (148, 16, 4, 6, '2025-06-20 08:33:42', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (149, 31, 9, 1, '2025-10-14 22:56:30', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (150, 30, 11, 8, '2025-10-17 08:42:38', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
 (151, 13, NULL, 1, '2025-11-26 22:22:00', 'Cancelled', NULL, 'poide pakabit cctv lods', 'Duplicate ka boss', NULL, 'Duplicate booking', 0, '2025-11-26 08:36:29', '2025-11-26 11:36:18', 'Unpaid', 1, 0, NULL, NULL),
-(152, 33, 4, 6, '2025-11-26 21:41:00', 'In Progress', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 09:41:18', '2025-11-26 13:07:31', 'Unpaid', NULL, 1, '2025-11-26 17:41:54', 1),
+(152, 33, 4, 6, '2025-11-26 21:41:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 09:41:18', '2025-11-26 15:20:47', 'Unpaid', NULL, 1, '2025-11-26 17:41:54', 1),
 (153, 14, 4, 3, '2025-11-28 02:39:00', 'Confirmed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:39:37', '2025-11-26 13:39:50', 'Unpaid', NULL, 0, NULL, NULL),
-(154, 2, 4, 2, '2025-11-26 00:45:00', 'Confirmed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:45:59', '2025-11-26 13:46:07', 'Unpaid', NULL, 0, NULL, NULL);
+(154, 2, 4, 2, '2025-11-26 00:45:00', 'In Progress', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:45:59', '2025-11-26 14:48:20', 'Unpaid', NULL, 0, NULL, NULL);
 
 --
 -- Triggers `appointments`
@@ -903,7 +903,9 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (261, 14, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 153, '2025-11-26 13:39:50'),
 (262, 4, 'New Job Assigned', 'You have been assigned to Appointment #153', 0, 153, '2025-11-26 13:39:50'),
 (263, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 154, '2025-11-26 13:46:07'),
-(264, 4, 'New Job Assigned', 'You have been assigned to Appointment #154', 0, 154, '2025-11-26 13:46:07');
+(264, 4, 'New Job Assigned', 'You have been assigned to Appointment #154', 0, 154, '2025-11-26 13:46:07'),
+(265, 4, 'New Job Assigned', 'You have been assigned to Appointment #76', 0, 76, '2025-11-26 14:42:51'),
+(266, 33, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 152, '2025-11-26 15:20:47');
 
 -- --------------------------------------------------------
 
@@ -1080,7 +1082,7 @@ CREATE TABLE `technician_profiles` (
 --
 
 INSERT INTO `technician_profiles` (`profile_id`, `user_id`, `specialty`, `bio`, `availability_status`, `total_jobs_completed`, `average_rating`) VALUES
-(1, 4, 'General', NULL, 'Available', 0, 3.53),
+(1, 4, 'General', 'Bading po ako', 'Available', 0, 3.53),
 (2, 8, 'System Maintenance', NULL, 'Available', 0, 3.22),
 (3, 9, 'Data Recovery', NULL, 'Available', 0, 3.25),
 (4, 10, 'Network Setup', NULL, 'Available', 0, 3.92),
@@ -1115,9 +1117,9 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `address`, `password_hash`, `role`, `status`, `created_at`, `updated_at`) VALUES
 (1, 'sherwin', 'Sherwin', 'Arizobal', 'sherwin@gmail.com', '09634045671', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Admin', 'Active', '2025-10-30 08:32:06', '2025-11-24 09:18:17'),
-(2, 'edrian', 'Edrian', 'Balingbing', 'edrian@gmail.com', '09955824197', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 08:34:33', '2025-11-24 09:18:17'),
+(2, 'edrian', 'Edrian', 'Balingbing', 'edrian@gmail.com', '09955824197', 'Nasugbu, Batangas', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 08:34:33', '2025-11-27 11:14:26'),
 (3, 'ishi', 'Ishi', 'Ganda', 'ishi@gmail.com', '09999999999', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-07 08:35:44', '2025-11-24 09:18:17'),
-(4, 'frank', 'Frank', 'Ocean', 'blonded@gmail.com', '09783813287', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-01 08:35:44', '2025-11-24 16:19:36'),
+(4, 'frank', 'Frank', 'Ocean', 'blonded@gmail.com', '09783813287', 'Manilazzz', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-01 08:35:44', '2025-11-26 16:03:47'),
 (5, 'lunamarie', 'Luna', 'Marie', 'luna.marie@example.com', '09806367741', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (6, 'sarahconnor', 'Sarah', 'Connor', 'sarah.connor@example.com', '09329465187', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (7, 'pambeesly', 'Pam', 'Beesly', 'pam.beesly@example.com', '09211063703', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
@@ -1235,7 +1237,7 @@ ALTER TABLE `appointments`
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=265;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=267;
 
 --
 -- AUTO_INCREMENT for table `reviews`

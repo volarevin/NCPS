@@ -49,7 +49,9 @@ export function CustomerServices() {
         setServices(data);
         
         // Extract unique categories
-        const uniqueCategories = ['All', ...new Set(data.map((s: any) => s.category_name).filter(Boolean)) as string[]];
+        const uniqueCategories = ['All', ...Array.from(new Set<string>(
+          data.map((s: any) => s.category_name).filter(Boolean) as string[]
+        ))];
         setCategories(uniqueCategories);
       }
     } catch (error) {
