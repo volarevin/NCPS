@@ -546,8 +546,16 @@ exports.updateAppointmentStatus = (req, res) => {
   const { status, reason, category, technicianId } = req.body;
   const userId = req.userId || req.body.userId; // Use authenticated user ID
 
+  console.log(`Updating appointment ${id} status to ${status}. TechnicianId: ${technicianId}`);
+
   let query = 'UPDATE appointments SET status = ?';
   let params = [status];
+
+  // Always update technician if provided
+  if (technicianId) {
+      query += ', technician_id = ?';
+      params.push(technicianId);
+  }
 
   if (status === 'Cancelled') {
     query += ', cancellation_reason = ?, cancellation_category = ?, cancelled_by = ?';
@@ -555,16 +563,16 @@ exports.updateAppointmentStatus = (req, res) => {
   } else if (status === 'Rejected') {
       query += ', rejection_reason = ?, cancellation_category = ?, cancelled_by = ?';
       params.push(reason, category, userId);
-  } else if ((status === 'Confirmed' || status === 'upcoming') && technicianId) {
-      query += ', technician_id = ?';
-      params.push(technicianId);
   }
 
   query += ' WHERE appointment_id = ?';
   params.push(id);
 
   db.query(query, params, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
+    if (err) {
+        console.error("Error updating appointment status:", err);
+        return res.status(500).json({ error: err.message });
+    }
     
     // Log activity
     const action = `Appointment ${status}`;

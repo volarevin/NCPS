@@ -15,7 +15,7 @@ exports.getDashboardStats = (req, res) => {
     `,
     today: `
       SELECT 
-        a.appointment_id, a.appointment_date, a.status, a.customer_notes,
+        a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
         t.first_name as tech_first, t.last_name as tech_last
@@ -29,7 +29,7 @@ exports.getDashboardStats = (req, res) => {
     `,
     pending_list: `
       SELECT 
-        a.appointment_id, a.appointment_date, a.status, a.customer_notes,
+        a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
         t.first_name as tech_first, t.last_name as tech_last
@@ -77,6 +77,7 @@ exports.getDashboardStats = (req, res) => {
             time: new Date(row.appointment_date).toLocaleTimeString('en-US', { 
               hour: '2-digit', minute: '2-digit' 
             }),
+            technicianId: row.technician_id ? row.technician_id.toString() : undefined,
             technician: row.tech_first ? `${row.tech_first} ${row.tech_last}` : 'Unassigned',
             status: (row.status || 'Pending').toLowerCase().replace(' ', '-'),
             notes: row.customer_notes
@@ -261,7 +262,7 @@ exports.updateAppointmentStatus = (req, res) => {
   } else if (status === 'rejected') {
     query += ', rejection_reason = ?';
     params.push(reason);
-  } else if (status === 'confirmed' && technicianId) {
+  } else if (status.toLowerCase() === 'confirmed' && technicianId) {
     query += ', technician_id = ?';
     params.push(technicianId);
   }

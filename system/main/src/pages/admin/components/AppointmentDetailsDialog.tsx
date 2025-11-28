@@ -45,7 +45,7 @@ interface AppointmentDetailsDialogProps {
   onOpenChange: (open: boolean) => void;
   appointment: Appointment | null;
   onUpdateStatus?: (id: string, status: Appointment["status"], technicianId?: string) => void;
-  onApprove?: (id: string, technicianId: string) => void;
+  onApprove?: (id: string, technicianId: string, technicianName?: string) => void;
   onReject?: (id: string) => void;
   onCancel?: (id: string) => void;
   onUpdateDetails?: (id: string, date: string, time: string, technicianId: string) => void;
@@ -117,6 +117,14 @@ export function AppointmentDetailsDialog({
     if (onUpdateDetails && appointment) {
       await onUpdateDetails(appointment.id, editDate, editTime, selectedTechnician);
       setIsEditing(false);
+    }
+  };
+
+  const handleApproveClick = () => {
+    if (onApprove && appointment) {
+        const tech = technicians.find(t => t.user_id.toString() === selectedTechnician);
+        const techName = tech ? `${tech.first_name} ${tech.last_name}` : undefined;
+        onApprove(appointment.id, selectedTechnician, techName);
     }
   };
 
@@ -389,7 +397,7 @@ export function AppointmentDetailsDialog({
                     </Button>
                     <Button 
                       className="bg-[#0B4F6C] hover:bg-[#012A4A]"
-                      onClick={() => onApprove?.(appointment.id, selectedTechnician)}
+                      onClick={handleApproveClick}
                       disabled={!selectedTechnician}
                     >
                       Approve

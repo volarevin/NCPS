@@ -35,6 +35,7 @@ interface Appointment {
   email: string;
   address: string;
   notes: string;
+  technicianId?: string;
   technician?: string;
   rawDate: Date;
   rating?: number;
@@ -162,6 +163,7 @@ export function Appointments() {
         email: appt.customer_email || 'N/A',
         address: 'N/A', 
         notes: appt.customer_notes || '',
+        technicianId: appt.technician_id ? appt.technician_id.toString() : undefined,
         technician: appt.tech_first_name ? `Tech. ${appt.tech_first_name}` : undefined,
         rawDate: new Date(appt.appointment_date),
         rating: appt.rating,
@@ -357,9 +359,17 @@ export function Appointments() {
             body: JSON.stringify(body)
         });
 
-        setAppointments(appointments.map(app => 
-            app.id === id ? { ...app, status: newStatus } : app
-        ));
+        setAppointments(appointments.map(app => {
+            if (app.id === id) {
+                const updatedApp: any = { ...app, status: newStatus };
+                if (newStatus === 'confirmed' && arg3) {
+                    updatedApp.technicianId = arg3;
+                    if (arg4) updatedApp.technician = arg4;
+                }
+                return updatedApp;
+            }
+            return app;
+        }));
         toast.success(`Appointment status updated to ${newStatus}`);
     } catch (error) {
         console.error("Error updating status", error);
@@ -618,7 +628,7 @@ export function Appointments() {
         appointment={selectedAppointment}
         onUpdateStatus={handleStatusUpdate}
         onUpdateDetails={handleUpdateDetails}
-        onApprove={(id, technicianId) => handleStatusUpdate(id, 'confirmed', technicianId)}
+        onApprove={(id, technicianId, technicianName) => handleStatusUpdate(id, 'confirmed', technicianId, technicianName)}
         onReject={(id) => setStatusDialog({ open: true, type: 'reject', appointmentId: id })}
         onCancel={(id) => setStatusDialog({ open: true, type: 'cancel', appointmentId: id })}
       />
