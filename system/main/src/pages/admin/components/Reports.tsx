@@ -71,6 +71,36 @@ export function Reports() {
     avgPerAppointment: 0,
     totalPaid: 0
   });
+  const [dateRange, setDateRange] = useState({
+    start: "",
+    end: ""
+  });
+
+  const handleExport = () => {
+    const headers = ["Month", "Appointments", "Completed", "Cancelled", "Revenue"];
+    const rows = monthlyData.map(m => [
+        m.month,
+        m.appointments,
+        m.completed,
+        m.cancelled,
+        m.revenue
+    ]);
+    
+    const csvContent = [
+        headers.join(","),
+        ...rows.map(r => r.join(","))
+    ].join("\n");
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `report_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -78,7 +108,16 @@ export function Reports() {
         const token = sessionStorage.getItem('token');
         if (!token) return;
 
-        const response = await fetch('http://localhost:5000/api/admin/reports', {
+        let url = 'http://localhost:5000/api/admin/reports';
+        const params = new URLSearchParams();
+        if (dateRange.start) params.append('startDate', dateRange.start);
+        if (dateRange.end) params.append('endDate', dateRange.end);
+        
+        if (params.toString()) {
+            url += `?${params.toString()}`;
+        }
+
+        const response = await fetch(url, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -114,7 +153,7 @@ export function Reports() {
     };
 
     fetchReports();
-  }, []);
+  }, [dateRange]);
 
   const appointmentSummaryData = summary;
   const monthlyAppointments = monthlyData;
@@ -134,14 +173,29 @@ export function Reports() {
         title="Reports & Analytics" 
         description="View detailed reports and analytics for your business."
         action={
-          <div className="flex gap-2">
-            <select className="bg-white border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B4F6C]">
-              <option>Last 30 Days</option>
-              <option>Last 3 Months</option>
-              <option>Last 6 Months</option>
-              <option>This Year</option>
-            </select>
-            <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] transition-colors">
+          <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-2 py-1">
+                <span className="text-sm text-gray-500">From:</span>
+                <input 
+                    type="date" 
+                    className="text-sm focus:outline-none"
+                    value={dateRange.start}
+                    onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                />
+            </div>
+            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-2 py-1">
+                <span className="text-sm text-gray-500">To:</span>
+                <input 
+                    type="date" 
+                    className="text-sm focus:outline-none"
+                    value={dateRange.end}
+                    onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                />
+            </div>
+            <button 
+                onClick={handleExport}
+                className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] transition-colors"
+            >
               Export Report
             </button>
           </div>

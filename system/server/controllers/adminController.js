@@ -156,6 +156,30 @@ exports.getUserActivityLogs = (req, res) => {
 };
 
 exports.getReportsData = (req, res) => {
+  const { startDate, endDate } = req.query;
+  
+  let dateWhere = "";
+  let dateAnd = "";
+  let joinCondition = "";
+  let queryParams = [];
+
+  if (startDate && endDate) {
+    dateWhere = "WHERE appointment_date BETWEEN ? AND ?";
+    dateAnd = "AND appointment_date BETWEEN ? AND ?";
+    joinCondition = "AND a.appointment_date BETWEEN ? AND ?";
+    queryParams = [startDate, endDate];
+  } else if (startDate) {
+    dateWhere = "WHERE appointment_date >= ?";
+    dateAnd = "AND appointment_date >= ?";
+    joinCondition = "AND a.appointment_date >= ?";
+    queryParams = [startDate];
+  } else if (endDate) {
+    dateWhere = "WHERE appointment_date <= ?";
+    dateAnd = "AND appointment_date <= ?";
+    joinCondition = "AND a.appointment_date <= ?";
+    queryParams = [endDate];
+  }
+
   const queries = {
     summary: `
       SELECT 
@@ -165,6 +189,7 @@ exports.getReportsData = (req, res) => {
           SUM(CASE WHEN status = 'Confirmed' THEN 1 ELSE 0 END) as confirmed,
           SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled
       FROM appointments
+      ${dateWhere}
     `,
     monthly: `
       SELECT 
@@ -174,18 +199,18 @@ exports.getReportsData = (req, res) => {
           SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
           COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as revenue
       FROM appointments
-      WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+      ${dateWhere || "WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)"}
       GROUP BY YEAR(appointment_date), MONTH(appointment_date)
       ORDER BY YEAR(appointment_date), MONTH(appointment_date)
     `,
     services: `
       SELECT 
           s.name,
-          COUNT(*) as requests,
+          COUNT(a.appointment_id) as requests,
           COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN a.total_cost ELSE 0 END), 0) as revenue,
           COALESCE(AVG(r.rating), 0) as rating
       FROM services s
-      LEFT JOIN appointments a ON s.service_id = a.service_id
+      LEFT JOIN appointments a ON s.service_id = a.service_id ${joinCondition}
       LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
       GROUP BY s.service_id
     `,
@@ -195,7 +220,7 @@ exports.getReportsData = (req, res) => {
           COUNT(CASE WHEN a.status = 'Completed' THEN 1 END) as totalHandled,
           COALESCE(AVG(r.rating), 0) as rating
       FROM users u
-      LEFT JOIN appointments a ON u.user_id = a.technician_id
+      LEFT JOIN appointments a ON u.user_id = a.technician_id ${joinCondition}
       LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
       WHERE u.role = 'Technician'
       GROUP BY u.user_id
@@ -205,6 +230,7 @@ exports.getReportsData = (req, res) => {
         DATE_FORMAT(appointment_date, '%l %p') as hour, 
         COUNT(*) as bookings 
       FROM appointments 
+      ${dateWhere}
       GROUP BY HOUR(appointment_date) 
       ORDER BY HOUR(appointment_date)
     `,
@@ -213,6 +239,7 @@ exports.getReportsData = (req, res) => {
         DATE_FORMAT(appointment_date, '%a') as day, 
         COUNT(*) as bookings 
       FROM appointments 
+      ${dateWhere}
       GROUP BY DAYOFWEEK(appointment_date) 
       ORDER BY DAYOFWEEK(appointment_date)
     `,
@@ -222,6 +249,7 @@ exports.getReportsData = (req, res) => {
         COUNT(*) as count 
       FROM appointments 
       WHERE status = 'Cancelled' AND cancellation_category IS NOT NULL 
+      ${dateAnd}
       GROUP BY cancellation_category
     `,
     revenueStats: `
@@ -231,34 +259,35 @@ exports.getReportsData = (req, res) => {
         COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as totalPaid
       FROM appointments
       WHERE status != 'Cancelled' AND status != 'Rejected'
+      ${dateAnd}
     `
   };
 
   // Execute all queries
   // Note: In a real app, might want to use Promise.all with db.promise() or similar
   // Here using nested callbacks for simplicity with the current db setup
-  db.query(queries.summary, (err, summaryRes) => {
+  db.query(queries.summary, queryParams, (err, summaryRes) => {
     if (err) return res.status(500).json({ error: err.message });
     
-    db.query(queries.monthly, (err, monthlyRes) => {
+    db.query(queries.monthly, queryParams, (err, monthlyRes) => {
       if (err) return res.status(500).json({ error: err.message });
       
-      db.query(queries.services, (err, servicesRes) => {
+      db.query(queries.services, queryParams, (err, servicesRes) => {
         if (err) return res.status(500).json({ error: err.message });
         
-        db.query(queries.staff, (err, staffRes) => {
+        db.query(queries.staff, queryParams, (err, staffRes) => {
           if (err) return res.status(500).json({ error: err.message });
           
-          db.query(queries.peakHours, (err, peakHoursRes) => {
+          db.query(queries.peakHours, queryParams, (err, peakHoursRes) => {
             if (err) return res.status(500).json({ error: err.message });
 
-            db.query(queries.peakDays, (err, peakDaysRes) => {
+            db.query(queries.peakDays, queryParams, (err, peakDaysRes) => {
               if (err) return res.status(500).json({ error: err.message });
 
-              db.query(queries.cancellationReasons, (err, cancellationReasonsRes) => {
+              db.query(queries.cancellationReasons, queryParams, (err, cancellationReasonsRes) => {
                 if (err) return res.status(500).json({ error: err.message });
 
-                db.query(queries.revenueStats, (err, revenueStatsRes) => {
+                db.query(queries.revenueStats, queryParams, (err, revenueStatsRes) => {
                   if (err) return res.status(500).json({ error: err.message });
 
                   res.json({
