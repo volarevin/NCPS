@@ -15,7 +15,7 @@ exports.getDashboardStats = (req, res) => {
     `,
     today: `
       SELECT 
-        a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id,
+        a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id, a.service_address,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
         t.first_name as tech_first, t.last_name as tech_last
@@ -29,7 +29,7 @@ exports.getDashboardStats = (req, res) => {
     `,
     pending_list: `
       SELECT 
-        a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id,
+        a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id, a.service_address,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
         t.first_name as tech_first, t.last_name as tech_last
@@ -69,7 +69,7 @@ exports.getDashboardStats = (req, res) => {
             clientName: `${row.client_first} ${row.client_last}`,
             phone: row.phone_number,
             email: row.email,
-            address: row.address || 'No address provided',
+            address: row.service_address || row.address || 'No address provided',
             service: row.category_name ? `${row.service_name} - ${row.category_name}` : row.service_name,
             date: new Date(row.appointment_date).toLocaleDateString('en-US', { 
               year: 'numeric', month: 'long', day: 'numeric' 
@@ -128,7 +128,7 @@ exports.getDashboardStats = (req, res) => {
 exports.getAllAppointments = (req, res) => {
   const query = `
     SELECT 
-      a.appointment_id, a.appointment_date, a.status, a.customer_notes,
+      a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.service_address,
       a.cancellation_reason, a.cancellation_category, a.rejection_reason,
       a.created_at, a.updated_at,
       u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
@@ -153,7 +153,7 @@ exports.getAllAppointments = (req, res) => {
       clientName: `${row.client_first} ${row.client_last}`,
       phone: row.phone_number,
       email: row.email,
-      address: row.address || 'No address provided',
+      address: row.service_address || row.address || 'No address provided',
       service: row.service_name,
       category: row.category_name,
       date: new Date(row.appointment_date).toLocaleDateString('en-US', { 
@@ -214,10 +214,10 @@ exports.createAppointment = (req, res) => {
   const insertAppointment = (customerId) => {
     const appointmentDate = `${date} ${time}`; 
     const query = `
-      INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, customer_notes, status)
-      VALUES (?, ?, ?, ?, ?, 'Pending')
+      INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, customer_notes, status, service_address)
+      VALUES (?, ?, ?, ?, ?, 'Pending', ?)
     `;
-    db.query(query, [customerId, serviceId, technicianId || null, appointmentDate, notes], (err, result) => {
+    db.query(query, [customerId, serviceId, technicianId || null, appointmentDate, notes, address], (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Appointment created successfully', id: result.insertId });
     });

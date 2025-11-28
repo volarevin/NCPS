@@ -11,6 +11,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { Checkbox } from "../../../components/ui/checkbox"; // Assuming you have this component
 import { toast } from 'sonner';
 
 interface CreateAppointmentDialogProps {
@@ -29,11 +30,15 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
     notes: '',
   });
   const [services, setServices] = useState<any[]>([]);
+  const [addresses, setAddresses] = useState<any[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>('new');
+  const [saveNewAddress, setSaveNewAddress] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
       fetchServices();
+      fetchAddresses();
       setFormData(prev => ({
         ...prev,
         serviceId: initialServiceId || prev.serviceId,
@@ -49,14 +54,48 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
       if (Array.isArray(data)) {
         setServices(data);
       } else {
-        console.error('Expected array of services, got:', data);
         setServices([]);
-        toast.error('Failed to load services data');
       }
     } catch (error) {
       console.error('Error fetching services:', error);
-      toast.error('Failed to load services');
       setServices([]);
+    }
+  };
+
+  const fetchAddresses = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      if (!token) return;
+      const response = await fetch('http://localhost:5000/api/customer/addresses', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setAddresses(data);
+        // Pre-select default address if available
+        const defaultAddr = data.find((a: any) => a.is_default);
+        if (defaultAddr) {
+            setSelectedAddressId(defaultAddr.address_id.toString());
+            setFormData(prev => ({ ...prev, address: defaultAddr.address_line }));
+        } else if (data.length > 0) {
+            setSelectedAddressId(data[0].address_id.toString());
+            setFormData(prev => ({ ...prev, address: data[0].address_line }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+    }
+  };
+
+  const handleAddressChange = (value: string) => {
+    setSelectedAddressId(value);
+    if (value === 'new') {
+        setFormData(prev => ({ ...prev, address: '' }));
+    } else {
+        const addr = addresses.find(a => a.address_id.toString() === value);
+        if (addr) {
+            setFormData(prev => ({ ...prev, address: addr.address_line }));
+        }
     }
   };
 
@@ -81,7 +120,9 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
           serviceId: formData.serviceId,
           date: formData.date,
           time: formData.time,
-          notes: `${formData.notes} \n\nAddress: ${formData.address}` // Appending address to notes for now
+          notes: formData.notes,
+          address: formData.address,
+          saveAddress: selectedAddressId === 'new' && saveNewAddress
         }),
       });
 
@@ -95,6 +136,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
       onOpenChange(false);
       // Reset form
       setFormData({ serviceId: '', date: '', time: '', address: '', notes: '' });
+      setSaveNewAddress(false);
       
       // Optional: Trigger a refresh of the appointments list if we had a context or callback
       window.location.reload(); // Simple reload to refresh data for now
@@ -169,14 +211,45 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
             <Label htmlFor="address" className="text-[#1A5560]">
               Service Address *
             </Label>
-            <Input
-              id="address"
-              value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              placeholder="Enter your complete address"
-              className="border-[#1A5560]/20 focus:border-[#3FA9BC]"
-              required
-            />
+            <Select value={selectedAddressId} onValueChange={handleAddressChange}>
+                <SelectTrigger className="border-[#1A5560]/20 focus:border-[#3FA9BC]">
+                    <SelectValue placeholder="Select address" />
+                </SelectTrigger>
+                <SelectContent>
+                    {addresses.map((addr) => (
+                        <SelectItem key={addr.address_id} value={addr.address_id.toString()}>
+                            {addr.address_label} - {addr.address_line}
+                        </SelectItem>
+                    ))}
+                    <SelectItem value="new">+ Enter New Address</SelectItem>
+                </SelectContent>
+            </Select>
+            
+            {selectedAddressId === 'new' && (
+                <div className="mt-2 space-y-2">
+                    <Textarea
+                        id="new-address"
+                        placeholder="Enter complete address (Street, Barangay, City, Province)"
+                        value={formData.address}
+                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        className="border-[#1A5560]/20 focus:border-[#3FA9BC] min-h-[80px]"
+                        required
+                    />
+                    <div className="flex items-center space-x-2">
+                        <Checkbox 
+                            id="save-address" 
+                            checked={saveNewAddress}
+                            onCheckedChange={(checked) => setSaveNewAddress(checked as boolean)}
+                        />
+                        <label
+                            htmlFor="save-address"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-600"
+                        >
+                            Save this address for future use
+                        </label>
+                    </div>
+                </div>
+            )}
           </div>
 
           <div className="space-y-2">

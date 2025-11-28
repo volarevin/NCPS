@@ -1,22 +1,33 @@
 const db = require('../config/db');
 
 exports.createAppointment = (req, res) => {
-  const { serviceId, date, time, notes } = req.body;
+  const { serviceId, date, time, notes, address, saveAddress } = req.body;
   const customerId = req.userId; // From auth middleware
 
-  if (!serviceId || !date || !time) {
-    return res.status(400).json({ message: 'Please provide service, date, and time.' });
+  if (!serviceId || !date || !time || !address) {
+    return res.status(400).json({ message: 'Please provide service, date, time, and address.' });
   }
 
   // Combine date and time into a single DATETIME string
   const appointmentDate = `${date} ${time}:00`;
 
+  // If saveAddress is true, save it to customer_addresses
+  if (saveAddress) {
+    // Check if address already exists to avoid duplicates (simple check)
+    db.query('SELECT * FROM customer_addresses WHERE user_id = ? AND address_line = ?', [customerId, address], (err, results) => {
+        if (!err && results.length === 0) {
+            db.query('INSERT INTO customer_addresses (user_id, address_line, address_label) VALUES (?, ?, ?)', 
+                [customerId, address, 'Saved Address']);
+        }
+    });
+  }
+
   const query = `
-    INSERT INTO appointments (customer_id, service_id, appointment_date, customer_notes, status)
-    VALUES (?, ?, ?, ?, 'Pending')
+    INSERT INTO appointments (customer_id, service_id, appointment_date, customer_notes, service_address, status)
+    VALUES (?, ?, ?, ?, ?, 'Pending')
   `;
 
-  db.query(query, [customerId, serviceId, appointmentDate, notes], (err, result) => {
+  db.query(query, [customerId, serviceId, appointmentDate, notes, address], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error creating appointment.' });

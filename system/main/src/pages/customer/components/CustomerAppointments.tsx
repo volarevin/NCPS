@@ -71,7 +71,7 @@ export function CustomerAppointments() {
         technician: appt.tech_first_name ? `${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
         technicianPhone: appt.tech_phone || '',
         technicianEmail: appt.tech_email || '',
-        address: '123 Main St, Nasugbu, Batangas', // TODO: Fetch from user profile
+        address: appt.service_address || 'No address provided',
         notes: appt.customer_notes,
         rating: appt.rating,
         feedback: appt.feedback_text

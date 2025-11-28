@@ -9,6 +9,8 @@ router.use(checkRole(['Customer']));
 
 router.get('/stats', customerController.getDashboardStats);
 router.get('/appointments', customerController.getAppointments);
+router.get('/addresses', customerController.getAddresses);
+router.post('/addresses', customerController.addAddress);
 router.get('/profile', customerController.getProfile);
 router.put('/profile', customerController.updateProfile);
 router.put('/change-password', customerController.changePassword);

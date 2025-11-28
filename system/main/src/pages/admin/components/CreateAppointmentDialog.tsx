@@ -37,6 +37,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
     service_id: "",
     appointment_date: "",
     time: "",
+    address: "",
     notes: ""
   });
 
@@ -87,6 +88,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
           customer_id: formData.customer_id,
           service_id: formData.service_id,
           appointment_date: dateTime.toISOString(),
+          address: formData.address,
           notes: formData.notes
         })
       });
@@ -101,6 +103,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
         service_id: "",
         appointment_date: "",
         time: "",
+        address: "",
         notes: ""
       });
     } catch (error) {
@@ -154,6 +157,16 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="address">Service Address</Label>
+            <Input 
+              id="address" 
+              placeholder="Enter service address"
+              value={formData.address}
+              onChange={(e) => setFormData({...formData, address: e.target.value})}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

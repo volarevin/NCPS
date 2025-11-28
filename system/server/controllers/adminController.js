@@ -36,7 +36,7 @@ exports.getAllAppointments = (req, res) => {
   const query = `
     SELECT a.*, 
            u.first_name as customer_first_name, u.last_name as customer_last_name,
-           u.email as customer_email, u.phone_number as customer_phone,
+           u.email as customer_email, u.phone_number as customer_phone, u.address as customer_address,
            t.first_name as tech_first_name, t.last_name as tech_last_name,
            s.name as service_name, sc.name as category_name,
            r.rating, r.feedback_text,
@@ -635,15 +635,15 @@ exports.emptyRecycleBin = (req, res) => {
 };
 
 exports.createAppointment = (req, res) => {
-    const { customer_id, service_id, appointment_date, notes } = req.body;
+    const { customer_id, service_id, appointment_date, notes, address } = req.body;
     // Basic validation
     if (!customer_id || !service_id || !appointment_date) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const query = 'INSERT INTO appointments (customer_id, service_id, appointment_date, status, customer_notes, created_at) VALUES (?, ?, ?, "Pending", ?, NOW())';
+    const query = 'INSERT INTO appointments (customer_id, service_id, appointment_date, status, customer_notes, service_address, created_at) VALUES (?, ?, ?, "Pending", ?, ?, NOW())';
     
-    db.query(query, [customer_id, service_id, appointment_date, notes], (err, result) => {
+    db.query(query, [customer_id, service_id, appointment_date, notes, address], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ message: 'Database error creating appointment.' });

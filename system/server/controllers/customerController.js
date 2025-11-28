@@ -36,6 +36,44 @@ exports.getAppointments = (req, res) => {
   });
 };
 
+exports.getAddresses = (req, res) => {
+  const userId = req.userId;
+  const query = 'SELECT * FROM customer_addresses WHERE user_id = ? ORDER BY is_default DESC, created_at DESC';
+  
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error fetching addresses.' });
+    }
+    res.json(results);
+  });
+};
+
+exports.addAddress = (req, res) => {
+  const userId = req.userId;
+  const { address, label, isDefault } = req.body;
+
+  if (!address) {
+    return res.status(400).json({ message: 'Address is required.' });
+  }
+
+  // If setting as default, unset other defaults first
+  if (isDefault) {
+    db.query('UPDATE customer_addresses SET is_default = 0 WHERE user_id = ?', [userId], (err) => {
+      if (err) console.error('Error resetting default addresses:', err);
+    });
+  }
+
+  const query = 'INSERT INTO customer_addresses (user_id, address_line, address_label, is_default) VALUES (?, ?, ?, ?)';
+  db.query(query, [userId, address, label || 'Home', isDefault ? 1 : 0], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error adding address.' });
+    }
+    res.status(201).json({ message: 'Address added successfully.', addressId: result.insertId });
+  });
+};
+
 exports.updateProfile = (req, res) => {
   const userId = req.userId;
   const { firstName, lastName, email, phone, address } = req.body;

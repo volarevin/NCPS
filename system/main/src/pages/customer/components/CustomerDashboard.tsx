@@ -87,7 +87,7 @@ export function CustomerDashboard() {
                 technician: todayAppt.tech_first_name ? `Tech ${todayAppt.tech_first_name} ${todayAppt.tech_last_name}` : 'Pending Assignment',
                 technicianPhone: '', 
                 technicianEmail: '',
-                address: '123 Main St, Nasugbu, Batangas',
+                address: todayAppt.service_address || 'No address provided',
                 notes: todayAppt.customer_notes || 'No notes provided.',
                 description: todayAppt.customer_notes || 'No notes provided.',
              });

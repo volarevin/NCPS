@@ -161,7 +161,7 @@ export function Appointments() {
         status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-'),
         phone: appt.customer_phone || 'N/A',
         email: appt.customer_email || 'N/A',
-        address: 'N/A', 
+        address: appt.service_address || appt.customer_address || 'N/A', 
         notes: appt.customer_notes || '',
         technicianId: appt.technician_id ? appt.technician_id.toString() : undefined,
         technician: appt.tech_first_name ? `Tech. ${appt.tech_first_name}` : undefined,
