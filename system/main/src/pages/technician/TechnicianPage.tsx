@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useFeedback } from "@/context/FeedbackContext";
 import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { TechnicianSidebar } from "./components/TechnicianSidebar";
@@ -35,6 +35,7 @@ interface Appointment {
 
 export default function TechnicianPage() {
   const navigate = useNavigate();
+  const { showPromise } = useFeedback();
   const [activeTab, setActiveTab] = useState<"dashboard" | "appointments" | "profile" | "ratings">("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
@@ -188,7 +189,7 @@ export default function TechnicianPage() {
     .sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => {
-    try {
+    const promise = async () => {
       const body: any = { status: newStatus };
       if (reason) body.reason = reason;
       if (category) body.category = category;
@@ -211,16 +212,18 @@ export default function TechnicianPage() {
       if (selectedAppointment && selectedAppointment.id === appointmentId) {
         setSelectedAppointment({ ...selectedAppointment, status: newStatus });
       }
-      
-      toast.success(`Appointment status updated to ${newStatus}`);
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update appointment status');
-    }
+      return `Appointment status updated to ${newStatus}`;
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating status...',
+      success: (data) => data,
+      error: 'Failed to update appointment status',
+    });
   };
 
   const updateProfile = async (updatedProfile: any) => {
-    try {
+    const promise = async () => {
       const response = await fetch('http://localhost:5000/api/technician/profile', {
         method: 'PUT',
         headers: {
@@ -234,11 +237,14 @@ export default function TechnicianPage() {
 
       await response.json();
       setTechnicianProfile((prev: any) => ({ ...prev, ...updatedProfile }));
-      toast.success('Profile updated successfully');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
-    }
+      return 'Profile updated successfully';
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating profile...',
+      success: (data) => data,
+      error: 'Failed to update profile',
+    });
   };
 
   const stats = [
@@ -322,7 +328,12 @@ export default function TechnicianPage() {
 
   const handleDeleteAccount = () => {
     if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      alert("Account deletion requested. Please contact the administrator to complete this process.");
+      const promise = Promise.resolve("Account deletion requested. Please contact the administrator to complete this process.");
+      showPromise(promise, {
+        loading: 'Processing...',
+        success: (data) => data,
+        error: 'Error',
+      });
     }
   };
 

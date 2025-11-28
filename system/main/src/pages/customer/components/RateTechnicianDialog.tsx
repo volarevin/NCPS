@@ -10,7 +10,7 @@ import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Star } from 'lucide-react';
-import { toast } from 'sonner';
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface RateTechnicianDialogProps {
   open: boolean;
@@ -19,23 +19,21 @@ interface RateTechnicianDialogProps {
 }
 
 export function RateTechnicianDialog({ open, onOpenChange, appointment }: RateTechnicianDialogProps) {
+  const { showPromise } = useFeedback();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (rating === 0) {
-      toast.error('Please select a rating');
-      return;
-    }
+    const promise = async () => {
+      if (rating === 0) {
+        throw new Error('Please select a rating');
+      }
 
-    setIsSubmitting(true);
-    try {
       const token = sessionStorage.getItem('token');
       if (!token) {
-        toast.error('You must be logged in');
-        return;
+        throw new Error('You must be logged in');
       }
 
       const response = await fetch(`http://localhost:5000/api/appointments/${appointment.id}/rate`, {
@@ -56,17 +54,18 @@ export function RateTechnicianDialog({ open, onOpenChange, appointment }: RateTe
         throw new Error(data.message || 'Failed to submit rating');
       }
 
-      toast.success('Thank you for your feedback!');
       onOpenChange(false);
       setRating(0);
       setHoveredRating(0);
       setFeedback('');
-    } catch (error: any) {
-      console.error('Error submitting rating:', error);
-      toast.error(error.message || 'An error occurred');
-    } finally {
-      setIsSubmitting(false);
-    }
+      return 'Thank you for your feedback!';
+    };
+
+    showPromise(promise(), {
+      loading: 'Submitting rating...',
+      success: (data) => data,
+      error: (err) => err instanceof Error ? err.message : 'Failed to submit rating',
+    });
   };
 
   if (!appointment) return null;

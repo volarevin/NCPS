@@ -31,6 +31,7 @@ import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
 import { TechnicianEditDialog } from "./TechnicianEditDialog";
 import { AddTechnicianDialog, SPECIALTIES } from "./AddTechnicianDialog";
 import { ConfirmActionDialog } from "./ConfirmActionDialog";
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface Technician {
   id: string;
@@ -49,6 +50,7 @@ interface Technician {
 }
 
 export function Technicians() {
+  const { showPromise } = useFeedback();
   const [technicians, setTechnicians] = useState<Technician[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -168,9 +170,9 @@ export function Technicians() {
       actionLabel: "Ban Technician",
       variant: "destructive",
       onConfirm: async () => {
-        try {
+        const promise = async () => {
             const token = sessionStorage.getItem('token');
-            await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
+            const response = await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -178,12 +180,20 @@ export function Technicians() {
                 },
                 body: JSON.stringify({ action: 'ban' })
             });
+            
+            if (!response.ok) throw new Error('Failed to ban technician');
+
             setIsEditOpen(false);
             setConfirmDialog(prev => ({ ...prev, open: false }));
             fetchTechnicians();
-        } catch (error) {
-            console.error(error);
-        }
+            return "Technician banned successfully";
+        };
+
+        showPromise(promise(), {
+            loading: 'Banning technician...',
+            success: (data) => data,
+            error: 'Failed to ban technician',
+        });
       }
     });
   };
@@ -196,9 +206,9 @@ export function Technicians() {
       actionLabel: "Demote to Customer",
       variant: "destructive",
       onConfirm: async () => {
-        try {
+        const promise = async () => {
             const token = sessionStorage.getItem('token');
-            await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
+            const response = await fetch(`http://localhost:5000/api/admin/technicians/${id}/status`, {
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -206,18 +216,26 @@ export function Technicians() {
                 },
                 body: JSON.stringify({ action: 'demote' })
             });
+            
+            if (!response.ok) throw new Error('Failed to demote technician');
+
             setIsEditOpen(false);
             setConfirmDialog(prev => ({ ...prev, open: false }));
             fetchTechnicians();
-        } catch (error) {
-            console.error(error);
-        }
+            return "Technician demoted successfully";
+        };
+
+        showPromise(promise(), {
+            loading: 'Demoting technician...',
+            success: (data) => data,
+            error: 'Failed to demote technician',
+        });
       }
     });
   };
 
     const handleEdit = async (id: number, data: any) => {
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       const response = await fetch(`http://localhost:5000/api/admin/technicians/${id}/profile`, {
         method: 'PUT',
@@ -228,17 +246,7 @@ export function Technicians() {
         body: JSON.stringify(data)
       });
 
-      console.log('updateTechnician response status:', response.status);
-
-      if (!response.ok) {
-        try {
-          const errorData = await response.json();
-          console.warn("Non-200 response updating technician:", errorData);
-        } catch (jsonErr) {
-          const text = await response.text();
-          console.warn("Non-200 response updating technician (text):", text, jsonErr);
-        }
-      }
+      if (!response.ok) throw new Error('Failed to update technician');
 
       // Optimistically update list regardless so UI stays in sync with intent
       setTechnicians(prev => prev.map(t => t.id === id.toString() ? {
@@ -252,9 +260,14 @@ export function Technicians() {
       } : t));
 
       setIsEditOpen(false);
-    } catch (error) {
-      console.error('Network/JS error updating technician:', error);
-    }
+      return "Technician updated successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating technician...',
+      success: (data) => data,
+      error: 'Failed to update technician',
+    });
     };
 
   const openEditDialog = (e: React.MouseEvent, tech: Technician) => {

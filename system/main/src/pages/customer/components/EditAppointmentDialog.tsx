@@ -11,7 +11,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { toast } from 'sonner';
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface EditAppointmentDialogProps {
   open: boolean;
@@ -20,6 +20,7 @@ interface EditAppointmentDialogProps {
 }
 
 export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditAppointmentDialogProps) {
+  const { showPromise } = useFeedback();
   const [formData, setFormData] = useState({
     serviceId: '',
     date: '',
@@ -68,15 +69,13 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
       }
     } catch (error) {
       console.error('Error fetching services:', error);
-      toast.error('Failed to load services');
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
+    
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       const response = await fetch(`http://localhost:5000/api/appointments/${appointment.id}`, {
         method: 'PUT',
@@ -97,14 +96,15 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
         throw new Error(error.message || 'Failed to update appointment');
       }
 
-      toast.success('Appointment updated successfully');
       onOpenChange(false);
-    } catch (error: any) {
-      console.error('Error updating appointment:', error);
-      toast.error(error.message || 'Failed to update appointment');
-    } finally {
-      setIsLoading(false);
-    }
+      return "Appointment updated successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating appointment...',
+      success: (data) => data,
+      error: (err) => err instanceof Error ? err.message : 'Failed to update appointment',
+    });
   };
 
   if (!appointment) return null;

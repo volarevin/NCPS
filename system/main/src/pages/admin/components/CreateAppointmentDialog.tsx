@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
+import { useFeedback } from "@/context/FeedbackContext";
 import { Loader2 } from "lucide-react";
 
 interface CreateAppointmentDialogProps {
@@ -28,6 +28,7 @@ interface Service {
 }
 
 export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: CreateAppointmentDialogProps) {
+  const { showPromise } = useFeedback();
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [services, setServices] = useState<Service[]>([]);
@@ -64,15 +65,13 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
       setServices(servicesData);
     } catch (error) {
       console.error("Error fetching data", error);
-      toast.error("Failed to load form data");
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
+    
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       
       // Combine date and time
@@ -95,7 +94,6 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
 
       if (!response.ok) throw new Error('Failed to create appointment');
 
-      toast.success("Appointment created successfully");
       onSuccess();
       onOpenChange(false);
       setFormData({
@@ -106,12 +104,14 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
         address: "",
         notes: ""
       });
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to create appointment");
-    } finally {
-      setLoading(false);
-    }
+      return "Appointment created successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Creating appointment...',
+      success: (data) => data,
+      error: 'Failed to create appointment',
+    });
   };
 
   return (

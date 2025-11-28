@@ -15,7 +15,6 @@ import {
 import { Calendar, Wrench, CheckCircle, Users, UserCheck, TrendingUp, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { PageHeader } from "./PageHeader";
 
 const COLORS = ["#5B8FFF", "#FFB366", "#5DD37C", "#FF6B6B", "#8884d8", "#9CA3AF"]; // Added Gray for Others
@@ -94,7 +93,6 @@ export function Dashboard() {
 
       } catch (error) {
         console.error('Error fetching admin dashboard data:', error);
-        toast.error('Failed to load dashboard data');
       }
     };
 

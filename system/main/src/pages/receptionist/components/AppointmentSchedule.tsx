@@ -4,7 +4,7 @@ import { Search, Filter, Trash2, Calendar, Clock, User, Phone, Plus } from "luci
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { useFeedback } from "@/context/FeedbackContext";
 import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
 import { RecycleBinDialog } from "./RecycleBinDialog";
 import { StatusChangeDialog } from "./StatusChangeDialog";
@@ -43,6 +43,7 @@ interface AppointmentScheduleProps {
 }
 
 export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearSelection }: AppointmentScheduleProps) {
+  const { showPromise } = useFeedback();
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -178,21 +179,19 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
       } else {
         console.error("Received non-array data:", data);
         setAppointments([]);
-        toast.error("Received invalid data format");
       }
     } catch (error) {
       console.error("Error fetching appointments:", error);
-      toast.error("Failed to load appointments");
       setAppointments([]);
     }
   };
 
   const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
-    try {
-      const token = sessionStorage.getItem('token');
-      if (!token) return;
+    const token = sessionStorage.getItem('token');
+    if (!token) return;
 
-      await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
+    const promise = async () => {
+      const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -201,24 +200,30 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
         body: JSON.stringify({ date, time, technicianId })
       });
 
-      toast.success("Appointment details updated successfully");
+      if (!response.ok) throw new Error("Failed to update details");
       fetchAppointments();
-    } catch (error) {
-      console.error("Error updating details:", error);
-      toast.error("Failed to update appointment details");
-    }
+      return "Appointment details updated successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating appointment details...',
+      success: (data) => data,
+      error: 'Failed to update appointment details',
+    });
   };
 
   const handleStatusUpdate = async (id: string, status: string, arg3?: string, arg4?: string) => {
-    try {
-      const token = sessionStorage.getItem('token');
-      
+    const token = sessionStorage.getItem('token');
+    if (!token) return;
+
+    const promise = async () => {
       if (status === 'deleted') {
-        await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/soft`, {
+        const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/soft`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        toast.success("Appointment moved to recycle bin");
+        if (!response.ok) throw new Error("Failed to delete appointment");
+        return "Appointment moved to recycle bin";
       } else {
         let backendStatus = status.charAt(0).toUpperCase() + status.slice(1);
         if (status === 'in-progress') {
@@ -233,7 +238,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
             if (arg4) body.category = arg4;
         }
 
-        await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
+        const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -241,21 +246,27 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
           },
           body: JSON.stringify(body)
         });
-        toast.success(`Appointment ${status}`);
+        
+        if (!response.ok) throw new Error("Failed to update status");
+        return `Appointment ${status}`;
       }
-      
-      fetchAppointments();
-      setIsDetailsOpen(false);
-    } catch (error) {
-      console.error("Error updating status:", error);
-      toast.error("Failed to update status");
-    }
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating status...',
+      success: (data) => {
+        fetchAppointments();
+        setIsDetailsOpen(false);
+        return data;
+      },
+      error: 'Failed to update status',
+    });
   };
 
   const handleBulkDelete = async () => {
     if (!confirm(`Are you sure you want to move ${filteredAppointments.length} appointments to the recycle bin?`)) return;
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       await Promise.all(filteredAppointments.map(apt => 
         fetch(`http://localhost:5000/api/receptionist/appointments/${apt.id}/soft`, {
@@ -263,13 +274,15 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ));
-      
-      toast.success("Appointments moved to recycle bin");
       fetchAppointments();
-    } catch (error) {
-      console.error("Error deleting appointments:", error);
-      toast.error("Failed to delete appointments");
-    }
+      return "Appointments moved to recycle bin";
+    };
+
+    showPromise(promise(), {
+      loading: 'Moving appointments to recycle bin...',
+      success: (data) => data,
+      error: 'Failed to delete appointments',
+    });
   };
 
   const handleViewDetails = (appointment: Appointment) => {

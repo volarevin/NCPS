@@ -4,11 +4,12 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
-import { toast } from 'sonner';
+import { useFeedback } from "@/context/FeedbackContext";
 import { User, Mail, Phone, MapPin, Lock, Camera } from 'lucide-react';
 import { PageHeader } from './PageHeader';
 
 export function MyAccount() {
+  const { showPromise } = useFeedback();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
     name: 'Receptionist Name',
@@ -27,18 +28,36 @@ export function MyAccount() {
   });
 
   const handleSaveProfile = () => {
-    setIsEditing(false);
-    toast.success('Profile updated successfully');
+    const promise = async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+        setIsEditing(false);
+        return "Profile updated successfully";
+    };
+
+    showPromise(promise(), {
+        loading: 'Updating profile...',
+        success: (data) => data,
+        error: 'Failed to update profile',
+    });
   };
 
   const handleUpdatePassword = (e: React.FormEvent) => {
     e.preventDefault();
-    if (passwords.new !== passwords.confirm) {
-      toast.error('New passwords do not match');
-      return;
-    }
-    toast.success('Password updated successfully');
-    setPasswords({ current: '', new: '', confirm: '' });
+    
+    const promise = async () => {
+        if (passwords.new !== passwords.confirm) {
+            throw new Error('New passwords do not match');
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+        setPasswords({ current: '', new: '', confirm: '' });
+        return "Password updated successfully";
+    };
+
+    showPromise(promise(), {
+        loading: 'Updating password...',
+        success: (data) => data,
+        error: (err) => err instanceof Error ? err.message : 'Failed to update password',
+    });
   };
 
   return (

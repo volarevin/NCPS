@@ -19,7 +19,7 @@ import {
   Menu,
   Star
 } from 'lucide-react';
-import { toast } from "sonner";
+import { useFeedback } from "@/context/FeedbackContext";
 import { AddAppointmentDialog } from './AddAppointmentDialog';
 import { AppointmentDetailsDialog } from './AppointmentDetailsDialog';
 import { StatusChangeDialog } from './StatusChangeDialog';
@@ -48,6 +48,7 @@ interface DashboardProps {
 }
 
 export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: DashboardProps) {
+  const { showPromise } = useFeedback();
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     total: 0,
@@ -151,12 +152,12 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
       return;
     }
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       let backendStatus = status.charAt(0).toUpperCase() + status.slice(1);
       if (status === 'in-progress') backendStatus = 'In Progress';
 
-      await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
+      const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -165,22 +166,27 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         body: JSON.stringify({ status: backendStatus })
       });
       
-      toast.success(`Appointment ${status}`);
+      if (!response.ok) throw new Error("Failed to update status");
+      
       fetchDashboardData();
-    } catch (error) {
-      console.error("Error updating status:", error);
-      toast.error("Failed to update status");
-    }
+      return `Appointment ${status}`;
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating status...',
+      success: (data) => data,
+      error: 'Failed to update status',
+    });
   };
 
   const handleStatusConfirm = async (reason: string, category: string) => {
     if (!statusDialog.appointmentId) return;
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       const status = statusDialog.type === 'reject' ? 'rejected' : 'cancelled';
       
-      await fetch(`http://localhost:5000/api/receptionist/appointments/${statusDialog.appointmentId}/status`, {
+      const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${statusDialog.appointmentId}/status`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -189,13 +195,18 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         body: JSON.stringify({ status, reason, category })
       });
       
-      toast.success(`Appointment ${status}`);
+      if (!response.ok) throw new Error('Failed to update status');
+      
       setStatusDialog({ ...statusDialog, open: false });
       fetchDashboardData();
-    } catch (error) {
-      console.error("Error updating status:", error);
-      toast.error("Failed to update status");
-    }
+      return `Appointment ${status}`;
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating status...',
+      success: (data) => data,
+      error: 'Failed to update status',
+    });
   };
 
   const today = new Date().toLocaleDateString('en-US', { 
@@ -434,7 +445,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
           appointment={selectedAppointment}
           onStatusUpdate={async (id, status, technicianId) => {
             // Handle status update from dialog
-            try {
+            const promise = async () => {
                 const token = sessionStorage.getItem('token');
                 let backendStatus = status.charAt(0).toUpperCase() + status.slice(1);
                 if (status === 'in-progress') backendStatus = 'In Progress';
@@ -444,7 +455,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                     body.technicianId = technicianId;
                 }
                 
-                await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
+                const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/status`, {
                     method: 'PUT',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -453,18 +464,23 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                     body: JSON.stringify(body)
                 });
                 
-                toast.success(`Appointment ${status}`);
+                if (!response.ok) throw new Error('Failed to update status');
+
                 setIsDetailsOpen(false);
                 fetchDashboardData();
-            } catch (error) {
-                console.error("Error updating status:", error);
-                toast.error("Failed to update status");
-            }
+                return `Appointment ${status}`;
+            };
+
+            showPromise(promise(), {
+                loading: 'Updating status...',
+                success: (data) => data,
+                error: 'Failed to update status',
+            });
           }}
           onUpdateDetails={async (id, date, time, technicianId) => {
-            try {
+            const promise = async () => {
               const token = sessionStorage.getItem('token');
-              await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
+              const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/details`, {
                 method: 'PUT',
                 headers: { 
                   'Authorization': `Bearer ${token}`,
@@ -472,12 +488,18 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                 },
                 body: JSON.stringify({ date, time, technicianId })
               });
-              toast.success("Appointment details updated");
+              
+              if (!response.ok) throw new Error('Failed to update details');
+
               fetchDashboardData();
-            } catch (error) {
-              console.error("Error updating details:", error);
-              toast.error("Failed to update details");
-            }
+              return "Appointment details updated";
+            };
+
+            showPromise(promise(), {
+                loading: 'Updating details...',
+                success: (data) => data,
+                error: 'Failed to update details',
+            });
           }}
         />
       )}

@@ -11,13 +11,14 @@ import { CancelAppointmentDialog } from './CancelAppointmentDialog';
 import { RateTechnicianDialog } from './RateTechnicianDialog';
 import { CustomerCalendar } from './CustomerCalendar';
 import { PageHeader } from './PageHeader';
-import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { useFeedback } from "@/context/FeedbackContext";
 
 type AppointmentStatus = 'all' | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 type ViewMode = 'list' | 'calendar';
 
 export function CustomerAppointments() {
+  const { showPromise } = useFeedback();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AppointmentStatus>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -80,7 +81,6 @@ export function CustomerAppointments() {
       setAppointments(formattedAppointments);
     } catch (error) {
       console.error('Error fetching appointments:', error);
-      toast.error('Failed to load appointments');
     } finally {
       setIsLoading(false);
     }
@@ -93,7 +93,7 @@ export function CustomerAppointments() {
   const handleCancelAppointment = async (reason: string) => {
     if (!selectedAppointment) return;
 
-    try {
+    const promise = async () => {
       const response = await fetch(`http://localhost:5000/api/appointments/${selectedAppointment.id}/status`, {
         method: 'PUT',
         headers: {
@@ -109,13 +109,16 @@ export function CustomerAppointments() {
         apt.id === selectedAppointment.id ? { ...apt, status: 'cancelled' } : apt
       ));
       
-      toast.success('Appointment cancelled successfully');
       setIsCancelDialogOpen(false);
       fetchAppointments(); // Refresh to get updated state
-    } catch (error) {
-      console.error('Error cancelling appointment:', error);
-      toast.error('Failed to cancel appointment');
-    }
+      return 'Appointment cancelled successfully';
+    };
+
+    showPromise(promise(), {
+      loading: 'Cancelling appointment...',
+      success: (data) => data,
+      error: 'Failed to cancel appointment',
+    });
   };
 
   const filteredAppointments = appointments.filter((apt) => {
@@ -324,11 +327,11 @@ export function CustomerAppointments() {
         onOpenChange={(open) => {
           setIsCreateDialogOpen(open);
           if (!open) {
-            fetchAppointments();
             setSelectedDateForBooking('');
           }
         }}
         initialDate={selectedDateForBooking}
+        onSuccess={fetchAppointments}
       />
 
       <ViewAppointmentDialog

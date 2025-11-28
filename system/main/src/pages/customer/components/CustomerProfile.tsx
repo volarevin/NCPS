@@ -23,9 +23,10 @@ import {
   DialogTitle,
 } from "../../../components/ui/dialog";
 import { PageHeader } from './PageHeader';
-import { toast } from 'sonner';
+import { useFeedback } from "@/context/FeedbackContext";
 
 export function CustomerProfile() {
+  const { showPromise } = useFeedback();
   const [isEditing, setIsEditing] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -74,9 +75,9 @@ export function CustomerProfile() {
   });
 
   const handleSave = async () => {
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
-      if (!token) return;
+      if (!token) throw new Error("No token found");
 
       const response = await fetch('http://localhost:5000/api/customer/profile', {
         method: 'PUT',
@@ -87,30 +88,30 @@ export function CustomerProfile() {
         body: JSON.stringify(formData)
       });
 
-      if (response.ok) {
-        toast.success('Profile updated successfully');
-        setIsEditing(false);
-        // Update local storage user info if needed
-        const user = JSON.parse(sessionStorage.getItem('user') || '{}');
-        sessionStorage.setItem('user', JSON.stringify({ ...user, firstName: formData.firstName, lastName: formData.lastName }));
-      } else {
-        toast.error('Failed to update profile');
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('An error occurred');
-    }
+      if (!response.ok) throw new Error('Failed to update profile');
+
+      setIsEditing(false);
+      // Update local storage user info if needed
+      const user = JSON.parse(sessionStorage.getItem('user') || '{}');
+      sessionStorage.setItem('user', JSON.stringify({ ...user, firstName: formData.firstName, lastName: formData.lastName }));
+      return "Profile updated successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating profile...',
+      success: (data) => data,
+      error: 'Failed to update profile',
+    });
   };
 
   const handlePasswordChange = async () => {
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
+    const promise = async () => {
+      if (passwordData.newPassword !== passwordData.confirmPassword) {
+        throw new Error('New passwords do not match');
+      }
 
-    try {
       const token = sessionStorage.getItem('token');
-      if (!token) return;
+      if (!token) throw new Error("No token found");
 
       const response = await fetch('http://localhost:5000/api/customer/change-password', {
         method: 'PUT',
@@ -126,23 +127,24 @@ export function CustomerProfile() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        toast.success('Password updated successfully');
-        setShowPasswordDialog(false);
-        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        toast.error(data.message || 'Failed to update password');
-      }
-    } catch (error) {
-      console.error('Error changing password:', error);
-      toast.error('An error occurred');
-    }
+      if (!response.ok) throw new Error(data.message || 'Failed to update password');
+
+      setShowPasswordDialog(false);
+      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      return "Password updated successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating password...',
+      success: (data) => data,
+      error: (err) => err instanceof Error ? err.message : 'Failed to update password',
+    });
   };
 
   const handleDeleteAccount = async () => {
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
-      if (!token) return;
+      if (!token) throw new Error("No token found");
 
       const response = await fetch('http://localhost:5000/api/customer/account', {
         method: 'DELETE',
@@ -153,17 +155,20 @@ export function CustomerProfile() {
 
       const data = await response.json();
 
-      if (response.ok) {
-        toast.success('Account deleted successfully');
-        sessionStorage.clear();
-        window.location.href = '/login';
-      } else {
-        toast.error(data.message || 'Failed to delete account');
-        setShowDeleteDialog(false);
-      }
+      if (!response.ok) throw new Error(data.message || 'Failed to delete account');
+      return 'Account deleted successfully';
+    };
+
+    try {
+      await showPromise(promise(), {
+        loading: 'Deleting account...',
+        success: (data) => data,
+        error: (err) => err.message || 'Failed to delete account'
+      });
+      sessionStorage.clear();
+      window.location.href = '/login';
     } catch (error) {
       console.error('Error deleting account:', error);
-      toast.error('An error occurred');
       setShowDeleteDialog(false);
     }
   };

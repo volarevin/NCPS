@@ -12,16 +12,18 @@ import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { Checkbox } from "../../../components/ui/checkbox"; // Assuming you have this component
-import { toast } from 'sonner';
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface CreateAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialServiceId?: string;
   initialDate?: string;
+  onSuccess?: () => void;
 }
 
-export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, initialDate }: CreateAppointmentDialogProps) {
+export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, initialDate, onSuccess }: CreateAppointmentDialogProps) {
+  const { showPromise } = useFeedback();
   const [formData, setFormData] = useState({
     serviceId: initialServiceId || '',
     date: initialDate || '',
@@ -103,11 +105,10 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
     e.preventDefault();
     setIsLoading(true);
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       if (!token) {
-        toast.error('You must be logged in to book an appointment.');
-        return;
+        throw new Error('You must be logged in to book an appointment.');
       }
 
       const response = await fetch('http://localhost:5000/api/appointments', {
@@ -132,19 +133,28 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
         throw new Error(data.message || 'Booking failed');
       }
 
-      toast.success('Appointment booked successfully!');
-      onOpenChange(false);
-      // Reset form
       setFormData({ serviceId: '', date: '', time: '', address: '', notes: '' });
       setSaveNewAddress(false);
+      onOpenChange(false);
       
-      // Optional: Trigger a refresh of the appointments list if we had a context or callback
-      window.location.reload(); // Simple reload to refresh data for now
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        window.location.reload();
+      }
+      return 'Appointment booked successfully!';
+    };
 
-    } catch (error: any) {
-      toast.error(error.message);
+    try {
+        await showPromise(promise(), {
+            loading: 'Booking appointment...',
+            success: (data) => data,
+            error: (err) => err instanceof Error ? err.message : 'Booking failed',
+        });
+    } catch (error) {
+        // Error handled by showPromise
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
 

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Textarea } from "../../../components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
+import { useFeedback } from "../../../context/FeedbackContext";
 
 interface Appointment {
   id: string;
@@ -39,6 +40,7 @@ export default function AppointmentDetailsModal({
   onUpdateStatus,
   isTechnician = false 
 }: AppointmentDetailsModalProps) {
+  const { showPromise } = useFeedback();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelCategory, setCancelCategory] = useState("");
@@ -77,14 +79,17 @@ export default function AppointmentDetailsModal({
 
   const confirmCancelAppointment = () => {
     if (!cancelCategory) {
-        alert("Please select a cancellation category");
+        showPromise(Promise.reject(new Error("Please select a cancellation category")), {
+            loading: 'Validating...',
+            success: () => '',
+            error: (err) => err.message
+        });
         return;
     }
     handleStatusUpdate("Cancelled", cancelReason, cancelCategory);
     setShowCancelDialog(false);
     setCancelReason("");
     setCancelCategory("");
-    alert(`Appointment cancelled${cancelReason ? ` with reason: ${cancelReason}` : ''}`);
     onClose();
   };
 
@@ -300,7 +305,6 @@ export default function AppointmentDetailsModal({
                     <Button
                       onClick={() => {
                         handleStatusUpdate("In Progress");
-                        alert("Appointment status updated to In Progress");
                       }}
                       className="bg-blue-500 hover:bg-blue-600 text-white"
                     >
@@ -312,7 +316,6 @@ export default function AppointmentDetailsModal({
                     <Button
                       onClick={() => {
                         handleStatusUpdate("Completed");
-                        alert("Appointment marked as Completed!");
                         onClose();
                       }}
                       className="bg-green-500 hover:bg-green-600 text-white"

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { LayoutDashboard, Calendar, User, LogOut, Wrench } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +38,6 @@ export function CustomerSidebar({ currentPage, onNavigate }: CustomerSidebarProp
   const confirmLogout = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
-    toast.success('Logged out successfully');
     navigate('/login');
   };
 

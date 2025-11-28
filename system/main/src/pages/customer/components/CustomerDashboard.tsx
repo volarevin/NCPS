@@ -10,7 +10,6 @@ import { EditAppointmentDialog } from './EditAppointmentDialog';
 import { CreateAppointmentDialog } from './CreateAppointmentDialog';
 import { PageHeader } from './PageHeader';
 import { ServiceBanner } from './ServiceBanner';
-import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
 
@@ -27,13 +26,7 @@ export function CustomerDashboard() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
 
-  useEffect(() => {
-    const storedUser = sessionStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-
-    const fetchDashboardData = async () => {
+  const fetchDashboardData = async () => {
       try {
         const token = sessionStorage.getItem('token');
         if (!token) {
@@ -146,10 +139,14 @@ export function CustomerDashboard() {
 
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        toast.error('Failed to load dashboard data');
       }
     };
 
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
     fetchDashboardData();
   }, []);
   
@@ -321,6 +318,7 @@ export function CustomerDashboard() {
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         initialServiceId={selectedAppointment?.service_id}
+        onSuccess={fetchDashboardData}
       />
     </div>
   );

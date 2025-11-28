@@ -5,7 +5,6 @@ import { Input } from "../../../components/ui/input";
 import { Badge } from "../../../components/ui/badge";
 import { CreateAppointmentDialog } from './CreateAppointmentDialog';
 import { PageHeader } from './PageHeader';
-import { toast } from 'sonner';
 
 const iconMap: Record<string, any> = {
   'Laptop': Laptop,
@@ -56,7 +55,6 @@ export function CustomerServices() {
       }
     } catch (error) {
       console.error('Error fetching services:', error);
-      toast.error('Failed to load services');
     } finally {
       setIsLoading(false);
     }

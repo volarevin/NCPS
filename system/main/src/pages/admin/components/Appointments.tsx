@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import { useFeedback } from "@/context/FeedbackContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Appointment {
@@ -53,6 +53,7 @@ interface Appointment {
 
 export function Appointments() {
   const navigate = useNavigate();
+  const { showPromise } = useFeedback();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -274,13 +275,13 @@ export function Appointments() {
         return;
     }
 
-    try {
+    const promise = async () => {
         const token = sessionStorage.getItem('token');
-        if (!token) return;
+        if (!token) throw new Error("No token");
 
         const ids = filteredAppointments.map(a => a.id);
 
-        await fetch('http://localhost:5000/api/admin/appointments/bulk-delete', {
+        const response = await fetch('http://localhost:5000/api/admin/appointments/bulk-delete', {
             method: 'POST',
             headers: { 
                 'Authorization': `Bearer ${token}`,
@@ -289,21 +290,26 @@ export function Appointments() {
             body: JSON.stringify({ ids })
         });
 
+        if (!response.ok) throw new Error("Failed to delete");
+
         setAppointments(appointments.filter(app => !ids.includes(app.id)));
         setRecycleBinCount(prev => prev + ids.length);
-        toast.success(`${ids.length} appointments moved to recycle bin`);
-    } catch (error) {
-        console.error("Error bulk deleting", error);
-        toast.error("Failed to move appointments to recycle bin");
-    }
+        return `${ids.length} appointments moved to recycle bin`;
+    };
+
+    showPromise(promise(), {
+        loading: 'Moving appointments to recycle bin...',
+        success: (data) => data,
+        error: 'Failed to move appointments to recycle bin'
+    });
   };
 
   const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
-    try {
-      const token = sessionStorage.getItem('token');
-      if (!token) return;
+    const token = sessionStorage.getItem('token');
+    if (!token) return;
 
-      await fetch(`http://localhost:5000/api/admin/appointments/${id}/details`, {
+    const promise = async () => {
+      const response = await fetch(`http://localhost:5000/api/admin/appointments/${id}/details`, {
         method: 'PUT',
         headers: { 
           'Authorization': `Bearer ${token}`,
@@ -312,29 +318,34 @@ export function Appointments() {
         body: JSON.stringify({ date, time, technicianId })
       });
 
-      toast.success("Appointment details updated successfully");
+      if (!response.ok) throw new Error("Failed to update details");
       fetchAppointments();
-    } catch (error) {
-      console.error("Error updating details:", error);
-      toast.error("Failed to update appointment details");
-    }
+      return "Appointment details updated successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating appointment details...',
+      success: (data) => data,
+      error: 'Failed to update appointment details',
+    });
   };
 
   const handleStatusUpdate = async (id: string, newStatus: Appointment["status"] | 'deleted', arg3?: string, arg4?: string) => {
-    try {
-        const token = sessionStorage.getItem('token');
-        if (!token) return;
+    const token = sessionStorage.getItem('token');
+    if (!token) return;
 
+    const promise = async () => {
         // If deleting (soft delete)
         if (newStatus === 'deleted') {
-             await fetch(`http://localhost:5000/api/admin/appointments/${id}`, {
+             const response = await fetch(`http://localhost:5000/api/admin/appointments/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+            if (!response.ok) throw new Error("Failed to delete appointment");
+            
             setAppointments(appointments.filter(app => app.id !== id));
             setRecycleBinCount(prev => prev + 1);
-            toast.success("Appointment moved to recycle bin");
-            return;
+            return "Appointment moved to recycle bin";
         }
 
         // Map frontend status to backend status
@@ -351,7 +362,7 @@ export function Appointments() {
             if (arg4) body.category = arg4;
         }
 
-        await fetch(`http://localhost:5000/api/admin/appointments/${id}/status`, {
+        const response = await fetch(`http://localhost:5000/api/admin/appointments/${id}/status`, {
             method: 'PUT',
             headers: { 
                 'Authorization': `Bearer ${token}`,
@@ -359,6 +370,8 @@ export function Appointments() {
             },
             body: JSON.stringify(body)
         });
+
+        if (!response.ok) throw new Error("Failed to update status");
 
         setAppointments(appointments.map(app => {
             if (app.id === id) {
@@ -371,11 +384,14 @@ export function Appointments() {
             }
             return app;
         }));
-        toast.success(`Appointment status updated to ${newStatus}`);
-    } catch (error) {
-        console.error("Error updating status", error);
-        toast.error("Failed to update status");
-    }
+        return `Appointment status updated to ${newStatus}`;
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating status...',
+      success: (data) => data,
+      error: 'Failed to update status',
+    });
   };
 
   return (

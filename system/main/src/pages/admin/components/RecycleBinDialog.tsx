@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2, RefreshCw, AlertTriangle, X } from "lucide-react";
-import { toast } from "sonner";
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface DeletedAppointment {
   appointment_id: number;
@@ -27,6 +27,7 @@ interface RecycleBinDialogProps {
 }
 
 export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) {
+  const { showPromise } = useFeedback();
   const [deletedItems, setDeletedItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -48,7 +49,6 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
       }
     } catch (error) {
       console.error('Error fetching deleted items:', error);
-      toast.error('Failed to load recycle bin');
     } finally {
       setLoading(false);
     }
@@ -61,61 +61,76 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
   }, [open]);
 
   const handleRestore = async (id: number) => {
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
-      if (!token) return;
+      if (!token) throw new Error("No token found");
 
-      await fetch(`http://localhost:5000/api/admin/appointments/${id}/restore`, {
+      const response = await fetch(`http://localhost:5000/api/admin/appointments/${id}/restore`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      toast.success('Appointment restored');
+      if (!response.ok) throw new Error('Failed to restore item');
+      
       fetchDeletedItems();
-    } catch (error) {
-      console.error('Error restoring item:', error);
-      toast.error('Failed to restore item');
-    }
+      return "Appointment restored";
+    };
+
+    showPromise(promise(), {
+      loading: 'Restoring appointment...',
+      success: (data) => data,
+      error: 'Failed to restore item',
+    });
   };
 
   const handlePermanentDelete = async (id: number) => {
     if (!confirm('Are you sure? This cannot be undone.')) return;
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
-      if (!token) return;
+      if (!token) throw new Error("No token found");
 
-      await fetch(`http://localhost:5000/api/admin/appointments/${id}/permanent`, {
+      const response = await fetch(`http://localhost:5000/api/admin/appointments/${id}/permanent`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      toast.success('Appointment permanently deleted');
+      if (!response.ok) throw new Error('Failed to delete item');
+      
       fetchDeletedItems();
-    } catch (error) {
-      console.error('Error deleting item:', error);
-      toast.error('Failed to delete item');
-    }
+      return "Appointment permanently deleted";
+    };
+
+    showPromise(promise(), {
+      loading: 'Deleting appointment permanently...',
+      success: (data) => data,
+      error: 'Failed to delete item',
+    });
   };
 
   const handleEmptyBin = async () => {
     if (!confirm('Are you sure you want to empty the recycle bin? All items will be permanently lost.')) return;
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
-      if (!token) return;
+      if (!token) throw new Error("No token found");
 
-      await fetch('http://localhost:5000/api/admin/appointments/recycle-bin', {
+      const response = await fetch('http://localhost:5000/api/admin/appointments/recycle-bin', {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      toast.success('Recycle bin emptied');
+      if (!response.ok) throw new Error('Failed to empty bin');
+      
       fetchDeletedItems();
-    } catch (error) {
-      console.error('Error emptying bin:', error);
-      toast.error('Failed to empty bin');
-    }
+      return "Recycle bin emptied";
+    };
+
+    showPromise(promise(), {
+      loading: 'Emptying recycle bin...',
+      success: (data) => data,
+      error: 'Failed to empty bin',
+    });
   };
 
   return (

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Settings, Plus, Menu, Box } from "lucide-react";
 import { EditServiceDialog } from "./EditServiceDialog";
 import { CategorySettingsDialog, iconMap } from "./CategorySettingsDialog";
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface Service {
   id: string;
@@ -22,6 +23,7 @@ interface Category {
 }
 
 export function Services() {
+  const { showPromise } = useFeedback();
   const [services, setServices] = useState<Service[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -75,11 +77,11 @@ export function Services() {
   }, []);
 
   const handleUpdateCategory = async (id: number, color: string, icon: string) => {
-      try {
-        const token = sessionStorage.getItem('token');
-        if (!token) return;
+      const token = sessionStorage.getItem('token');
+      if (!token) return;
 
-        await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
+      const promise = async () => {
+        const response = await fetch(`http://localhost:5000/api/admin/categories/${id}`, {
             method: 'PUT',
             headers: { 
                 'Content-Type': 'application/json',
@@ -88,12 +90,19 @@ export function Services() {
             body: JSON.stringify({ color, icon })
         });
 
+        if (!response.ok) throw new Error("Failed to update category");
+
         // Refresh data
         await fetchCategories();
         await fetchServices();
-      } catch (error) {
-          console.error('Error updating category:', error);
-      }
+        return "Category updated successfully";
+      };
+
+      showPromise(promise(), {
+        loading: 'Updating category...',
+        success: (data) => data,
+        error: 'Failed to update category',
+      });
   };
 
   const filteredServices =
@@ -115,10 +124,10 @@ export function Services() {
     const token = sessionStorage.getItem('token');
     if (!token) return;
 
-    try {
+    const promise = async () => {
       if (selectedService) {
         // Edit existing service
-        await fetch(`http://localhost:5000/api/admin/services/${service.id}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/services/${service.id}`, {
           method: 'PUT',
           headers: { 
             'Content-Type': 'application/json',
@@ -132,11 +141,14 @@ export function Services() {
           })
         });
         
+        if (!response.ok) throw new Error("Failed to update service");
+
         // Refresh to get updated category metadata
         fetchServices();
+        return "Service updated successfully";
       } else {
         // Add new service
-        await fetch('http://localhost:5000/api/admin/services', {
+        const response = await fetch('http://localhost:5000/api/admin/services', {
           method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
@@ -151,27 +163,43 @@ export function Services() {
             icon: service.icon
           })
         });
+
+        if (!response.ok) throw new Error("Failed to create service");
+
         fetchServices();
         fetchCategories(); // Also refresh categories as they might have been updated
+        return "Service created successfully";
       }
-    } catch (error) {
-      console.error('Error saving service:', error);
-    }
+    };
+
+    showPromise(promise(), {
+      loading: selectedService ? 'Updating service...' : 'Creating service...',
+      success: (data) => data,
+      error: selectedService ? 'Failed to update service' : 'Failed to create service',
+    });
   };
 
   const handleDeleteService = async (id: string) => {
     const token = sessionStorage.getItem('token');
     if (!token) return;
 
-    try {
-      await fetch(`http://localhost:5000/api/admin/services/${id}`, {
+    const promise = async () => {
+      const response = await fetch(`http://localhost:5000/api/admin/services/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      
+      if (!response.ok) throw new Error("Failed to delete service");
+
       setServices(services.filter((s) => s.id !== id));
-    } catch (error) {
-      console.error('Error deleting service:', error);
-    }
+      return "Service deleted successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Deleting service...',
+      success: (data) => data,
+      error: 'Failed to delete service',
+    });
   };
 
   const getCategoryIcon = (iconName: string) => {

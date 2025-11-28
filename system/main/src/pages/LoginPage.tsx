@@ -5,11 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
+import { useFeedback } from '@/context/FeedbackContext';
 
 type ViewMode = 'login' | 'signup' | 'forgot-password';
 
 export default function LoginPage() {
+  const { showPromise } = useFeedback();
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<ViewMode>('login');
   
@@ -170,9 +171,19 @@ export default function LoginPage() {
     const API_URL = 'http://localhost:5000/api/auth';
 
     if (viewMode === 'forgot-password') {
-      // TODO: Implement forgot password API
-      console.log('Reset password for:', email);
-      toast.success("Password reset link sent to your email!");
+      const promise = async () => {
+        // TODO: Implement forgot password API
+        console.log('Reset password for:', email);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        return "Password reset link sent to your email!";
+      };
+
+      await showPromise(promise(), {
+        loading: 'Sending reset link...',
+        success: (data) => data,
+        error: 'Failed to send reset link'
+      });
+
       setViewMode('login');
       setIsLoading(false);
       return;
@@ -181,12 +192,16 @@ export default function LoginPage() {
     if (viewMode === 'signup') {
       // Sign Up Logic
       if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
+        showPromise(Promise.reject(new Error("Passwords do not match")), {
+            loading: 'Validating...',
+            success: () => '',
+            error: (err) => err.message
+        });
         setIsLoading(false);
         return;
       }
 
-      try {
+      const promise = async () => {
         const response = await fetch(`${API_URL}/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -206,12 +221,19 @@ export default function LoginPage() {
         if (!response.ok) {
           throw new Error(data.message || 'Registration failed');
         }
+        return "Account created successfully! Please login.";
+      };
 
-        toast.success("Account created successfully! Please login.");
+      try {
+        await showPromise(promise(), {
+            loading: 'Creating account...',
+            success: (data) => data,
+            error: (err) => err.message || 'Registration failed'
+        });
         setViewMode('login');
         resetForm();
       } catch (error: any) {
-        toast.error(error.message);
+        // Error handled by showPromise
       } finally {
         setIsLoading(false);
       }
@@ -219,7 +241,7 @@ export default function LoginPage() {
     }
 
     // Login Logic
-    try {
+    const promise = async () => {
       const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -235,8 +257,16 @@ export default function LoginPage() {
       // Store token and user info
       sessionStorage.setItem('token', data.token);
       sessionStorage.setItem('user', JSON.stringify(data.user));
+      
+      return data;
+    };
 
-      toast.success(`Welcome back, ${data.user.firstName}!`);
+    try {
+      const data = await showPromise(promise(), {
+        loading: 'Logging in...',
+        success: (data) => `Welcome back, ${data.user.firstName}!`,
+        error: (err) => err.message || 'Login failed'
+      });
 
       // Redirect based on role
       const role = data.user.role.toLowerCase();
@@ -250,7 +280,7 @@ export default function LoginPage() {
         navigate('/customer');
       }
     } catch (error: any) {
-      toast.error(error.message);
+      // Error handled by showPromise
     } finally {
       setIsLoading(false);
     }

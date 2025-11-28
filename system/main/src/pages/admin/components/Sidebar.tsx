@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,7 +54,6 @@ export function Sidebar({ currentPage = "Dashboard", onNavigate, mobileMenuOpen 
   const confirmLogout = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
-    toast.success('Logged out successfully');
     navigate('/login');
   };
 

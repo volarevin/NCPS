@@ -5,7 +5,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { toast } from 'sonner';
+import { useFeedback } from "../../../context/FeedbackContext";
 import { Appointment } from './AppointmentSchedule';
 
 interface AddAppointmentDialogProps {
@@ -31,6 +31,7 @@ export function AddAppointmentDialog({
   onOpenChange,
   onAddAppointment,
 }: AddAppointmentDialogProps) {
+  const { showPromise } = useFeedback();
   const [formData, setFormData] = useState({
     clientName: '',
     phone: '',
@@ -83,11 +84,15 @@ export function AddAppointmentDialog({
 
     // Validation
     if (!formData.clientName || !formData.phone || !formData.serviceId || !formData.date || !formData.time) {
-      toast.error('Please fill in all required fields');
+      showPromise(Promise.reject(new Error('Please fill in all required fields')), {
+        loading: 'Validating...',
+        success: () => '',
+        error: (err) => err.message
+      });
       return;
     }
 
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/receptionist/appointments', {
         method: 'POST',
@@ -98,32 +103,35 @@ export function AddAppointmentDialog({
         body: JSON.stringify(formData)
       });
 
-      if (response.ok) {
-        toast.success('Walk-in appointment added successfully');
-        onAddAppointment({} as any); // Trigger refresh in parent
-        
-        // Reset form
-        setFormData({
-          clientName: '',
-          phone: '',
-          email: '',
-          address: '',
-          serviceId: '',
-          date: '',
-          time: '',
-          technicianId: '',
-          notes: '',
-        });
-        
-        onOpenChange(false);
-      } else {
+      if (!response.ok) {
         const error = await response.json();
-        toast.error(error.message || 'Failed to add appointment');
+        throw new Error(error.message || 'Failed to add appointment');
       }
-    } catch (error) {
-      console.error('Error adding appointment:', error);
-      toast.error('Failed to add appointment');
-    }
+
+      onAddAppointment({} as any); // Trigger refresh in parent
+      
+      // Reset form
+      setFormData({
+        clientName: '',
+        phone: '',
+        email: '',
+        address: '',
+        serviceId: '',
+        date: '',
+        time: '',
+        technicianId: '',
+        notes: '',
+      });
+      
+      onOpenChange(false);
+      return 'Walk-in appointment added successfully';
+    };
+
+    showPromise(promise(), {
+      loading: 'Adding appointment...',
+      success: (data) => data,
+      error: (err) => err.message || 'Failed to add appointment',
+    });
   };
 
   return (

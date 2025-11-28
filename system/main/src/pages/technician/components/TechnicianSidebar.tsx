@@ -7,7 +7,6 @@ import {
   Star
 } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,7 +42,6 @@ export function TechnicianSidebar({ currentPage, onNavigate, className = "" }: T
   const confirmLogout = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
-    toast.success('Logged out successfully');
     navigate('/login');
   };
 

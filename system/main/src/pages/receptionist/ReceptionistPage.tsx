@@ -3,7 +3,6 @@ import { Sidebar } from './components/Sidebar';
 import { AppointmentSchedule, Appointment } from './components/AppointmentSchedule';
 import { Dashboard } from './components/Dashboard';
 import { MyAccount } from './components/MyAccount';
-import { Toaster } from '../../components/ui/sonner';
 import { MobileHeader } from './components/MobileHeader';
 
 export default function ReceptionistPage() {
@@ -45,8 +44,6 @@ export default function ReceptionistPage() {
           </div>
         </main>
       </div>
-      
-      <Toaster position="top-right" />
     </div>
   );
 }

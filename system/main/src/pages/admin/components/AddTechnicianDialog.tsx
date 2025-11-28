@@ -35,7 +35,10 @@ export const SPECIALTIES = [
   { value: "General", label: "General Technician", icon: Briefcase, color: "text-slate-500", bg: "bg-slate-50" },
 ];
 
+import { useFeedback } from "@/context/FeedbackContext";
+
 export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: AddTechnicianDialogProps) {
+  const { showPromise } = useFeedback();
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
@@ -68,8 +71,7 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
   const handlePromote = async () => {
     if (!selectedUser || !selectedSpecialty) return;
 
-    setLoading(true);
-    try {
+    const promise = async () => {
       const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/admin/technicians/promote', {
         method: 'POST',
@@ -83,17 +85,18 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
         })
       });
 
-      if (response.ok) {
-        onTechnicianAdded();
-        onOpenChange(false);
-      } else {
-        console.error('Failed to promote user');
-      }
-    } catch (error) {
-      console.error('Error promoting user:', error);
-    } finally {
-      setLoading(false);
-    }
+      if (!response.ok) throw new Error('Failed to promote user');
+
+      onTechnicianAdded();
+      onOpenChange(false);
+      return "User promoted to technician successfully";
+    };
+
+    showPromise(promise(), {
+      loading: 'Promoting user...',
+      success: (data) => data,
+      error: 'Failed to promote user',
+    });
   };
 
   const filteredUsers = users.filter(user => 
