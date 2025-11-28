@@ -16,4 +16,7 @@ router.put('/:id/status', checkRole(['Admin', 'Technician', 'Receptionist', 'Cus
 // Update Appointment Details (Customer only, for Pending appointments)
 router.put('/:id', checkRole(['Customer']), appointmentController.updateAppointment);
 
+// Rate Appointment (Customer only)
+router.post('/:id/rate', checkRole(['Customer']), appointmentController.rateAppointment);
+
 module.exports = router;

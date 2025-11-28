@@ -10,6 +10,7 @@ import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
 import { Star } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface RateTechnicianDialogProps {
   open: boolean;
@@ -21,14 +22,51 @@ export function RateTechnicianDialog({ open, onOpenChange, appointment }: RateTe
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [feedback, setFeedback] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = () => {
-    // Handle rating submission
-    console.log('Rating:', rating, 'Feedback:', feedback);
-    onOpenChange(false);
-    setRating(0);
-    setHoveredRating(0);
-    setFeedback('');
+  const handleSubmit = async () => {
+    if (rating === 0) {
+      toast.error('Please select a rating');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const token = sessionStorage.getItem('token');
+      if (!token) {
+        toast.error('You must be logged in');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:5000/api/appointments/${appointment.id}/rate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          rating,
+          feedback
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to submit rating');
+      }
+
+      toast.success('Thank you for your feedback!');
+      onOpenChange(false);
+      setRating(0);
+      setHoveredRating(0);
+      setFeedback('');
+    } catch (error: any) {
+      console.error('Error submitting rating:', error);
+      toast.error(error.message || 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!appointment) return null;
@@ -107,15 +145,16 @@ export function RateTechnicianDialog({ open, onOpenChange, appointment }: RateTe
                 setFeedback('');
               }}
               className="flex-1 border-[#1A5560] text-[#1A5560] hover:bg-[#1A5560]/10"
+              disabled={isSubmitting}
             >
               Skip
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={rating === 0}
+              disabled={rating === 0 || isSubmitting}
               className="flex-1 bg-[#3FA9BC] hover:bg-[#2A6570] text-white transition-colors duration-200"
             >
-              Submit Review
+              {isSubmitting ? 'Submitting...' : 'Submit Review'}
             </Button>
           </div>
         </div>

@@ -110,3 +110,76 @@ exports.updateAppointment = (req, res) => {
     });
   });
 };
+
+exports.rateAppointment = (req, res) => {
+  const { id } = req.params;
+  const { rating, feedback } = req.body;
+  const userId = req.userId;
+
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: 'Please provide a valid rating (1-5).' });
+  }
+
+  // Check appointment validity
+  const checkQuery = 'SELECT * FROM appointments WHERE appointment_id = ?';
+  db.query(checkQuery, [id], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Appointment not found.' });
+    }
+
+    const appointment = results[0];
+
+    if (appointment.customer_id !== userId) {
+      return res.status(403).json({ message: 'Unauthorized.' });
+    }
+
+    if (appointment.status !== 'Completed') {
+      return res.status(400).json({ message: 'You can only rate completed appointments.' });
+    }
+
+    // Check if already rated
+    const checkRatingQuery = 'SELECT * FROM reviews WHERE appointment_id = ?';
+    db.query(checkRatingQuery, [id], (err, ratingResults) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Database error.' });
+      }
+
+      if (ratingResults.length > 0) {
+        return res.status(400).json({ message: 'You have already rated this appointment.' });
+      }
+
+      // Insert review
+      const insertQuery = `
+        INSERT INTO reviews (appointment_id, customer_id, technician_id, rating, feedback_text)
+        VALUES (?, ?, ?, ?, ?)
+      `;
+      
+      db.query(insertQuery, [id, userId, appointment.technician_id, rating, feedback], (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ message: 'Database error saving review.' });
+        }
+
+        // Manually update technician rating to ensure it syncs (in case trigger is missing/broken)
+        const updateRatingQuery = `
+          UPDATE technician_profiles 
+          SET average_rating = (SELECT AVG(rating) FROM reviews WHERE technician_id = ?)
+          WHERE user_id = ?
+        `;
+
+        db.query(updateRatingQuery, [appointment.technician_id, appointment.technician_id], (updateErr) => {
+          if (updateErr) {
+            console.error('Error updating technician rating:', updateErr);
+          }
+          res.status(201).json({ message: 'Rating submitted successfully.' });
+        });
+      });
+    });
+  });
+};
