@@ -16,7 +16,8 @@ import {
   Wrench,
   Sparkles,
   Box,
-  Menu
+  Menu,
+  Star
 } from 'lucide-react';
 import { toast } from "sonner";
 import { AddAppointmentDialog } from './AddAppointmentDialog';
@@ -276,7 +277,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
             {todayAppointments.length === 0 ? (
               <p className="text-gray-500 text-center py-3 text-xs sm:text-sm">No appointments scheduled for today</p>
             ) : (
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+              <div className="space-y-2 max-h-60 overflow-y-auto overflow-x-hidden">
                 {todayAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
@@ -286,6 +287,17 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                     <div className="flex-1 min-w-0">
                       <p className="text-xs sm:text-sm text-[#0B4F6C] group-hover:text-[#4DBDCC] transition-colors truncate">{appointment.clientName}</p>
                       <p className="text-xs text-gray-600 truncate">{appointment.service}</p>
+                      {appointment.status === 'completed' && appointment.rating && (
+                        <div className="flex items-center gap-1 mt-1">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                          <span className="text-xs text-gray-600">{appointment.rating}/5</span>
+                        </div>
+                      )}
+                      {appointment.status === 'cancelled' && appointment.cancellationCategory && (
+                        <p className="text-xs text-red-500 mt-1 truncate">
+                          Reason: {appointment.cancellationCategory}
+                        </p>
+                      )}
                     </div>
                     <div className="text-right ml-2 flex-shrink-0 flex flex-col items-end gap-1">
                       <p className="text-xs text-[#0B4F6C]">{appointment.time}</p>
@@ -326,7 +338,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
             {pendingAppointments.length === 0 ? (
               <p className="text-gray-500 text-center py-3 text-xs sm:text-sm">No pending appointments</p>
             ) : (
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+              <div className="space-y-2 max-h-60 overflow-y-auto overflow-x-hidden">
                 {pendingAppointments.map((appointment) => (
                   <div
                     key={appointment.id}

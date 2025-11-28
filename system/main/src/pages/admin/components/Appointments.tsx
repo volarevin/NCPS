@@ -16,7 +16,8 @@ import {
   XCircle,
   Loader,
   Trash2,
-  Phone
+  Phone,
+  Star
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -519,6 +520,17 @@ export function Appointments() {
                   <p className="text-[#0B4F6C] font-medium flex items-center gap-2">
                     {appointment.service}
                   </p>
+                  {appointment.status === 'completed' && appointment.rating && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                      <span className="text-sm font-medium text-gray-700">{appointment.rating}/5</span>
+                    </div>
+                  )}
+                  {(appointment.status === 'cancelled' || appointment.status === 'rejected') && (appointment.cancellationCategory || appointment.rejectionReason) && (
+                    <p className="text-xs text-red-500 mt-1 font-medium">
+                      {appointment.status === 'cancelled' ? `Reason: ${appointment.cancellationCategory}` : `Reason: ${appointment.rejectionReason}`}
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
                     <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
                       <Calendar className="w-3.5 h-3.5 text-gray-400" />

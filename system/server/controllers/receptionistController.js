@@ -16,30 +16,36 @@ exports.getDashboardStats = (req, res) => {
     today: `
       SELECT 
         a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id, a.service_address,
+        a.cancellation_category,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
-        t.first_name as tech_first, t.last_name as tech_last
+        t.first_name as tech_first, t.last_name as tech_last,
+        r.rating
       FROM appointments a
       JOIN users u ON a.customer_id = u.user_id
       JOIN services s ON a.service_id = s.service_id
       LEFT JOIN service_categories sc ON s.category_id = sc.category_id
       LEFT JOIN users t ON a.technician_id = t.user_id
+      LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
       WHERE DATE(a.appointment_date) = CURDATE() AND (a.marked_for_deletion = 0 OR a.marked_for_deletion IS NULL)
-      ORDER BY a.appointment_date ASC
+      ORDER BY a.created_at DESC
     `,
     pending_list: `
       SELECT 
         a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id, a.service_address,
+        a.cancellation_category,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
-        t.first_name as tech_first, t.last_name as tech_last
+        t.first_name as tech_first, t.last_name as tech_last,
+        r.rating
       FROM appointments a
       JOIN users u ON a.customer_id = u.user_id
       JOIN services s ON a.service_id = s.service_id
       LEFT JOIN service_categories sc ON s.category_id = sc.category_id
       LEFT JOIN users t ON a.technician_id = t.user_id
+      LEFT JOIN reviews r ON a.appointment_id = r.appointment_id
       WHERE a.status = 'Pending' AND (a.marked_for_deletion = 0 OR a.marked_for_deletion IS NULL)
-      ORDER BY a.appointment_date ASC
+      ORDER BY a.created_at DESC
       LIMIT 10
     `,
     services: `
@@ -80,7 +86,9 @@ exports.getDashboardStats = (req, res) => {
             technicianId: row.technician_id ? row.technician_id.toString() : undefined,
             technician: row.tech_first ? `${row.tech_first} ${row.tech_last}` : 'Unassigned',
             status: (row.status || 'Pending').toLowerCase().replace(' ', '-'),
-            notes: row.customer_notes
+            notes: row.customer_notes,
+            rating: row.rating,
+            cancellationCategory: row.cancellation_category
           });
 
           // Group services by category
@@ -110,7 +118,7 @@ exports.getDashboardStats = (req, res) => {
             stats: {
               total: countRes[0].total,
               pending: countRes[0].pending,
-              'in-progress': countRes[0].in_progress,
+              in_progress: countRes[0].in_progress,
               confirmed: countRes[0].confirmed,
               completed: countRes[0].completed,
               cancelled: countRes[0].cancelled

@@ -10,6 +10,8 @@ import { RecycleBinDialog } from "./RecycleBinDialog";
 import { StatusChangeDialog } from "./StatusChangeDialog";
 import { AddAppointmentDialog } from "./AddAppointmentDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ReceptionistCalendar } from "./ReceptionistCalendar";
+import { LayoutList, Calendar as CalendarIcon, Star } from "lucide-react";
 
 export interface Appointment {
   id: string;
@@ -60,6 +62,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
     appointmentId?: string;
   }>({ open: false, type: 'cancel' });
   const [recycleBinCount, setRecycleBinCount] = useState(0);
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
 
   const filters = [
     { id: "all", label: "All" },
@@ -333,6 +336,22 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
           <p className="text-gray-500">Manage and track all appointments</p>
         </div>
         <div className="flex gap-2">
+          <div className="flex bg-gray-100 p-1 rounded-lg mr-2">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`p-2 rounded-md transition-all ${viewMode === "list" ? "bg-white shadow-sm text-[#0B4F6C]" : "text-gray-500 hover:text-gray-700"}`}
+              title="List View"
+            >
+              <LayoutList className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("calendar")}
+              className={`p-2 rounded-md transition-all ${viewMode === "calendar" ? "bg-white shadow-sm text-[#0B4F6C]" : "text-gray-500 hover:text-gray-700"}`}
+              title="Calendar View"
+            >
+              <CalendarIcon className="w-4 h-4" />
+            </button>
+          </div>
           <Button 
             variant="outline" 
             onClick={() => setIsRecycleBinOpen(true)}
@@ -432,7 +451,13 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
         </div>
       </div>
 
-      {/* Appointments List */}
+      {/* Appointments List or Calendar */}
+      {viewMode === "calendar" ? (
+        <ReceptionistCalendar 
+          appointments={filteredAppointments} 
+          onAppointmentClick={handleViewDetails} 
+        />
+      ) : (
       <div className="grid gap-4">
         {filteredAppointments.map((appointment) => (
           <div
@@ -459,6 +484,17 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
                   <p className="text-[#0B4F6C] font-medium flex items-center gap-2">
                     {appointment.service}
                   </p>
+                  {appointment.status === 'completed' && appointment.rating && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                      <span className="text-sm font-medium text-gray-700">{appointment.rating}/5</span>
+                    </div>
+                  )}
+                  {(appointment.status === 'cancelled' || appointment.status === 'rejected') && (appointment.cancellationCategory || appointment.rejectionReason) && (
+                    <p className="text-xs text-red-500 mt-1 font-medium">
+                      {appointment.status === 'cancelled' ? `Reason: ${appointment.cancellationCategory}` : `Reason: ${appointment.rejectionReason}`}
+                    </p>
+                  )}
                   <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
                     <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
                       <Calendar className="w-3.5 h-3.5 text-gray-400" />
@@ -561,6 +597,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
           </div>
         )}
       </div>
+      )}
 
       <AppointmentDetailsDialog
         open={isDetailsOpen}
