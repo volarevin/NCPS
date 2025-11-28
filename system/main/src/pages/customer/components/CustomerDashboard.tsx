@@ -89,6 +89,7 @@ export function CustomerDashboard() {
                 technicianEmail: '',
                 address: '123 Main St, Nasugbu, Batangas',
                 notes: todayAppt.customer_notes || 'No notes provided.',
+                description: todayAppt.customer_notes || 'No notes provided.',
              });
         } else {
             setTodaysAppointment(null);
@@ -251,7 +252,10 @@ export function CustomerDashboard() {
             </div>
              <div className="mt-4 pt-4 border-t border-white/20 flex justify-end">
                 <Button 
-                    onClick={() => setIsViewDialogOpen(true)} 
+                    onClick={() => {
+                        setSelectedAppointment(todaysAppointment);
+                        setIsViewDialogOpen(true);
+                    }} 
                     variant="secondary"
                     className="bg-white text-[#0B4F6C] hover:bg-gray-100"
                 >

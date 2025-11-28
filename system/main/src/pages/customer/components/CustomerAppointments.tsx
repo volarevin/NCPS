@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, Calendar, Search, List } from 'lucide-react';
+import { Plus, Calendar, Search, List, ArrowUpDown } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { AppointmentListCard } from './AppointmentListCard';
 import { CreateAppointmentDialog } from './CreateAppointmentDialog';
 import { ViewAppointmentDialog } from './ViewAppointmentDialog';
@@ -20,6 +21,8 @@ export function CustomerAppointments() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AppointmentStatus>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [sortBy, setSortBy] = useState<'date' | 'created' | 'updated'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
@@ -61,6 +64,9 @@ export function CustomerAppointments() {
         date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false }),
         rawDate: appt.appointment_date.split('T')[0], // For edit form
+        rawDateObj: new Date(appt.appointment_date),
+        createdAt: new Date(appt.created_at),
+        updatedAt: new Date(appt.updated_at),
         status: appt.status.toLowerCase().replace(' ', '_'),
         technician: appt.tech_first_name ? `${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
         technicianPhone: appt.tech_phone || '',
@@ -118,6 +124,22 @@ export function CustomerAppointments() {
       apt.service.toLowerCase().includes(searchQuery.toLowerCase()) ||
       apt.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesTab && matchesSearch;
+  }).sort((a, b) => {
+    let dateA, dateB;
+    if (sortBy === 'date') {
+        dateA = a.rawDateObj;
+        dateB = b.rawDateObj;
+    } else if (sortBy === 'created') {
+        dateA = a.createdAt;
+        dateB = b.createdAt;
+    } else {
+        dateA = a.updatedAt;
+        dateB = b.updatedAt;
+    }
+    
+    return sortOrder === 'asc' 
+        ? dateA.getTime() - dateB.getTime() 
+        : dateB.getTime() - dateA.getTime();
   });
 
   const tabs = [
@@ -166,6 +188,27 @@ export function CustomerAppointments() {
           </div>
           
           <div className="flex gap-2 items-center">
+            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                <SelectTrigger className="w-[140px] h-9 md:h-10 bg-white">
+                    <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="date">Appointment Date</SelectItem>
+                    <SelectItem value="created">Date Created</SelectItem>
+                    <SelectItem value="updated">Last Updated</SelectItem>
+                </SelectContent>
+            </Select>
+
+            <Button
+                variant="outline"
+                size="icon"
+                className="h-9 w-9 md:h-10 md:w-10 bg-white"
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                title={sortOrder === 'asc' ? "Ascending" : "Descending"}
+            >
+                <ArrowUpDown className="h-4 w-4" />
+            </Button>
+
             <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
               <button
                 onClick={() => setViewMode('list')}
