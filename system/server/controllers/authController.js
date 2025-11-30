@@ -94,7 +94,8 @@ exports.login = (req, res) => {
         firstName: user.first_name,
         lastName: user.last_name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        profile_picture: user.profile_picture
       }
     });
   });

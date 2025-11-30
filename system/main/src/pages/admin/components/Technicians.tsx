@@ -32,6 +32,7 @@ import { TechnicianEditDialog } from "./TechnicianEditDialog";
 import { AddTechnicianDialog, SPECIALTIES } from "./AddTechnicianDialog";
 import { ConfirmActionDialog } from "./ConfirmActionDialog";
 import { useFeedback } from "@/context/FeedbackContext";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 interface Technician {
   id: string;
@@ -104,6 +105,7 @@ export function Technicians() {
         activeJobs: tech.active_jobs,
         completedJobs: tech.total_jobs_completed,
         rating: parseFloat(tech.average_rating) || 0,
+        avatar: getProfilePictureUrl(tech.profile_picture)
       }));
 
       setTechnicians(formatted);

@@ -13,6 +13,7 @@ import { CustomerCalendar } from './CustomerCalendar';
 import { PageHeader } from './PageHeader';
 import { useNavigate } from 'react-router-dom';
 import { useFeedback } from "@/context/FeedbackContext";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 type AppointmentStatus = 'all' | 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled';
 type ViewMode = 'list' | 'calendar';
@@ -72,6 +73,7 @@ export function CustomerAppointments() {
         technician: appt.tech_first_name ? `${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
         technicianPhone: appt.tech_phone || '',
         technicianEmail: appt.tech_email || '',
+        technicianAvatar: getProfilePictureUrl(appt.tech_profile_picture),
         address: appt.service_address || 'No address provided',
         notes: appt.customer_notes,
         rating: appt.rating,

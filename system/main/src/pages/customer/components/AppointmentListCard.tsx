@@ -13,6 +13,7 @@ interface AppointmentListCardProps {
     technician: string;
     technicianPhone?: string;
     technicianEmail?: string;
+    technicianAvatar?: string;
     address?: string;
     notes?: string;
     rating?: number;
@@ -78,7 +79,11 @@ export function AppointmentListCard({ appointment, onView, onCancel, onRate, onE
         </div>
 
         <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
-          <User className="w-4 h-4 text-gray-400" />
+          {appointment.technicianAvatar ? (
+            <img src={appointment.technicianAvatar} alt={appointment.technician} className="w-5 h-5 rounded-full object-cover" />
+          ) : (
+            <User className="w-4 h-4 text-gray-400" />
+          )}
           <span>Technician: <span className="font-medium text-gray-700">{appointment.technician}</span></span>
         </div>
 

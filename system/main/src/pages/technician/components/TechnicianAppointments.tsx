@@ -8,6 +8,7 @@ import { useState } from "react";
 import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { TechnicianCalendar } from "./TechnicianCalendar";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 interface TechnicianAppointmentsProps {
   appointments: any[];
@@ -189,7 +190,11 @@ export function TechnicianAppointments({
                         {getStatusBadge(apt.status)}
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
-                        <User className="w-4 h-4" />
+                        {apt.customerAvatar ? (
+                          <img src={getProfilePictureUrl(apt.customerAvatar)} alt={apt.customerName} className="w-5 h-5 rounded-full object-cover" />
+                        ) : (
+                          <User className="w-4 h-4" />
+                        )}
                         <span>{apt.customerName}</span>
                       </div>
                       <div className="flex flex-wrap gap-4 text-sm text-gray-500">

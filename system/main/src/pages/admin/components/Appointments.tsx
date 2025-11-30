@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFeedback } from "@/context/FeedbackContext";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 interface Appointment {
   id: string;
@@ -49,6 +50,8 @@ interface Appointment {
   category?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  customerAvatar?: string;
+  technicianAvatar?: string;
 }
 
 export function Appointments() {
@@ -177,7 +180,9 @@ export function Appointments() {
         cancelledById: appt.cancelled_by_id,
         category: appt.category_name,
         createdAt: new Date(appt.created_at),
-        updatedAt: new Date(appt.updated_at)
+        updatedAt: new Date(appt.updated_at),
+        customerAvatar: getProfilePictureUrl(appt.customer_profile_picture),
+        technicianAvatar: getProfilePictureUrl(appt.tech_profile_picture)
       }));
 
       setAppointments(formatted);

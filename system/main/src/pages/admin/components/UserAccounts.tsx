@@ -4,6 +4,7 @@ import { UserCard } from "./UserCard";
 import { UserDetailsDialog } from "./UserDetailsDialog";
 import { Search, Users, Shield, UserPlus, UserCheck, Activity } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 interface ActivityLog {
   id: string;
@@ -58,6 +59,7 @@ export function UserAccounts() {
             email: user.email,
             phone: user.phone_number,
             role: role,
+            avatar: getProfilePictureUrl(user.profile_picture),
             joinedDate: new Date(user.created_at).toLocaleDateString(),
             activityLogs: [], // Fetched on demand
           };

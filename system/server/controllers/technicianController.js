@@ -5,7 +5,7 @@ exports.getAssignedJobs = (req, res) => {
   
   const query = `
     SELECT a.*, u.first_name as customer_first_name, u.last_name as customer_last_name, 
-           u.email as customer_email, u.phone_number as customer_phone,
+           u.email as customer_email, u.phone_number as customer_phone, u.profile_picture as customer_profile_picture,
            s.name as service_name,
            r.rating, r.feedback_text,
            cb.role as cancelled_by_role, cb.user_id as cancelled_by_id
@@ -31,7 +31,7 @@ exports.getProfile = (req, res) => {
   const userId = req.userId;
   
   const query = `
-    SELECT tp.*, u.first_name, u.last_name, u.email, u.phone_number, u.address, u.created_at
+    SELECT tp.*, u.first_name, u.last_name, u.email, u.phone_number, u.address, u.created_at, u.profile_picture
     FROM users u
     LEFT JOIN technician_profiles tp ON u.user_id = tp.user_id
     WHERE u.user_id = ?

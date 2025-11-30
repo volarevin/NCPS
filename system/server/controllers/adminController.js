@@ -15,7 +15,7 @@ exports.getDashboardStats = (req, res) => {
 
 exports.getAllUsers = (req, res) => {
   const { role } = req.query;
-  let query = 'SELECT user_id, username, first_name, last_name, email, phone_number, address, role, status, created_at FROM users';
+  let query = 'SELECT user_id, username, first_name, last_name, email, phone_number, address, role, status, created_at, profile_picture FROM users';
   const params = [];
 
   if (role) {
@@ -36,8 +36,8 @@ exports.getAllAppointments = (req, res) => {
   const query = `
     SELECT a.*, 
            u.first_name as customer_first_name, u.last_name as customer_last_name,
-           u.email as customer_email, u.phone_number as customer_phone, u.address as customer_address,
-           t.first_name as tech_first_name, t.last_name as tech_last_name,
+           u.email as customer_email, u.phone_number as customer_phone, u.address as customer_address, u.profile_picture as customer_profile_picture,
+           t.first_name as tech_first_name, t.last_name as tech_last_name, t.profile_picture as tech_profile_picture,
            s.name as service_name, sc.name as category_name,
            r.rating, r.feedback_text,
            cb.role as cancelled_by_role, cb.user_id as cancelled_by_id
@@ -120,7 +120,7 @@ exports.getRecentActivity = (req, res) => {
 
 exports.getAllTechnicians = (req, res) => {
   const query = `
-    SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone_number, u.address,
+    SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone_number, u.address, u.profile_picture,
            tp.specialty, tp.availability_status, tp.total_jobs_completed, tp.average_rating,
            (SELECT COUNT(*) FROM appointments WHERE technician_id = u.user_id AND status IN ('Pending', 'Confirmed', 'In Progress')) as active_jobs
     FROM users u

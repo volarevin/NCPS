@@ -31,6 +31,7 @@ interface Appointment {
   cancelledByRole?: string;
   cancelledById?: string;
   updatedAt?: Date;
+  customerAvatar?: string;
 }
 
 export default function TechnicianPage() {
@@ -127,7 +128,8 @@ export default function TechnicianPage() {
           cancellationCategory: job.cancellation_category,
           cancelledByRole: job.cancelled_by_role,
           cancelledById: job.cancelled_by_id,
-          updatedAt: new Date(job.updated_at)
+          updatedAt: new Date(job.updated_at),
+          customerAvatar: job.customer_profile_picture
         };
       });
 

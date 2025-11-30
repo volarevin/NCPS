@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   LayoutDashboard, 
   Wrench, 
@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
+import { getProfilePictureUrl } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,6 +34,16 @@ interface SidebarProps {
 export function Sidebar({ currentPage = "Dashboard", onNavigate, mobileMenuOpen = false, setMobileMenuOpen }: SidebarProps) {
   const navigate = useNavigate();
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [user, setUser] = useState(JSON.parse(sessionStorage.getItem('user') || '{}'));
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      setUser(JSON.parse(sessionStorage.getItem('user') || '{}'));
+    };
+
+    window.addEventListener('user-profile-updated', handleProfileUpdate);
+    return () => window.removeEventListener('user-profile-updated', handleProfileUpdate);
+  }, []);
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard },
@@ -119,6 +130,19 @@ export function Sidebar({ currentPage = "Dashboard", onNavigate, mobileMenuOpen 
 
         {/* Log out button */}
         <div className="p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 mb-4 px-2">
+             <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center overflow-hidden">
+                {user.profile_picture ? (
+                  <img src={getProfilePictureUrl(user.profile_picture)} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <User className="w-6 h-6 text-gray-300" />
+                )}
+             </div>
+             <div className="flex flex-col overflow-hidden">
+                <span className="font-medium truncate">{user.firstName} {user.lastName}</span>
+                <span className="text-xs text-gray-400 truncate">{user.email}</span>
+             </div>
+          </div>
           <Button
             onClick={handleLogout}
             className="w-full bg-red-500 text-white py-3 rounded-lg hover:bg-red-600 transition-all duration-200 flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transform hover:-translate-y-0.5"

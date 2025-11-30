@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { User, Mail, Phone, MapPin, Lock, Plus, Trash2, Star, Edit2, Save, X, Camera } from 'lucide-react';
+import Cropper from 'react-easy-crop';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,6 +45,13 @@ export default function ProfilePage() {
   // Password Dialog State
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
+
+  // Crop State
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -90,6 +98,16 @@ export default function ProfilePage() {
       
       await fetchProfile();
       setIsEditing(false);
+
+      // Update session storage and notify components
+      const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
+      currentUser.firstName = editForm.firstName;
+      currentUser.lastName = editForm.lastName;
+      currentUser.email = editForm.email;
+      currentUser.username = editForm.username;
+      sessionStorage.setItem('user', JSON.stringify(currentUser));
+      window.dispatchEvent(new Event('user-profile-updated'));
+
       return 'Profile updated successfully';
     };
 
@@ -104,30 +122,136 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('profilePicture', file);
+    const reader = new FileReader();
+    reader.addEventListener('load', () => {
+      setImageSrc(reader.result as string);
+      setIsCropDialogOpen(true);
+    });
+    reader.readAsDataURL(file);
+    
+    // Reset input so the same file can be selected again if needed
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
-    const promise = async () => {
-      const token = sessionStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/profile/picture', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formData
+  const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.addEventListener('load', () => resolve(image));
+      image.addEventListener('error', (error) => reject(error));
+      image.setAttribute('crossOrigin', 'anonymous');
+      image.src = url;
+    });
+
+  const getCroppedImg = async (
+    imageSrc: string,
+    pixelCrop: any,
+    rotation = 0
+  ): Promise<Blob> => {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      throw new Error('No 2d context');
+    }
+
+    const maxSize = Math.max(image.width, image.height);
+    const safeArea = 2 * ((maxSize / 2) * Math.sqrt(2));
+
+    canvas.width = safeArea;
+    canvas.height = safeArea;
+
+    ctx.translate(safeArea / 2, safeArea / 2);
+    ctx.rotate((rotation * Math.PI) / 180);
+    ctx.translate(-safeArea / 2, -safeArea / 2);
+
+    ctx.drawImage(
+      image,
+      safeArea / 2 - image.width * 0.5,
+      safeArea / 2 - image.height * 0.5
+    );
+
+    const data = ctx.getImageData(0, 0, safeArea, safeArea);
+
+    canvas.width = pixelCrop.width;
+    canvas.height = pixelCrop.height;
+
+    ctx.putImageData(
+      data,
+      0 - safeArea / 2 + image.width * 0.5 - pixelCrop.x,
+      0 - safeArea / 2 + image.height * 0.5 - pixelCrop.y
+    );
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((file) => {
+        if (file) resolve(file);
+        else reject(new Error('Canvas is empty'));
+      }, 'image/jpeg');
+    });
+  };
+
+  const handleSaveCroppedImage = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+
+    try {
+      const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const file = new File([croppedImageBlob], "profile_picture.jpg", { type: "image/jpeg" });
+
+      const formData = new FormData();
+      formData.append('profilePicture', file);
+
+      const promise = async () => {
+        const token = sessionStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/profile/picture', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Failed to upload image');
+        await fetchProfile();
+        
+        // Update session storage user object to reflect new picture immediately
+        const currentUser = JSON.parse(sessionStorage.getItem('user') || '{}');
+        // We need to get the new path. Since the API might not return it directly in the simple response,
+        // we rely on fetchProfile updating the state, but for the sidebar to update, we need to update session storage.
+        // Ideally the API should return the new path.
+        // For now, let's assume fetchProfile will get the new data, but we might need to reload or update context.
+        // Let's check what fetchProfile does. It setsProfile.
+        // We should also update the session storage if we can get the new URL.
+        // Let's just rely on the page refresh or context update if available.
+        // Actually, the sidebar reads from sessionStorage. We should update it.
+        // Let's fetch the profile again and update session storage.
+        
+        const profileResponse = await fetch('http://localhost:5000/api/profile', {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const profileData = await profileResponse.json();
+        
+        currentUser.profile_picture = profileData.profile_picture;
+        sessionStorage.setItem('user', JSON.stringify(currentUser));
+        
+        // Notify other components
+        window.dispatchEvent(new Event('user-profile-updated'));
+
+        return 'Profile picture updated';
+      };
+
+      await showPromise(promise(), {
+        loading: 'Uploading image...',
+        success: (data) => data,
+        error: 'Failed to upload image'
       });
 
-      if (!response.ok) throw new Error('Failed to upload image');
-      await fetchProfile();
-      return 'Profile picture updated';
-    };
-
-    showPromise(promise(), {
-      loading: 'Uploading image...',
-      success: (data) => data,
-      error: 'Failed to upload image'
-    });
-    
-    // Reset input
-    if (fileInputRef.current) fileInputRef.current.value = '';
+      setIsCropDialogOpen(false);
+      setImageSrc(null);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleAddressSubmit = async () => {
@@ -552,6 +676,45 @@ export default function ProfilePage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Cancel</Button>
             <Button onClick={handleChangePassword} className="bg-[#3FA9BC] hover:bg-[#2A6570]">Update Password</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Crop Dialog */}
+      <Dialog open={isCropDialogOpen} onOpenChange={setIsCropDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Crop Profile Picture</DialogTitle>
+          </DialogHeader>
+          <div className="relative w-full h-[400px] bg-black rounded-md overflow-hidden">
+            {imageSrc && (
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            )}
+          </div>
+          <div className="py-4 space-y-2">
+             <Label>Zoom</Label>
+             <input
+               type="range"
+               value={zoom}
+               min={1}
+               max={3}
+               step={0.1}
+               aria-labelledby="Zoom"
+               onChange={(e) => setZoom(Number(e.target.value))}
+               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+             />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setIsCropDialogOpen(false); setImageSrc(null); }}>Cancel</Button>
+            <Button onClick={handleSaveCroppedImage} className="bg-[#3FA9BC] hover:bg-[#2A6570]">Save Picture</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
