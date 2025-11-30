@@ -65,7 +65,7 @@ exports.updateAvailability = (req, res) => {
 
   const query = 'UPDATE technician_profiles SET availability_status = ? WHERE user_id = ?';
 
-  db.query(query, [status, userId], (err, result) => {
+  (req.db || db).query(query, [status, userId], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error updating availability.' });
@@ -83,38 +83,56 @@ exports.updateProfile = (req, res) => {
   const firstName = nameParts[0];
   const lastName = nameParts.slice(1).join(' ') || '';
 
-  db.beginTransaction(err => {
-    if (err) return res.status(500).json({ message: 'Database transaction error.' });
-
-    // Update users table
-    const userQuery = 'UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ? WHERE user_id = ?';
-    db.query(userQuery, [firstName, lastName, email, phone, address, userId], (err, result) => {
-      if (err) {
-        return db.rollback(() => {
-          res.status(500).json({ message: 'Error updating user info.' });
-        });
-      }
-
-      // Update technician_profiles table
-      const techQuery = 'UPDATE technician_profiles SET specialty = ?, bio = ? WHERE user_id = ?';
-      db.query(techQuery, [specialization, bio, userId], (err, result) => {
+  const runTransaction = (conn, shouldRelease) => {
+      conn.beginTransaction(err => {
         if (err) {
-          return db.rollback(() => {
-            res.status(500).json({ message: 'Error updating technician info.' });
-          });
+            if (shouldRelease) conn.release();
+            return res.status(500).json({ message: 'Database transaction error.' });
         }
 
-        db.commit(err => {
+        // Update users table
+        const userQuery = 'UPDATE users SET first_name = ?, last_name = ?, email = ?, phone_number = ?, address = ? WHERE user_id = ?';
+        conn.query(userQuery, [firstName, lastName, email, phone, address, userId], (err, result) => {
           if (err) {
-            return db.rollback(() => {
-              res.status(500).json({ message: 'Error committing transaction.' });
+            return conn.rollback(() => {
+              if (shouldRelease) conn.release();
+              res.status(500).json({ message: 'Error updating user info.' });
             });
           }
-          res.json({ message: 'Profile updated successfully.' });
+
+          // Update technician_profiles table
+          const techQuery = 'UPDATE technician_profiles SET specialty = ?, bio = ? WHERE user_id = ?';
+          conn.query(techQuery, [specialization, bio, userId], (err, result) => {
+            if (err) {
+              return conn.rollback(() => {
+                if (shouldRelease) conn.release();
+                res.status(500).json({ message: 'Error updating technician info.' });
+              });
+            }
+
+            conn.commit(err => {
+              if (err) {
+                return conn.rollback(() => {
+                  if (shouldRelease) conn.release();
+                  res.status(500).json({ message: 'Error committing transaction.' });
+                });
+              }
+              if (shouldRelease) conn.release();
+              res.json({ message: 'Profile updated successfully.' });
+            });
+          });
         });
       });
-    });
-  });
+  };
+
+  if (!req.db) {
+      db.getConnection((err, conn) => {
+          if (err) return res.status(500).json({ message: 'Database connection error.' });
+          runTransaction(conn, true);
+      });
+  } else {
+      runTransaction(req.db, false);
+  }
 };
 
 exports.getNotifications = (req, res) => {

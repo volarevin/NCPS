@@ -6,6 +6,7 @@ import { Services } from "./components/Services";
 import { Technicians } from "./components/Technicians";
 import { UserAccounts } from "./components/UserAccounts";
 import { Reports } from "./components/Reports";
+import { AuditLogs } from "./components/AuditLogs";
 import { MobileHeader } from "./components/MobileHeader";
 import ProfilePage from "../common/ProfilePage";
 
@@ -31,6 +32,8 @@ export default function AdminPage() {
         return <UserAccounts />;
       case "Reports":
         return <Reports />;
+      case "Audit Logs":
+        return <AuditLogs />;
       case "My Profile":
         return <ProfilePage />;
       default:

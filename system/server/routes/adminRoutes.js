@@ -2,12 +2,16 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const auditMiddleware = require('../middleware/auditMiddleware');
 
 // Protect all routes
 router.use(verifyToken);
 router.use(checkRole(['Admin']));
+router.use(auditMiddleware);
 
 router.get('/stats', adminController.getDashboardStats);
+router.get('/audit-logs', adminController.getAuditLogs);
+router.get('/audit-logs/export', adminController.exportAuditLogs);
 router.get('/users', adminController.getAllUsers);
 router.get('/appointments', adminController.getAllAppointments);
 router.get('/monthly-stats', adminController.getMonthlyStats);

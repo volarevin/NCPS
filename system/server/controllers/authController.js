@@ -1,6 +1,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { logLogin } = require('../utils/auditHelper');
 
 exports.register = async (req, res) => {
   const { username, firstName, lastName, email, phone, password, role } = req.body;
@@ -66,6 +67,11 @@ exports.login = (req, res) => {
     }
 
     if (results.length === 0) {
+      // Log failed attempt (if we can find user by email, we log it, but here we don't have user ID yet easily unless we query by email first)
+      // For security, maybe we don't log user_id if user not found, or we log '0' or similar.
+      // But wait, if user not found, we can't log user_id.
+      // Let's skip logging for non-existent users to avoid spam, or log with user_id=null if table allows.
+      // My table says user_id NOT NULL. So skip.
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
@@ -74,6 +80,7 @@ exports.login = (req, res) => {
     // Check password
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
+      logLogin(user.user_id, false, 'Invalid password', req);
       return res.status(401).json({ message: 'Invalid credentials.' });
     }
 
@@ -85,6 +92,8 @@ exports.login = (req, res) => {
     };
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
+
+    logLogin(user.user_id, true, null, req);
 
     res.json({
       token,

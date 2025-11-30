@@ -140,8 +140,8 @@ exports.getAllTechnicians = (req, res) => {
 exports.getUserActivityLogs = (req, res) => {
   const userId = req.params.userId;
   const query = `
-    SELECT log_id, action_type, description, created_at 
-    FROM activity_logs 
+    SELECT log_id, action, table_name, changes, created_at 
+    FROM audit_logs 
     WHERE user_id = ? 
     ORDER BY created_at DESC
   `;
@@ -717,11 +717,11 @@ exports.createUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         
         const query = 'INSERT INTO users (username, first_name, last_name, email, phone_number, password_hash, role, status) VALUES (?, ?, ?, ?, ?, ?, ?, "Active")';
-        db.query(query, [username, first_name, last_name, email, phone_number, hashedPassword, role], (err, result) => {
+        (req.db || db).query(query, [username, first_name, last_name, email, phone_number, hashedPassword, role], (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             
             if (role === 'Technician') {
-                db.query('INSERT INTO technician_profiles (user_id, specialty, availability_status) VALUES (?, "General", "Available")', [result.insertId]);
+                (req.db || db).query('INSERT INTO technician_profiles (user_id, specialty, availability_status) VALUES (?, "General", "Available")', [result.insertId]);
             }
             res.json({ message: 'User created successfully', id: result.insertId });
         });
@@ -735,7 +735,7 @@ exports.updateUser = (req, res) => {
     const { first_name, last_name, email, phone_number, role, status } = req.body;
     
     const query = 'UPDATE users SET first_name=?, last_name=?, email=?, phone_number=?, role=?, status=? WHERE user_id=?';
-    db.query(query, [first_name, last_name, email, phone_number, role, status, id], (err, result) => {
+    (req.db || db).query(query, [first_name, last_name, email, phone_number, role, status, id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: 'User updated successfully' });
     });
@@ -746,7 +746,7 @@ exports.deleteUser = (req, res) => {
     // Note: This might fail if user has related records (FK constraints). 
     // For now, assuming simple delete or we'd need to cascade/soft delete.
     // Given "proceed with database changes", we might need ON DELETE CASCADE, but let's try simple delete first.
-    db.query('DELETE FROM users WHERE user_id = ?', [id], (err, result) => {
+    (req.db || db).query('DELETE FROM users WHERE user_id = ?', [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: 'User deleted successfully' });
     });
@@ -757,7 +757,7 @@ exports.deleteUser = (req, res) => {
 exports.createService = (req, res) => {
     const { name, category, price, description, color, icon } = req.body;
     // First get or create category
-    db.query('SELECT category_id FROM service_categories WHERE name = ?', [category], (err, results) => {
+    (req.db || db).query('SELECT category_id FROM service_categories WHERE name = ?', [category], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
         
         let catId;
@@ -766,13 +766,13 @@ exports.createService = (req, res) => {
             // Update category color/icon if provided
             if (color || icon) {
                 const updateQuery = 'UPDATE service_categories SET color = COALESCE(?, color), icon = COALESCE(?, icon) WHERE category_id = ?';
-                db.query(updateQuery, [color, icon, catId], (err) => {
+                (req.db || db).query(updateQuery, [color, icon, catId], (err) => {
                     if (err) console.error('Error updating category details:', err);
                 });
             }
             insertService(catId);
         } else {
-            db.query('INSERT INTO service_categories (name, color, icon) VALUES (?, ?, ?)', [category, color, icon], (err, result) => {
+            (req.db || db).query('INSERT INTO service_categories (name, color, icon) VALUES (?, ?, ?)', [category, color, icon], (err, result) => {
                 if (err) return res.status(500).json({ error: err.message });
                 catId = result.insertId;
                 insertService(catId);
@@ -782,7 +782,7 @@ exports.createService = (req, res) => {
 
     function insertService(catId) {
         const query = 'INSERT INTO services (category_id, name, estimated_price, description) VALUES (?, ?, ?, ?)';
-        db.query(query, [catId, name, price, description], (err, result) => {
+        (req.db || db).query(query, [catId, name, price, description], (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'Service created successfully', id: result.insertId });
         });
@@ -795,20 +795,20 @@ exports.updateService = (req, res) => {
 
     const doUpdate = (catId) => {
         const query = 'UPDATE services SET name=?, estimated_price=?, description=?, category_id=? WHERE service_id=?';
-        db.query(query, [name, price, description, catId, id], (err, result) => {
+        (req.db || db).query(query, [name, price, description, catId, id], (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'Service updated successfully' });
         });
     };
 
     if (category) {
-        db.query('SELECT category_id FROM service_categories WHERE name = ?', [category], (err, results) => {
+        (req.db || db).query('SELECT category_id FROM service_categories WHERE name = ?', [category], (err, results) => {
             if (err) return res.status(500).json({ error: err.message });
             
             if (results.length > 0) {
                 doUpdate(results[0].category_id);
             } else {
-                db.query('INSERT INTO service_categories (name) VALUES (?)', [category], (err, result) => {
+                (req.db || db).query('INSERT INTO service_categories (name) VALUES (?)', [category], (err, result) => {
                     if (err) return res.status(500).json({ error: err.message });
                     doUpdate(result.insertId);
                 });
@@ -817,7 +817,7 @@ exports.updateService = (req, res) => {
     } else {
         // If no category provided, just update other fields (optional, but safer to require category)
         const query = 'UPDATE services SET name=?, estimated_price=?, description=? WHERE service_id=?';
-        db.query(query, [name, price, description, id], (err, result) => {
+        (req.db || db).query(query, [name, price, description, id], (err, result) => {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'Service updated successfully' });
         });
@@ -826,7 +826,7 @@ exports.updateService = (req, res) => {
 
 exports.deleteService = (req, res) => {
     const { id } = req.params;
-    db.query('DELETE FROM services WHERE service_id = ?', [id], (err, result) => {
+    (req.db || db).query('DELETE FROM services WHERE service_id = ?', [id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: 'Service deleted successfully' });
     });
@@ -839,40 +839,202 @@ exports.promoteToTechnician = (req, res) => {
     return res.status(400).json({ message: 'User ID and specialty are required' });
   }
 
-  db.beginTransaction(err => {
-    if (err) return res.status(500).json({ error: err.message });
+  const connection = req.db || db;
+  
+  // If using pool (db), we need to get a connection for transaction manually if not provided
+  // But since we expect req.db to be set by middleware for audit logs, we'll assume it's there or handle it.
+  // If req.db is set, it's a connection. If db is set, it's a pool.
+  // Pool doesn't have beginTransaction.
+  
+  if (!req.db) {
+      // Fallback if middleware didn't run (shouldn't happen in production with correct setup)
+      // We need a connection to run transaction
+      db.getConnection((err, conn) => {
+          if (err) return res.status(500).json({ error: err.message });
+          runTransaction(conn, true); // true = release connection when done
+      });
+  } else {
+      runTransaction(req.db, false); // false = don't release, middleware handles it
+  }
 
-    // 1. Update user role
-    const updateRoleQuery = "UPDATE users SET role = 'Technician' WHERE user_id = ?";
-    db.query(updateRoleQuery, [userId], (err, result) => {
-      if (err) {
-        return db.rollback(() => {
-          res.status(500).json({ error: err.message });
-        });
-      }
-
-      // 2. Create technician profile
-      const createProfileQuery = `
-        INSERT INTO technician_profiles (user_id, specialty, availability_status, total_jobs_completed, average_rating)
-        VALUES (?, ?, 'Available', 0, 0)
-      `;
-      
-      db.query(createProfileQuery, [userId, specialty], (err, result) => {
+  function runTransaction(conn, shouldRelease) {
+      conn.beginTransaction(err => {
         if (err) {
-          return db.rollback(() => {
-            res.status(500).json({ error: err.message });
-          });
+            if (shouldRelease) conn.release();
+            return res.status(500).json({ error: err.message });
         }
 
-        db.commit(err => {
+        // 1. Update user role
+        const updateRoleQuery = "UPDATE users SET role = 'Technician' WHERE user_id = ?";
+        conn.query(updateRoleQuery, [userId], (err, result) => {
           if (err) {
-            return db.rollback(() => {
+            return conn.rollback(() => {
+              if (shouldRelease) conn.release();
               res.status(500).json({ error: err.message });
             });
           }
-          res.json({ message: 'User promoted to technician successfully' });
+
+          // 2. Create technician profile
+          const createProfileQuery = `
+            INSERT INTO technician_profiles (user_id, specialty, availability_status, total_jobs_completed, average_rating)
+            VALUES (?, ?, 'Available', 0, 0)
+          `;
+          
+          conn.query(createProfileQuery, [userId, specialty], (err, result) => {
+            if (err) {
+              return conn.rollback(() => {
+                if (shouldRelease) conn.release();
+                res.status(500).json({ error: err.message });
+              });
+            }
+
+            conn.commit(err => {
+              if (err) {
+                return conn.rollback(() => {
+                  if (shouldRelease) conn.release();
+                  res.status(500).json({ error: err.message });
+                });
+              }
+              if (shouldRelease) conn.release();
+              res.json({ message: 'User promoted to technician successfully' });
+            });
+          });
         });
       });
+  }
+};
+
+exports.getAuditLogs = (req, res) => {
+  const { page = 1, limit = 50, search, action, startDate, endDate, userId } = req.query;
+  const offset = (page - 1) * limit;
+  
+  let query = `
+    SELECT l.*, 
+           u.username as actor_username_real, u.first_name as actor_first_name, u.last_name as actor_last_name, u.profile_picture as actor_avatar
+    FROM audit_logs l
+    LEFT JOIN users u ON l.user_id = u.user_id
+    WHERE 1=1
+  `;
+  const params = [];
+
+  if (search) {
+    query += ` AND (
+      l.action LIKE ? OR 
+      l.table_name LIKE ? OR 
+      l.actor_role LIKE ? OR
+      u.username LIKE ? OR
+      u.first_name LIKE ? OR
+      u.last_name LIKE ?
+    )`;
+    const term = `%${search}%`;
+    params.push(term, term, term, term, term, term);
+  }
+
+  if (action) {
+    query += ' AND l.action = ?';
+    params.push(action);
+  }
+
+  if (userId) {
+    query += ' AND l.user_id = ?';
+    params.push(userId);
+  }
+
+  if (startDate) {
+    query += ' AND l.created_at >= ?';
+    params.push(startDate);
+  }
+
+  if (endDate) {
+    query += ' AND l.created_at <= ?';
+    params.push(endDate + ' 23:59:59');
+  }
+
+  // Count total for pagination
+  const countQuery = `SELECT COUNT(*) as total FROM (${query.replace('SELECT l.*, \n           u.username as actor_username_real, u.first_name as actor_first_name, u.last_name as actor_last_name, u.profile_picture as actor_avatar', 'SELECT 1')}) as sub`;
+  
+  // Add sorting and pagination
+  query += ' ORDER BY l.created_at DESC LIMIT ? OFFSET ?';
+  params.push(parseInt(limit), parseInt(offset));
+
+  db.query(countQuery, params.slice(0, params.length - 2), (err, countResult) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Error counting logs' });
+    }
+    
+    const total = countResult[0].total;
+
+    db.query(query, params, (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Error fetching logs' });
+      }
+      
+      res.json({
+        data: results,
+        pagination: {
+          total,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          pages: Math.ceil(total / limit)
+        }
+      });
     });
+  });
+};
+
+exports.exportAuditLogs = (req, res) => {
+  const { search, action, startDate, endDate, userId } = req.query;
+  
+  let query = `
+    SELECT l.log_id, l.created_at, l.action, l.actor_role, 
+           COALESCE(u.username, 'System') as username,
+           l.table_name, l.record_id, l.changes, l.ip_address
+    FROM audit_logs l
+    LEFT JOIN users u ON l.user_id = u.user_id
+    WHERE 1=1
+  `;
+  const params = [];
+
+  if (search) {
+    query += ` AND (l.action LIKE ? OR l.table_name LIKE ? OR u.username LIKE ?)`;
+    const term = `%${search}%`;
+    params.push(term, term, term);
+  }
+  if (action) { query += ' AND l.action = ?'; params.push(action); }
+  if (userId) { query += ' AND l.user_id = ?'; params.push(userId); }
+  if (startDate) { query += ' AND l.created_at >= ?'; params.push(startDate); }
+  if (endDate) { query += ' AND l.created_at <= ?'; params.push(endDate + ' 23:59:59'); }
+
+  query += ' ORDER BY l.created_at DESC LIMIT 10000';
+
+  db.query(query, params, (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Error exporting logs' });
+    }
+
+    const headers = ['ID', 'Date', 'Action', 'Role', 'User', 'Target', 'Record ID', 'Details', 'IP'];
+    const rows = results.map(row => [
+      row.log_id,
+      new Date(row.created_at).toISOString(),
+      row.action,
+      row.actor_role,
+      row.username,
+      row.table_name,
+      row.record_id,
+      JSON.stringify(row.changes).replace(/"/g, '""'),
+      row.ip_address
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(r => r.map(c => `"${c}"`).join(','))
+    ].join('\n');
+
+    res.header('Content-Type', 'text/csv');
+    res.header('Content-Disposition', 'attachment; filename="audit_logs.csv"');
+    res.send(csvContent);
   });
 };

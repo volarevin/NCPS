@@ -2,12 +2,17 @@ const express = require('express');
 const router = express.Router();
 const appointmentController = require('../controllers/appointmentController');
 const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const auditMiddleware = require('../middleware/auditMiddleware');
 
 // Protect all routes
 router.use(verifyToken);
+router.use(auditMiddleware);
 
 // Create Appointment (Customer only)
 router.post('/', checkRole(['Customer']), appointmentController.createAppointment);
+
+// Create Walk-in Appointment (Admin, Receptionist)
+router.post('/walkin', checkRole(['Admin', 'Receptionist']), appointmentController.createWalkInAppointment);
 
 // Update Status (Admin, Technician, Receptionist)
 // Note: Customers might need to cancel, but we'll handle that separately or allow 'Cancelled' status update for them later if needed.

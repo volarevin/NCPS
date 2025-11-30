@@ -53,9 +53,32 @@ export default function ProfilePage() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [isCropDialogOpen, setIsCropDialogOpen] = useState(false);
 
+  // Login History State
+  const [loginHistory, setLoginHistory] = useState<any[]>([]);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotalPages, setHistoryTotalPages] = useState(1);
+
   useEffect(() => {
     fetchProfile();
+    fetchLoginHistory();
   }, []);
+
+  const fetchLoginHistory = async (page = 1) => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/profile/login-history?page=${page}&limit=5`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setLoginHistory(data.history);
+        setHistoryTotalPages(data.totalPages);
+        setHistoryPage(data.page);
+      }
+    } catch (error) {
+      console.error('Error fetching login history:', error);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -640,6 +663,57 @@ export default function ProfilePage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Login History Section */}
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold text-[#0B4F6C]">Login History</CardTitle>
+          <CardDescription>Recent login activity for your account</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {loginHistory.length === 0 ? (
+              <p className="text-sm text-gray-500">No login history found.</p>
+            ) : (
+              <div className="space-y-2">
+                {loginHistory.map((log) => (
+                  <div key={log.history_id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg text-sm">
+                    <div>
+                      <div className="font-medium">{new Date(log.created_at).toLocaleString()}</div>
+                      <div className="text-xs text-gray-500">{log.ip_address || 'Unknown IP'} • {log.user_agent ? log.user_agent.substring(0, 30) + '...' : 'Unknown Device'}</div>
+                    </div>
+                    <Badge variant={log.success ? "outline" : "destructive"} className={log.success ? "text-green-600 border-green-200 bg-green-50" : ""}>
+                      {log.success ? "Success" : "Failed"}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {historyTotalPages > 1 && (
+              <div className="flex justify-center gap-2 mt-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fetchLoginHistory(historyPage - 1)}
+                  disabled={historyPage === 1}
+                >
+                  Previous
+                </Button>
+                <span className="text-sm flex items-center">Page {historyPage} of {historyTotalPages}</span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => fetchLoginHistory(historyPage + 1)}
+                  disabled={historyPage === historyTotalPages}
+                >
+                  Next
+                </Button>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Password Dialog */}
       <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>

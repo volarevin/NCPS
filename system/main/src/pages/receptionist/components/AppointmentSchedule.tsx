@@ -8,7 +8,7 @@ import { useFeedback } from "@/context/FeedbackContext";
 import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
 import { RecycleBinDialog } from "./RecycleBinDialog";
 import { StatusChangeDialog } from "./StatusChangeDialog";
-import { AddAppointmentDialog } from "./AddAppointmentDialog";
+import { CreateWalkInDialog } from "../../admin/components/CreateWalkInDialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReceptionistCalendar } from "./ReceptionistCalendar";
 import { LayoutList, Calendar as CalendarIcon, Star } from "lucide-react";
@@ -635,10 +635,10 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
         onOpenChange={setIsRecycleBinOpen}
       />
 
-      <AddAppointmentDialog 
+      <CreateWalkInDialog 
         open={isCreateDialogOpen} 
         onOpenChange={setIsCreateDialogOpen}
-        onAddAppointment={() => {
+        onSuccess={() => {
             fetchAppointments();
         }}
       />

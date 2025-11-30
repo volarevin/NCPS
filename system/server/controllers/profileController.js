@@ -54,7 +54,7 @@ exports.uploadProfilePicture = (req, res) => {
       }
 
       // Update DB
-      db.query('UPDATE users SET profile_picture = ? WHERE user_id = ?', [relativePath, userId], (err) => {
+      (req.db || db).query('UPDATE users SET profile_picture = ? WHERE user_id = ?', [relativePath, userId], (err) => {
         if (err) return res.status(500).json({ message: 'Error updating profile picture' });
         res.json({ message: 'Profile picture updated', profilePicture: relativePath });
       });
@@ -92,7 +92,7 @@ exports.updateProfile = (req, res) => {
   const { username, firstName, lastName, email, phone } = req.body;
 
   // Check if username exists (if changed)
-  db.query('SELECT user_id FROM users WHERE username = ? AND user_id != ?', [username, userId], (err, results) => {
+  (req.db || db).query('SELECT user_id FROM users WHERE username = ? AND user_id != ?', [username, userId], (err, results) => {
     if (err) return res.status(500).json({ message: 'Database error' });
     if (results.length > 0) return res.status(400).json({ message: 'Username already taken' });
 
@@ -101,12 +101,44 @@ exports.updateProfile = (req, res) => {
       WHERE user_id = ?
     `;
 
-    db.query(query, [username, firstName, lastName, email, phone, userId], (err, result) => {
+    (req.db || db).query(query, [username, firstName, lastName, email, phone, userId], (err) => {
       if (err) return res.status(500).json({ message: 'Error updating profile' });
       res.json({ message: 'Profile updated successfully' });
     });
   });
 };
+
+exports.getLoginHistory = (req, res) => {
+  const userId = req.userId;
+  const { page = 1, limit = 10 } = req.query;
+  const offset = (page - 1) * limit;
+
+  const query = `
+    SELECT * FROM login_history 
+    WHERE user_id = ? 
+    ORDER BY created_at DESC 
+    LIMIT ? OFFSET ?
+  `;
+
+  db.query(query, [userId, parseInt(limit), parseInt(offset)], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Error fetching login history' });
+    }
+    
+    db.query('SELECT COUNT(*) as total FROM login_history WHERE user_id = ?', [userId], (err, countResult) => {
+      if (err) return res.status(500).json({ message: 'Error counting history' });
+      
+      res.json({
+        history: results,
+        total: countResult[0].total,
+        page: parseInt(page),
+        totalPages: Math.ceil(countResult[0].total / limit)
+      });
+    });
+  });
+};
+
 
 exports.addAddress = (req, res) => {
   const userId = req.userId;

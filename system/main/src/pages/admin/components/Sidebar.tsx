@@ -8,7 +8,8 @@ import {
   HardHat,
   LogOut,
   X,
-  User
+  User,
+  History
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom';
@@ -52,6 +53,7 @@ export function Sidebar({ currentPage = "Dashboard", onNavigate, mobileMenuOpen 
     { name: "Technicians", icon: HardHat },
     { name: "User Account", icon: Users },
     { name: "Reports", icon: FileText },
+    { name: "Audit Logs", icon: History },
     { name: "My Profile", icon: User },
   ];
 

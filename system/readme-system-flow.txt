@@ -1,7 +1,6 @@
  Web-Based Appointment Scheduler for Nasugbu Computer Parts & Services
 
 
-
 Entities:
 
 Admin

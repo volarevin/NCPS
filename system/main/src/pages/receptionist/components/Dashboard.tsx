@@ -20,7 +20,7 @@ import {
   Star
 } from 'lucide-react';
 import { useFeedback } from "@/context/FeedbackContext";
-import { AddAppointmentDialog } from './AddAppointmentDialog';
+import { CreateWalkInDialog } from "../../admin/components/CreateWalkInDialog";
 import { AppointmentDetailsDialog } from './AppointmentDetailsDialog';
 import { StatusChangeDialog } from './StatusChangeDialog';
 import { StatCard } from './StatCard';
@@ -429,11 +429,10 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         </CardContent>
       </Card>
 
-      <AddAppointmentDialog 
+      <CreateWalkInDialog 
         open={isAddDialogOpen} 
         onOpenChange={setIsAddDialogOpen}
-        onAddAppointment={(newAppointment) => {
-          console.log('Add appointment', newAppointment);
+        onSuccess={() => {
           fetchDashboardData();
         }}
       />

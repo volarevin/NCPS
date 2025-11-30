@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 28, 2025 at 11:53 AM
+-- Generation Time: Nov 30, 2025 at 03:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -398,7 +398,11 @@ INSERT INTO `activity_logs` (`log_id`, `user_id`, `action_type`, `description`, 
 (319, 1, 'Create Appointment', 'Created appointment #153', '2025-11-26 13:39:37'),
 (320, 1, 'Appointment Confirmed', 'Appointment #153 was confirmed', '2025-11-26 13:39:51'),
 (321, 1, 'Create Appointment', 'Created appointment #154', '2025-11-26 13:45:59'),
-(322, 1, 'Appointment Confirmed', 'Appointment #154 was confirmed', '2025-11-26 13:46:07');
+(322, 1, 'Appointment Confirmed', 'Appointment #154 was confirmed', '2025-11-26 13:46:07'),
+(323, 1, 'Appointment Confirmed', 'Appointment #158 was confirmed', '2025-11-28 12:17:15'),
+(324, 1, 'Appointment Confirmed', 'Appointment #158 was confirmed', '2025-11-28 12:17:18'),
+(325, 1, 'Appointment Confirmed', 'Appointment #162 was confirmed', '2025-11-28 13:28:06'),
+(326, 1, 'Appointment Confirmed', 'Appointment #163 was confirmed', '2025-11-28 14:25:33');
 
 -- --------------------------------------------------------
 
@@ -411,6 +415,7 @@ CREATE TABLE `appointments` (
   `customer_id` int(11) NOT NULL,
   `technician_id` int(11) DEFAULT NULL,
   `service_id` int(11) NOT NULL,
+  `service_address` text DEFAULT NULL,
   `appointment_date` datetime NOT NULL,
   `status` enum('Pending','Confirmed','In Progress','Completed','Cancelled','Rejected') DEFAULT 'Pending',
   `total_cost` decimal(10,2) DEFAULT NULL,
@@ -432,160 +437,169 @@ CREATE TABLE `appointments` (
 -- Dumping data for table `appointments`
 --
 
-INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `service_id`, `appointment_date`, `status`, `total_cost`, `customer_notes`, `cancellation_reason`, `rejection_reason`, `cancellation_category`, `is_walk_in`, `created_at`, `updated_at`, `payment_status`, `cancelled_by`, `marked_for_deletion`, `deletion_marked_at`, `deletion_marked_by`) VALUES
-(1, 32, 8, 3, '2025-06-14 22:03:00', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(2, 28, 12, 5, '2025-06-23 09:30:31', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(3, 24, 4, 1, '2025-10-11 18:01:45', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(4, 18, 9, 1, '2025-07-03 04:34:04', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(5, 18, 4, 5, '2025-12-06 13:15:47', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(6, 29, NULL, 1, '2025-11-25 10:05:29', 'Rejected', 1500.00, NULL, NULL, 'Service not avaialable at the moment', NULL, 0, '2025-11-24 09:18:17', '2025-11-26 07:59:38', 'Unpaid', NULL, 0, NULL, NULL),
-(7, 25, 4, 8, '2025-12-10 03:35:40', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 12:56:53', 'Unpaid', NULL, 0, NULL, NULL),
-(8, 14, 4, 6, '2025-06-24 22:21:38', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(9, 23, 12, 5, '2025-05-30 22:15:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(10, 26, 10, 6, '2025-10-06 05:03:44', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(11, 32, 12, 6, '2025-10-21 02:05:23', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(12, 31, 11, 5, '2025-08-05 19:45:08', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(13, 23, 10, 8, '2025-09-22 19:02:32', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(14, 28, 4, 3, '2025-06-29 00:37:45', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(15, 24, 4, 1, '2025-07-30 16:22:14', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(16, 20, 11, 7, '2025-12-23 08:45:10', 'Cancelled', 500.00, NULL, 'mukha kang burat', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-24 13:08:05', 'Unpaid', 1, 0, NULL, NULL),
-(17, 31, 9, 3, '2025-06-26 23:08:59', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(18, 27, 9, 6, '2025-12-08 20:29:24', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(19, 30, NULL, 4, '2025-12-06 15:28:36', 'Pending', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(20, 19, 12, 4, '2025-12-17 07:24:04', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(21, 15, NULL, 7, '2025-11-28 05:26:44', 'Rejected', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 08:22:42', 'Unpaid', NULL, 0, NULL, NULL),
-(22, 2, 4, 1, '2025-06-05 21:59:33', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(23, 31, 9, 5, '2025-12-10 21:46:54', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(24, 30, NULL, 2, '2025-11-26 01:57:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:43:13', 'Unpaid', NULL, 0, NULL, NULL),
-(25, 32, NULL, 5, '2025-12-19 19:36:10', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:29', 'Unpaid', 1, 0, NULL, NULL),
-(26, 17, 12, 2, '2025-09-04 09:13:37', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(27, 18, 8, 6, '2025-10-14 08:52:40', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(28, 21, 8, 8, '2025-09-18 01:22:51', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(29, 21, 4, 3, '2025-09-29 08:14:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(30, 32, 4, 5, '2025-06-29 00:57:25', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(31, 18, 12, 1, '2025-08-06 20:25:52', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(32, 13, NULL, 8, '2025-11-13 16:41:11', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(33, 22, NULL, 2, '0000-00-00 00:00:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 09:10:25', 'Unpaid', NULL, 0, NULL, NULL),
-(34, 20, 12, 5, '2025-12-19 23:35:13', 'Cancelled', 1000.00, NULL, 'FAHHHHHH', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:37:25', 'Unpaid', 1, 0, NULL, NULL),
-(35, 27, 8, 6, '2025-07-26 08:05:31', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(36, 29, 10, 6, '2025-06-02 08:51:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(37, 30, 12, 5, '2025-11-30 13:19:52', 'Cancelled', 1000.00, NULL, 'technician is gay, sorry', NULL, 'No available technician', 0, '2025-11-24 09:18:17', '2025-11-26 08:07:19', 'Unpaid', 3, 0, NULL, NULL),
-(38, 24, NULL, 3, '2025-11-30 09:34:42', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(39, 30, NULL, 1, '2025-12-01 02:08:09', 'Pending', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(40, 27, NULL, 5, '2025-12-18 18:48:14', 'Rejected', 1000.00, NULL, NULL, 'KAMAGONG', NULL, 0, '2025-11-24 09:18:17', '2025-11-26 11:38:00', 'Unpaid', NULL, 0, NULL, NULL),
-(41, 20, 4, 4, '2025-10-29 14:03:24', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(42, 21, NULL, 8, '2025-12-19 21:52:34', 'Cancelled', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:26', 'Unpaid', 1, 0, NULL, NULL),
-(43, 13, 9, 2, '2025-08-30 08:29:20', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(44, 19, NULL, 6, '2025-05-25 05:10:30', 'Cancelled', 2000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(45, 29, NULL, 3, '2025-07-24 09:30:24', 'Cancelled', 800.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(46, 31, 8, 3, '2025-12-12 22:58:54', 'Confirmed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(47, 23, 10, 6, '2025-10-19 02:59:56', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(48, 18, NULL, 3, '2025-12-06 08:58:44', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(49, 14, 10, 4, '2025-12-16 23:36:22', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(50, 30, NULL, 5, '2025-12-24 06:09:42', 'Rejected', 1000.00, NULL, NULL, 'bcos you\'re gay', 'Other', 0, '2025-11-24 09:18:17', '2025-11-26 10:29:53', 'Unpaid', NULL, 1, '2025-11-26 18:29:53', 1),
-(51, 25, 4, 2, '2025-12-09 12:34:19', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 13:39:13', 'Unpaid', NULL, 0, NULL, NULL),
-(52, 27, 9, 6, '2025-09-15 23:29:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(53, 31, 9, 5, '2025-05-24 14:24:02', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(54, 26, 4, 7, '2025-11-01 23:36:42', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(55, 23, 10, 2, '2025-10-03 19:13:00', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(56, 21, 9, 1, '2025-10-10 16:09:08', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(57, 21, 12, 1, '2025-10-10 16:36:12', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(58, 27, 12, 4, '2025-12-16 20:14:30', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(59, 26, 10, 6, '2025-07-19 13:20:51', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(60, 2, 4, 3, '2025-07-29 19:22:37', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(61, 30, NULL, 8, '2025-12-21 08:44:20', 'Cancelled', 0.00, NULL, 'ayoko hahaha', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:36:46', 'Unpaid', 1, 0, NULL, NULL),
-(62, 14, NULL, 8, '2025-05-29 03:19:54', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(63, 25, NULL, 4, '2025-10-19 23:01:52', 'Cancelled', 1200.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(64, 15, NULL, 2, '2025-08-28 12:08:27', 'Cancelled', 3000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(65, 30, NULL, 8, '2025-07-20 06:54:30', 'Cancelled', 0.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(66, 2, 4, 5, '2025-09-15 16:12:16', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(67, 29, 12, 1, '2025-08-25 22:05:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(68, 19, 9, 1, '2025-10-10 21:32:10', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(69, 20, 4, 3, '2025-06-28 18:40:23', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(70, 13, 9, 2, '2025-09-05 05:26:27', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(71, 16, 10, 8, '2025-08-31 22:56:16', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(72, 13, 9, 5, '2025-11-01 12:58:42', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(73, 31, 4, 8, '2025-06-27 19:24:34', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(74, 2, 4, 7, '2025-08-02 06:33:36', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(75, 24, NULL, 3, '2025-09-01 13:20:42', 'Cancelled', 800.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(76, 21, 4, 5, '2025-12-18 19:35:00', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:42:51', 'Unpaid', NULL, 0, NULL, NULL),
-(77, 28, 12, 6, '2025-10-02 09:25:25', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(78, 2, 10, 2, '2025-12-11 17:48:42', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(79, 26, NULL, 7, '2025-12-24 05:08:34', 'Cancelled', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:47', 'Unpaid', 1, 0, NULL, NULL),
-(81, 32, 11, 6, '2025-11-11 11:46:59', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(82, 19, 11, 4, '2025-10-07 16:16:19', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(83, 17, 8, 8, '2025-07-12 12:08:04', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(84, 18, NULL, 8, '2025-06-25 18:30:31', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(85, 30, 9, 1, '2025-09-19 12:46:23', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(86, 16, 10, 5, '2025-11-15 05:08:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(87, 32, 4, 7, '2025-07-16 02:58:25', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(88, 15, 4, 5, '2025-11-26 23:39:00', 'In Progress', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 15:35:17', 'Unpaid', NULL, 0, NULL, NULL),
-(89, 26, 9, 1, '2025-06-14 09:16:56', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(90, 2, 11, 6, '2025-07-14 05:47:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(91, 25, 9, 7, '2025-12-22 09:24:29', 'Cancelled', 500.00, NULL, 'YOU\'RE GAY', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 12:57:34', 'Unpaid', NULL, 0, NULL, NULL),
-(92, 16, 4, 3, '2025-09-23 10:37:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(93, 2, 4, 4, '2025-11-24 18:59:12', 'Cancelled', 1200.00, NULL, 'Conflict in sched', NULL, 'Scheduling conflict', 0, '2025-11-24 09:18:17', '2025-11-26 08:06:09', 'Unpaid', 3, 0, NULL, NULL),
-(94, 19, 4, 7, '2025-12-12 07:23:51', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(95, 27, 9, 2, '2025-08-11 23:57:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(96, 29, NULL, 3, '2025-08-22 13:05:17', 'Cancelled', 800.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(97, 18, 11, 6, '2025-11-30 02:12:08', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(98, 32, 12, 5, '2025-09-20 11:39:56', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(99, 25, 12, 3, '2025-08-23 05:11:29', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(100, 29, 9, 2, '2025-09-22 21:09:58', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(101, 2, 11, 4, '2025-09-05 14:05:12', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(102, 22, 10, 2, '2025-11-02 10:26:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(103, 13, 8, 6, '2025-10-02 14:51:18', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(104, 29, 4, 8, '2025-12-18 02:42:48', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(105, 28, NULL, 5, '2025-11-22 18:32:42', 'Cancelled', 1000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(106, 2, NULL, 1, '2025-06-09 02:54:47', 'Cancelled', 1500.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(107, 19, 11, 3, '2025-06-28 06:06:49', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(108, 16, NULL, 1, '2025-09-03 03:17:03', 'Cancelled', 1500.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(109, 31, 11, 1, '2025-12-09 03:22:46', 'Confirmed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(110, 16, 9, 7, '2025-07-01 16:54:30', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(111, 14, 8, 7, '2025-12-06 10:35:25', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(112, 32, 8, 8, '2025-10-06 12:25:52', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(113, 26, 9, 1, '2025-06-01 11:11:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(114, 28, 8, 7, '2025-08-16 04:27:59', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(115, 19, 11, 5, '2025-09-06 12:58:07', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(116, 19, 10, 5, '2025-08-26 01:26:48', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(117, 14, 10, 6, '2025-11-09 18:26:50', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(118, 28, 10, 6, '2025-06-23 23:00:02', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(119, 19, NULL, 3, '2025-09-28 04:48:25', 'Cancelled', 800.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(120, 29, 4, 6, '2025-11-13 04:34:28', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(121, 28, NULL, 5, '2025-12-21 14:05:05', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:59', 'Unpaid', 1, 0, NULL, NULL),
-(122, 25, 4, 5, '2025-09-04 09:09:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(123, 32, 12, 8, '2025-06-26 02:34:03', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(124, 2, 10, 2, '2025-08-03 02:04:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(125, 28, NULL, 4, '2025-10-04 07:24:31', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(126, 27, 8, 8, '2025-09-23 01:58:20', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(127, 21, NULL, 4, '2025-08-27 06:25:56', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(128, 28, 12, 4, '2025-11-01 04:00:07', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(129, 26, 8, 6, '2025-07-15 14:52:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(130, 2, 4, 3, '2025-08-29 18:04:43', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(131, 30, NULL, 2, '2025-06-19 19:19:59', 'Cancelled', 3000.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(132, 24, 4, 4, '2025-07-27 04:55:06', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(133, 22, 8, 6, '2025-06-23 14:18:19', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(134, 31, 10, 1, '2025-07-12 03:37:02', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(135, 2, NULL, 2, '2025-12-07 08:42:36', 'Pending', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(136, 27, 12, 4, '2025-12-12 10:22:41', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(137, 25, 12, 4, '2025-06-09 21:15:50', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(138, 2, 9, 5, '2025-05-31 16:54:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(139, 26, 12, 2, '2025-08-08 00:38:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(140, 31, NULL, 8, '2025-07-26 04:23:33', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(141, 31, 8, 8, '2025-09-04 01:54:41', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(142, 14, 11, 5, '2025-08-24 13:34:32', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(143, 20, NULL, 6, '2025-11-28 10:35:46', 'Pending', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(144, 19, 9, 7, '2025-08-31 15:57:03', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(145, 26, NULL, 2, '2025-08-04 03:04:56', 'Cancelled', 3000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(146, 27, 8, 7, '2025-11-04 12:39:08', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-27 01:52:42', 'Paid', NULL, 1, '2025-11-27 09:52:42', 3),
-(147, 15, 12, 2, '2025-08-19 15:58:09', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(148, 16, 4, 6, '2025-06-20 08:33:42', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(149, 31, 9, 1, '2025-10-14 22:56:30', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(150, 30, 11, 8, '2025-10-17 08:42:38', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(151, 13, NULL, 1, '2025-11-26 22:22:00', 'Cancelled', NULL, 'poide pakabit cctv lods', 'Duplicate ka boss', NULL, 'Duplicate booking', 0, '2025-11-26 08:36:29', '2025-11-26 11:36:18', 'Unpaid', 1, 0, NULL, NULL),
-(152, 33, 4, 6, '2025-11-26 21:41:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 09:41:18', '2025-11-26 15:20:47', 'Unpaid', NULL, 1, '2025-11-26 17:41:54', 1),
-(153, 14, 4, 3, '2025-11-28 02:39:00', 'Confirmed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:39:37', '2025-11-26 13:39:50', 'Unpaid', NULL, 0, NULL, NULL),
-(154, 2, 4, 2, '2025-11-26 00:45:00', 'In Progress', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:45:59', '2025-11-26 14:48:20', 'Unpaid', NULL, 0, NULL, NULL);
+INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `service_id`, `service_address`, `appointment_date`, `status`, `total_cost`, `customer_notes`, `cancellation_reason`, `rejection_reason`, `cancellation_category`, `is_walk_in`, `created_at`, `updated_at`, `payment_status`, `cancelled_by`, `marked_for_deletion`, `deletion_marked_at`, `deletion_marked_by`) VALUES
+(1, 32, 8, 3, NULL, '2025-06-14 22:03:00', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(2, 28, 12, 5, NULL, '2025-06-23 09:30:31', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(3, 24, 4, 1, NULL, '2025-10-11 18:01:45', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(4, 18, 9, 1, NULL, '2025-07-03 04:34:04', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(5, 18, 4, 5, NULL, '2025-12-06 13:15:47', 'Cancelled', 1000.00, NULL, NULL, NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-28 16:22:45', 'Unpaid', 4, 0, NULL, NULL),
+(6, 29, NULL, 1, NULL, '2025-11-25 10:05:29', 'Rejected', 1500.00, NULL, NULL, 'Service not avaialable at the moment', NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:26', 'Unpaid', NULL, 0, NULL, NULL),
+(7, 25, 4, 8, NULL, '2025-12-10 03:35:40', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 12:56:53', 'Unpaid', NULL, 0, NULL, NULL),
+(8, 14, 4, 6, NULL, '2025-06-24 22:21:38', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(9, 23, 12, 5, NULL, '2025-05-30 22:15:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(10, 26, 10, 6, NULL, '2025-10-06 05:03:44', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(11, 32, 12, 6, NULL, '2025-10-21 02:05:23', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(12, 31, 11, 5, NULL, '2025-08-05 19:45:08', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(13, 23, 10, 8, NULL, '2025-09-22 19:02:32', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(14, 28, 4, 3, NULL, '2025-06-29 00:37:45', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(15, 24, 4, 1, NULL, '2025-07-30 16:22:14', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(16, 20, 11, 7, NULL, '2025-12-23 08:45:10', 'Cancelled', 500.00, NULL, 'mukha kang burat', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-24 13:08:05', 'Unpaid', 1, 0, NULL, NULL),
+(17, 31, 9, 3, NULL, '2025-06-26 23:08:59', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(18, 27, 9, 6, NULL, '2025-12-08 20:29:24', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(19, 30, NULL, 4, NULL, '2025-12-06 15:28:36', 'Pending', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(20, 19, 12, 4, NULL, '2025-12-17 07:24:04', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(21, 15, NULL, 7, NULL, '2025-11-28 05:26:44', 'Rejected', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:24', 'Unpaid', NULL, 0, NULL, NULL),
+(22, 2, 4, 1, 'Nasugbu, Batangas', '2025-06-05 21:59:33', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(23, 31, 9, 5, NULL, '2025-12-10 21:46:54', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(24, 30, NULL, 2, NULL, '2025-11-26 01:57:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:43:13', 'Unpaid', NULL, 0, NULL, NULL),
+(25, 32, NULL, 5, NULL, '2025-12-19 19:36:10', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:29', 'Unpaid', 1, 0, NULL, NULL),
+(26, 17, 12, 2, NULL, '2025-09-04 09:13:37', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(27, 18, 8, 6, NULL, '2025-10-14 08:52:40', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(28, 21, 8, 8, NULL, '2025-09-18 01:22:51', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(29, 21, 4, 3, NULL, '2025-09-29 08:14:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(30, 32, 4, 5, NULL, '2025-06-29 00:57:25', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(31, 18, 12, 1, NULL, '2025-08-06 20:25:52', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(32, 13, NULL, 8, NULL, '2025-11-13 16:41:11', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(33, 22, NULL, 2, NULL, '0000-00-00 00:00:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 09:10:25', 'Unpaid', NULL, 0, NULL, NULL),
+(34, 20, 12, 5, NULL, '2025-12-19 23:35:13', 'Cancelled', 1000.00, NULL, 'FAHHHHHH', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:37:25', 'Unpaid', 1, 0, NULL, NULL),
+(35, 27, 8, 6, NULL, '2025-07-26 08:05:31', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(36, 29, 10, 6, NULL, '2025-06-02 08:51:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(37, 30, 12, 5, NULL, '2025-11-30 13:19:52', 'Cancelled', 1000.00, NULL, 'technician is gay, sorry', NULL, 'No available technician', 0, '2025-11-24 09:18:17', '2025-11-26 08:07:19', 'Unpaid', 3, 0, NULL, NULL),
+(38, 24, NULL, 3, NULL, '2025-11-30 09:34:42', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(39, 30, NULL, 1, NULL, '2025-12-01 02:08:09', 'Pending', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(40, 27, NULL, 5, NULL, '2025-12-18 18:48:14', 'Rejected', 1000.00, NULL, NULL, 'KAMAGONG', NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:25', 'Unpaid', NULL, 0, NULL, NULL),
+(41, 20, 4, 4, NULL, '2025-10-29 14:03:24', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(42, 21, NULL, 8, NULL, '2025-12-19 21:52:34', 'Cancelled', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:26', 'Unpaid', 1, 0, NULL, NULL),
+(43, 13, 9, 2, NULL, '2025-08-30 08:29:20', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(44, 19, NULL, 6, NULL, '2025-05-25 05:10:30', 'Cancelled', 2000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(45, 29, NULL, 3, NULL, '2025-07-24 09:30:24', 'Cancelled', 800.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(46, 31, 8, 3, NULL, '2025-12-12 22:58:54', 'Confirmed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(47, 23, 10, 6, NULL, '2025-10-19 02:59:56', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(48, 18, NULL, 3, NULL, '2025-12-06 08:58:44', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(49, 14, 10, 4, NULL, '2025-12-16 23:36:22', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(50, 30, NULL, 5, NULL, '2025-12-24 06:09:42', 'Rejected', 1000.00, NULL, NULL, 'bcos you\'re gay', 'Other', 0, '2025-11-24 09:18:17', '2025-11-26 10:29:53', 'Unpaid', NULL, 1, '2025-11-26 18:29:53', 1),
+(51, 25, 4, 2, NULL, '2025-12-09 12:34:19', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 13:39:13', 'Unpaid', NULL, 0, NULL, NULL),
+(52, 27, 9, 6, NULL, '2025-09-15 23:29:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(53, 31, 9, 5, NULL, '2025-05-24 14:24:02', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(54, 26, 4, 7, NULL, '2025-11-01 23:36:42', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(55, 23, 10, 2, NULL, '2025-10-03 19:13:00', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(56, 21, 9, 1, NULL, '2025-10-10 16:09:08', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(57, 21, 12, 1, NULL, '2025-10-10 16:36:12', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(58, 27, 12, 4, NULL, '2025-12-16 20:14:30', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(59, 26, 10, 6, NULL, '2025-07-19 13:20:51', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(60, 2, 4, 3, 'Nasugbu, Batangas', '2025-07-29 19:22:37', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(61, 30, NULL, 8, NULL, '2025-12-21 08:44:20', 'Cancelled', 0.00, NULL, 'ayoko hahaha', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:36:46', 'Unpaid', 1, 0, NULL, NULL),
+(62, 14, NULL, 8, NULL, '2025-05-29 03:19:54', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(63, 25, NULL, 4, NULL, '2025-10-19 23:01:52', 'Cancelled', 1200.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(64, 15, NULL, 2, NULL, '2025-08-28 12:08:27', 'Cancelled', 3000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(65, 30, NULL, 8, NULL, '2025-07-20 06:54:30', 'Cancelled', 0.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(66, 2, 4, 5, 'Nasugbu, Batangas', '2025-09-15 16:12:16', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(67, 29, 12, 1, NULL, '2025-08-25 22:05:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(68, 19, 9, 1, NULL, '2025-10-10 21:32:10', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(69, 20, 4, 3, NULL, '2025-06-28 18:40:23', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(70, 13, 9, 2, NULL, '2025-09-05 05:26:27', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(71, 16, 10, 8, NULL, '2025-08-31 22:56:16', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(72, 13, 9, 5, NULL, '2025-11-01 12:58:42', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(73, 31, 4, 8, NULL, '2025-06-27 19:24:34', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(74, 2, 4, 7, 'Nasugbu, Batangas', '2025-08-02 06:33:36', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(75, 24, NULL, 3, NULL, '2025-09-01 13:20:42', 'Cancelled', 800.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(76, 21, 4, 5, NULL, '2025-12-18 19:35:00', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:42:51', 'Unpaid', NULL, 0, NULL, NULL),
+(77, 28, 12, 6, NULL, '2025-10-02 09:25:25', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(78, 2, 10, 2, 'Nasugbu, Batangas', '2025-12-11 17:48:42', 'Cancelled', 3000.00, NULL, 'ayaw ko na', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', 2, 0, NULL, NULL),
+(79, 26, NULL, 7, NULL, '2025-12-24 05:08:34', 'Cancelled', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:47', 'Unpaid', 1, 0, NULL, NULL),
+(81, 32, 11, 6, NULL, '2025-11-11 11:46:59', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(82, 19, 11, 4, NULL, '2025-10-07 16:16:19', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(83, 17, 8, 8, NULL, '2025-07-12 12:08:04', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(84, 18, NULL, 8, NULL, '2025-06-25 18:30:31', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(85, 30, 9, 1, NULL, '2025-09-19 12:46:23', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(86, 16, 10, 5, NULL, '2025-11-15 05:08:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(87, 32, 4, 7, NULL, '2025-07-16 02:58:25', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(88, 15, 4, 5, NULL, '2025-11-26 23:39:00', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 14:31:13', 'Unpaid', NULL, 0, NULL, NULL),
+(89, 26, 9, 1, NULL, '2025-06-14 09:16:56', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(90, 2, 11, 6, 'Nasugbu, Batangas', '2025-07-14 05:47:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(91, 25, 9, 7, NULL, '2025-12-22 09:24:29', 'Cancelled', 500.00, NULL, 'YOU\'RE GAY', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 12:57:34', 'Unpaid', NULL, 0, NULL, NULL),
+(92, 16, 4, 3, NULL, '2025-09-23 10:37:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(93, 2, 4, 4, 'Nasugbu, Batangas', '2025-11-24 18:59:12', 'Cancelled', 1200.00, NULL, 'Conflict in sched', NULL, 'Scheduling conflict', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', 3, 0, NULL, NULL),
+(94, 19, 4, 7, NULL, '2025-12-12 07:23:51', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(95, 27, 9, 2, NULL, '2025-08-11 23:57:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(96, 29, NULL, 3, NULL, '2025-08-22 13:05:17', 'Cancelled', 800.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(97, 18, 11, 6, NULL, '2025-11-30 02:12:08', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(98, 32, 12, 5, NULL, '2025-09-20 11:39:56', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(99, 25, 12, 3, NULL, '2025-08-23 05:11:29', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(100, 29, 9, 2, NULL, '2025-09-22 21:09:58', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(101, 2, 11, 4, 'Nasugbu, Batangas', '2025-09-05 14:05:12', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(102, 22, 10, 2, NULL, '2025-11-02 10:26:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(103, 13, 8, 6, NULL, '2025-10-02 14:51:18', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(104, 29, 4, 8, NULL, '2025-12-18 02:42:48', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(105, 28, NULL, 5, NULL, '2025-11-22 18:32:42', 'Cancelled', 1000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(106, 2, NULL, 1, 'Nasugbu, Batangas', '2025-06-09 02:54:47', 'Cancelled', 1500.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
+(107, 19, 11, 3, NULL, '2025-06-28 06:06:49', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(108, 16, NULL, 1, NULL, '2025-09-03 03:17:03', 'Cancelled', 1500.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(109, 31, 11, 1, NULL, '2025-12-09 03:22:46', 'Confirmed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(110, 16, 9, 7, NULL, '2025-07-01 16:54:30', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(111, 14, 8, 7, NULL, '2025-12-06 10:35:25', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(112, 32, 8, 8, NULL, '2025-10-06 12:25:52', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(113, 26, 9, 1, NULL, '2025-06-01 11:11:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(114, 28, 8, 7, NULL, '2025-08-16 04:27:59', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(115, 19, 11, 5, NULL, '2025-09-06 12:58:07', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(116, 19, 10, 5, NULL, '2025-08-26 01:26:48', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(117, 14, 10, 6, NULL, '2025-11-09 18:26:50', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(118, 28, 10, 6, NULL, '2025-06-23 23:00:02', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(119, 19, NULL, 3, NULL, '2025-09-28 04:48:25', 'Cancelled', 800.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(120, 29, 4, 6, NULL, '2025-11-13 04:34:28', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(121, 28, NULL, 5, NULL, '2025-12-21 14:05:05', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:59', 'Unpaid', 1, 0, NULL, NULL),
+(122, 25, 4, 5, NULL, '2025-09-04 09:09:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(123, 32, 12, 8, NULL, '2025-06-26 02:34:03', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(124, 2, 10, 2, 'Nasugbu, Batangas', '2025-08-03 02:04:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(125, 28, NULL, 4, NULL, '2025-10-04 07:24:31', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(126, 27, 8, 8, NULL, '2025-09-23 01:58:20', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(127, 21, NULL, 4, NULL, '2025-08-27 06:25:56', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(128, 28, 12, 4, NULL, '2025-11-01 04:00:07', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(129, 26, 8, 6, NULL, '2025-07-15 14:52:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(130, 2, 4, 3, 'Nasugbu, Batangas', '2025-08-29 18:04:43', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(131, 30, NULL, 2, NULL, '2025-06-19 19:19:59', 'Cancelled', 3000.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(132, 24, 4, 4, NULL, '2025-07-27 04:55:06', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(133, 22, 8, 6, NULL, '2025-06-23 14:18:19', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(134, 31, 10, 1, NULL, '2025-07-12 03:37:02', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(135, 2, NULL, 2, 'Nasugbu, Batangas', '2025-12-07 08:42:36', 'Pending', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
+(136, 27, 12, 4, NULL, '2025-12-12 10:22:41', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(137, 25, 12, 4, NULL, '2025-06-09 21:15:50', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(138, 2, 9, 5, 'Nasugbu, Batangas', '2025-05-31 16:54:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
+(139, 26, 12, 2, NULL, '2025-08-08 00:38:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(140, 31, NULL, 8, NULL, '2025-07-26 04:23:33', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(141, 31, 8, 8, NULL, '2025-09-04 01:54:41', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(142, 14, 11, 5, NULL, '2025-08-24 13:34:32', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(143, 20, NULL, 6, NULL, '2025-11-28 10:35:46', 'Pending', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(144, 19, 9, 7, NULL, '2025-08-31 15:57:03', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(145, 26, NULL, 2, NULL, '2025-08-04 03:04:56', 'Cancelled', 3000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
+(146, 27, 8, 7, NULL, '2025-11-04 12:39:08', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-27 01:52:42', 'Paid', NULL, 1, '2025-11-27 09:52:42', 3),
+(147, 15, 12, 2, NULL, '2025-08-19 15:58:09', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(148, 16, 4, 6, NULL, '2025-06-20 08:33:42', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(149, 31, 9, 1, NULL, '2025-10-14 22:56:30', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(150, 30, 11, 8, NULL, '2025-10-17 08:42:38', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
+(151, 13, NULL, 1, NULL, '2025-11-26 22:22:00', 'Cancelled', NULL, 'poide pakabit cctv lods', 'Duplicate ka boss', NULL, 'Duplicate booking', 0, '2025-11-26 08:36:29', '2025-11-26 11:36:18', 'Unpaid', 1, 0, NULL, NULL),
+(152, 33, 4, 6, '123 Main St, Nasugbu, Batangas', '2025-11-26 21:41:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 09:41:18', '2025-11-28 13:52:30', 'Unpaid', NULL, 1, '2025-11-26 17:41:54', 1),
+(153, 14, 4, 3, NULL, '2025-11-28 02:39:00', 'Cancelled', NULL, '', NULL, NULL, 'Scheduling conflict', 0, '2025-11-26 13:39:37', '2025-11-28 15:41:09', 'Unpaid', 4, 0, NULL, NULL),
+(154, 2, 4, 2, 'Nasugbu, Batangas', '2025-11-26 00:45:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:45:59', '2025-11-28 14:31:11', 'Unpaid', NULL, 0, NULL, NULL),
+(155, 2, 4, 6, 'Nasugbu, Batangas', '2025-11-27 21:02:00', 'Confirmed', NULL, 'pakabit ng CCTV \n\nAddress: 123 Main St, Nasugbu, Batangas', NULL, NULL, NULL, 0, '2025-11-28 12:02:46', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
+(156, 2, 4, 3, 'Nasugbu, Batangas', '2025-11-27 22:06:00', 'Confirmed', NULL, 'pagawa cam \n\nAddress: Manila', NULL, NULL, NULL, 0, '2025-11-28 12:06:47', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
+(157, 2, NULL, 3, 'Nasugbu, Batangas', '2025-11-28 21:13:00', 'Confirmed', NULL, ' \n\nAddress: Manila', NULL, NULL, NULL, 0, '2025-11-28 12:13:59', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
+(158, 2, 4, 7, 'Nasugbu, Batangas', '2025-11-28 21:17:00', 'Completed', NULL, ' \n\nAddress: Manilaz', NULL, NULL, NULL, 0, '2025-11-28 12:17:07', '2025-11-28 14:20:09', 'Unpaid', NULL, 0, NULL, NULL),
+(161, 2, 4, 6, 'Nasugbu, Batangas', '2025-11-28 22:12:00', 'Cancelled', NULL, 'KAMAGONG \n\nAddress: 123 Main St, Nasugbu, Batangas', NULL, NULL, NULL, 0, '2025-11-28 13:12:45', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
+(162, 2, 4, 4, 'Nasugbu, Batangas', '2025-11-28 23:26:00', 'Cancelled', NULL, ' \n\nAddress: Manila', 'Walang tao', NULL, 'No available technician', 0, '2025-11-28 13:26:38', '2025-11-28 13:52:30', 'Unpaid', 4, 0, NULL, NULL),
+(163, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-11-28 23:24:00', 'Completed', NULL, 'pagawa po ng cam', NULL, NULL, NULL, 0, '2025-11-28 14:25:03', '2025-11-28 15:41:40', 'Unpaid', NULL, 0, NULL, NULL),
+(164, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-11-28 23:59:00', 'Cancelled', NULL, '', NULL, NULL, NULL, 0, '2025-11-28 15:40:01', '2025-11-28 15:40:55', 'Unpaid', NULL, 0, NULL, NULL),
+(165, 2, 4, 8, 'Nasugbu, Batangas', '2025-11-29 02:23:00', 'In Progress', NULL, '', NULL, NULL, NULL, 0, '2025-11-28 16:23:19', '2025-11-28 16:23:53', 'Unpaid', NULL, 0, NULL, NULL);
 
 --
 -- Triggers `appointments`
@@ -618,6 +632,36 @@ CREATE TRIGGER `trg_appointment_notifications` AFTER UPDATE ON `appointments` FO
 END
 $$
 DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer_addresses`
+--
+
+CREATE TABLE `customer_addresses` (
+  `address_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `address_label` varchar(50) DEFAULT 'Home',
+  `address_line` text NOT NULL,
+  `is_default` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `customer_addresses`
+--
+
+INSERT INTO `customer_addresses` (`address_id`, `user_id`, `address_label`, `address_line`, `is_default`, `created_at`) VALUES
+(1, 2, 'Home', 'Nasugbu, Batangas', 1, '2025-11-28 13:52:30'),
+(2, 4, 'Home', 'Manilazzz', 1, '2025-11-28 13:52:30'),
+(3, 8, 'Home', 'Manila', 1, '2025-11-28 13:52:30'),
+(4, 9, 'Home', 'Manila', 1, '2025-11-28 13:52:30'),
+(5, 10, 'Home', 'Manila', 1, '2025-11-28 13:52:30'),
+(6, 11, 'Home', 'Manila', 1, '2025-11-28 13:52:30'),
+(7, 12, 'Home', 'Manila', 1, '2025-11-28 13:52:30'),
+(8, 33, 'Home', '123 Main St, Nasugbu, Batangas', 1, '2025-11-28 13:52:30'),
+(16, 2, 'Saved Address', 'Tumalim, Nasugbu, Batangas', 0, '2025-11-28 14:25:03');
 
 -- --------------------------------------------------------
 
@@ -905,7 +949,30 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (263, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 154, '2025-11-26 13:46:07'),
 (264, 4, 'New Job Assigned', 'You have been assigned to Appointment #154', 0, 154, '2025-11-26 13:46:07'),
 (265, 4, 'New Job Assigned', 'You have been assigned to Appointment #76', 0, 76, '2025-11-26 14:42:51'),
-(266, 33, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 152, '2025-11-26 15:20:47');
+(266, 33, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 152, '2025-11-26 15:20:47'),
+(267, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 155, '2025-11-28 12:03:13'),
+(268, 4, 'New Job Assigned', 'You have been assigned to Appointment #155', 0, 155, '2025-11-28 12:03:54'),
+(269, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 156, '2025-11-28 12:07:58'),
+(270, 4, 'New Job Assigned', 'You have been assigned to Appointment #156', 0, 156, '2025-11-28 12:09:21'),
+(271, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 157, '2025-11-28 12:15:24'),
+(272, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 158, '2025-11-28 12:17:15'),
+(273, 4, 'New Job Assigned', 'You have been assigned to Appointment #158', 0, 158, '2025-11-28 12:17:15'),
+(274, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, NULL, '2025-11-28 12:22:12'),
+(275, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, NULL, '2025-11-28 12:48:08'),
+(276, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 161, '2025-11-28 13:12:58'),
+(277, 4, 'New Job Assigned', 'You have been assigned to Appointment #161', 0, 161, '2025-11-28 13:12:58'),
+(278, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 162, '2025-11-28 13:28:06'),
+(279, 4, 'New Job Assigned', 'You have been assigned to Appointment #162', 0, 162, '2025-11-28 13:28:06'),
+(280, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 158, '2025-11-28 14:20:09'),
+(281, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 163, '2025-11-28 14:25:33'),
+(282, 4, 'New Job Assigned', 'You have been assigned to Appointment #163', 0, 163, '2025-11-28 14:25:33'),
+(283, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 154, '2025-11-28 14:31:11'),
+(284, 15, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 88, '2025-11-28 14:31:13'),
+(285, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 164, '2025-11-28 15:40:35'),
+(286, 4, 'New Job Assigned', 'You have been assigned to Appointment #164', 0, 164, '2025-11-28 15:40:35'),
+(287, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 163, '2025-11-28 15:41:40'),
+(288, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 165, '2025-11-28 16:23:40'),
+(289, 4, 'New Job Assigned', 'You have been assigned to Appointment #165', 0, 165, '2025-11-28 16:23:40');
 
 -- --------------------------------------------------------
 
@@ -993,7 +1060,10 @@ INSERT INTO `reviews` (`review_id`, `appointment_id`, `customer_id`, `technician
 (63, 142, 14, 11, 5, 'Very happy with the installation. The cameras are crystal clear.', '2025-08-26 01:48:51'),
 (64, 146, 27, 8, 3, 'Average service. The camera works but the angle isn\'t what I asked for.', '2025-11-07 01:03:55'),
 (65, 147, 15, 12, 3, 'Average service. The camera works but the angle isn\'t what I asked for.', '2025-08-25 10:21:35'),
-(66, 150, 30, 11, 5, 'Very happy with the installation. The cameras are crystal clear.', '2025-10-17 22:18:47');
+(66, 150, 30, 11, 5, 'Very happy with the installation. The cameras are crystal clear.', '2025-10-17 22:18:47'),
+(67, 66, 2, 4, 4, 'wow ang galing sheesh', '2025-11-28 11:51:06'),
+(68, 158, 2, 4, 5, 'tysm\n', '2025-11-28 14:20:55'),
+(69, 163, 2, 4, 4, 'nice', '2025-11-28 15:42:44');
 
 --
 -- Triggers `reviews`
@@ -1082,7 +1152,7 @@ CREATE TABLE `technician_profiles` (
 --
 
 INSERT INTO `technician_profiles` (`profile_id`, `user_id`, `specialty`, `bio`, `availability_status`, `total_jobs_completed`, `average_rating`) VALUES
-(1, 4, 'General', 'Bading po ako', 'Available', 0, 3.53),
+(1, 4, 'General', 'Bading po ako', 'Available', 0, 3.65),
 (2, 8, 'System Maintenance', NULL, 'Available', 0, 3.22),
 (3, 9, 'Data Recovery', NULL, 'Available', 0, 3.25),
 (4, 10, 'Network Setup', NULL, 'Available', 0, 3.92),
@@ -1106,6 +1176,7 @@ CREATE TABLE `users` (
   `address` text DEFAULT NULL,
   `password_hash` varchar(255) NOT NULL,
   `role` enum('Admin','Receptionist','Technician','Customer') NOT NULL DEFAULT 'Customer',
+  `profile_picture` varchar(255) DEFAULT NULL,
   `status` enum('Active','Inactive','Banned') DEFAULT 'Active',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
@@ -1115,40 +1186,68 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `address`, `password_hash`, `role`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'sherwin', 'Sherwin', 'Arizobal', 'sherwin@gmail.com', '09634045671', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Admin', 'Active', '2025-10-30 08:32:06', '2025-11-24 09:18:17'),
-(2, 'edrian', 'Edrian', 'Balingbing', 'edrian@gmail.com', '09955824197', 'Nasugbu, Batangas', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 08:34:33', '2025-11-27 11:14:26'),
-(3, 'ishi', 'Ishi', 'Ganda', 'ishi@gmail.com', '09999999999', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-07 08:35:44', '2025-11-24 09:18:17'),
-(4, 'frank', 'Frank', 'Ocean', 'blonded@gmail.com', '09783813287', 'Manilazzz', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-01 08:35:44', '2025-11-26 16:03:47'),
-(5, 'lunamarie', 'Luna', 'Marie', 'luna.marie@example.com', '09806367741', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(6, 'sarahconnor', 'Sarah', 'Connor', 'sarah.connor@example.com', '09329465187', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(7, 'pambeesly', 'Pam', 'Beesly', 'pam.beesly@example.com', '09211063703', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(8, 'bobbuilder', 'Bob', 'Builder', 'bobbuilder@example.com', '09532562007', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:49'),
-(9, 'fixit', 'Fix', 'It', 'fixit@example.com', '09802843386', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:52'),
-(10, 'handymanny', 'Handy', 'Manny', 'handymanny@example.com', '09882602529', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:56'),
-(11, 'timtaylor', 'Tim', 'Taylor', 'timtaylor@example.com', '09425547033', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:20:04'),
-(12, 'alborland', 'Al', 'Borland', 'alborland@example.com', '09911773013', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:44'),
-(13, 'patriciataylor0', 'Patricia', 'Taylor', 'patriciataylor0@example.com', '09322981200', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(14, 'lindawilliams1', 'Linda', 'Williams', 'lindawilliams1@example.com', '099907278', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(15, 'sarahwilliams2', 'Sarah', 'Williams', 'sarahwilliams2@example.com', '0946698306', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(16, 'michaelmoore3', 'Michael', 'Moore', 'michaelmoore3@example.com', '09129214966', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(17, 'thomasgonzalez4', 'Thomas', 'Gonzalez', 'thomasgonzalez4@example.com', '09772281612', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(18, 'williamwilson5', 'William', 'Wilson', 'williamwilson5@example.com', '09454943742', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(19, 'josephjones6', 'Joseph', 'Jones', 'josephjones6@example.com', '09528277042', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(20, 'davidbrown7', 'David', 'Brown', 'davidbrown7@example.com', '09111949885', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(21, 'williamgonzalez8', 'William', 'Gonzalez', 'williamgonzalez8@example.com', '09490082945', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(22, 'robertwilliams9', 'Robert', 'Williams', 'robertwilliams9@example.com', '09210847636', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(23, 'marygonzalez10', 'Mary', 'Gonzalez', 'marygonzalez10@example.com', '09169434857', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(24, 'barbararodriguez11', 'Barbara', 'Rodriguez', 'barbararodriguez11@example.com', '09513242060', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(25, 'maryrodriguez12', 'Mary', 'Rodriguez', 'maryrodriguez12@example.com', '09251118917', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(26, 'marytaylor13', 'Mary', 'Taylor', 'marytaylor13@example.com', '0996895546', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(27, 'jamestaylor14', 'James', 'Taylor', 'jamestaylor14@example.com', '09575720939', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(28, 'patriciawilson15', 'Patricia', 'Wilson', 'patriciawilson15@example.com', '09800948295', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(29, 'karenjohnson16', 'Karen', 'Johnson', 'karenjohnson16@example.com', '09536186144', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(30, 'richarddavis17', 'Richard', 'Davis', 'richarddavis17@example.com', '09822468053', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(31, 'elizabethmartinez18', 'Elizabeth', 'Martinez', 'elizabethmartinez18@example.com', '09143091841', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
-(32, 'davidmiller19', 'David', 'Miller', 'davidmiller19@example.com', '09500137252', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:01'),
-(33, 'ardelarizobal613', 'Luna', 'Customer', 'ardelarizobal@gmail.com', '09783813287', '123 Main St, Nasugbu, Batangas', '$2b$10$VigJAJexvXo6kcFCEbcUUe91S/.L3qDnicJ.Pnl0/JhVapdzaotDG', 'Customer', 'Active', '2025-11-26 09:41:18', '2025-11-26 09:41:18');
+INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, `phone_number`, `address`, `password_hash`, `role`, `profile_picture`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'sherwin', 'Sherwin', 'Arizobal', 'sherwin@gmail.com', '09634045671', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Admin', '/uploads/profile_pics/user-1-1764513611274-916117309.jpg', 'Active', '2025-10-30 08:32:06', '2025-11-30 14:40:11'),
+(2, 'edrian', 'Edrian', 'Balingbing', 'edrian@gmail.com', '09955824197', 'Nasugbu, Batangas', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', '/uploads/profile_pics/user-2-1764514670699-896750777.jpg', 'Active', '2025-11-24 08:34:33', '2025-11-30 14:57:50'),
+(3, 'denmark', 'Denmark', 'Cabanhao', 'denmark@gmail.com', '09999999999', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', '/uploads/profile_pics/user-3-1764513627435-692111303.jpg', 'Active', '2025-11-07 08:35:44', '2025-11-30 14:40:27'),
+(4, 'glenn', 'Glenn', 'Mikko', 'glenn@gmail.com', '09783813287', 'Manilazzz', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-01 08:35:44', '2025-11-30 14:33:13'),
+(5, 'lunamarie', 'Luna', 'Marie', 'luna.marie@example.com', '09806367741', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(6, 'sarahconnor', 'Sarah', 'Connor', 'sarah.connor@example.com', '09329465187', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(7, 'pambeesly', 'Pam', 'Beesly', 'pam.beesly@example.com', '09211063703', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(8, 'bobbuilder', 'Bob', 'Builder', 'bobbuilder@example.com', '09532562007', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:49'),
+(9, 'fixit', 'Fix', 'It', 'fixit@example.com', '09802843386', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:52'),
+(10, 'handymanny', 'Handy', 'Manny', 'handymanny@example.com', '09882602529', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:56'),
+(11, 'timtaylor', 'Tim', 'Taylor', 'timtaylor@example.com', '09425547033', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:20:04'),
+(12, 'alborland', 'Al', 'Borland', 'alborland@example.com', '09911773013', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:44'),
+(13, 'patriciataylor0', 'Patricia', 'Taylor', 'patriciataylor0@example.com', '09322981200', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(14, 'lindawilliams1', 'Linda', 'Williams', 'lindawilliams1@example.com', '099907278', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(15, 'sarahwilliams2', 'Sarah', 'Williams', 'sarahwilliams2@example.com', '0946698306', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(16, 'michaelmoore3', 'Michael', 'Moore', 'michaelmoore3@example.com', '09129214966', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(17, 'thomasgonzalez4', 'Thomas', 'Gonzalez', 'thomasgonzalez4@example.com', '09772281612', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(18, 'williamwilson5', 'William', 'Wilson', 'williamwilson5@example.com', '09454943742', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(19, 'josephjones6', 'Joseph', 'Jones', 'josephjones6@example.com', '09528277042', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(20, 'davidbrown7', 'David', 'Brown', 'davidbrown7@example.com', '09111949885', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(21, 'williamgonzalez8', 'William', 'Gonzalez', 'williamgonzalez8@example.com', '09490082945', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(22, 'robertwilliams9', 'Robert', 'Williams', 'robertwilliams9@example.com', '09210847636', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(23, 'marygonzalez10', 'Mary', 'Gonzalez', 'marygonzalez10@example.com', '09169434857', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(24, 'barbararodriguez11', 'Barbara', 'Rodriguez', 'barbararodriguez11@example.com', '09513242060', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(25, 'maryrodriguez12', 'Mary', 'Rodriguez', 'maryrodriguez12@example.com', '09251118917', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(26, 'marytaylor13', 'Mary', 'Taylor', 'marytaylor13@example.com', '0996895546', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(27, 'jamestaylor14', 'James', 'Taylor', 'jamestaylor14@example.com', '09575720939', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(28, 'patriciawilson15', 'Patricia', 'Wilson', 'patriciawilson15@example.com', '09800948295', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(29, 'karenjohnson16', 'Karen', 'Johnson', 'karenjohnson16@example.com', '09536186144', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(30, 'richarddavis17', 'Richard', 'Davis', 'richarddavis17@example.com', '09822468053', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(31, 'elizabethmartinez18', 'Elizabeth', 'Martinez', 'elizabethmartinez18@example.com', '09143091841', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(32, 'davidmiller19', 'David', 'Miller', 'davidmiller19@example.com', '09500137252', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:01'),
+(33, 'ardelarizobal613', 'Luna', 'Customer', 'ardelarizobal@gmail.com', '09783813287', '123 Main St, Nasugbu, Batangas', '$2b$10$VigJAJexvXo6kcFCEbcUUe91S/.L3qDnicJ.Pnl0/JhVapdzaotDG', 'Customer', NULL, 'Active', '2025-11-26 09:41:18', '2025-11-26 09:41:18');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_addresses`
+--
+
+CREATE TABLE `user_addresses` (
+  `address_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `address_line` text NOT NULL,
+  `is_primary` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_addresses`
+--
+
+INSERT INTO `user_addresses` (`address_id`, `user_id`, `address_line`, `is_primary`, `created_at`) VALUES
+(1, 2, 'Nasugbu, Batangas', 1, '2025-11-30 13:42:29'),
+(2, 4, 'Manilazzz', 1, '2025-11-30 13:42:29'),
+(3, 8, 'Manila', 1, '2025-11-30 13:42:29'),
+(4, 9, 'Manila', 1, '2025-11-30 13:42:29'),
+(5, 10, 'Manila', 1, '2025-11-30 13:42:29'),
+(6, 11, 'Manila', 1, '2025-11-30 13:42:29'),
+(7, 12, 'Manila', 1, '2025-11-30 13:42:29'),
+(8, 33, '123 Main St, Nasugbu, Batangas', 1, '2025-11-30 13:42:29');
 
 --
 -- Indexes for dumped tables
@@ -1171,6 +1270,13 @@ ALTER TABLE `appointments`
   ADD KEY `service_id` (`service_id`),
   ADD KEY `fk_cancelled_by` (`cancelled_by`),
   ADD KEY `fk_deletion_marked_by` (`deletion_marked_by`);
+
+--
+-- Indexes for table `customer_addresses`
+--
+ALTER TABLE `customer_addresses`
+  ADD PRIMARY KEY (`address_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `notifications`
@@ -1218,6 +1324,13 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `username` (`username`);
 
 --
+-- Indexes for table `user_addresses`
+--
+ALTER TABLE `user_addresses`
+  ADD PRIMARY KEY (`address_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -1225,25 +1338,31 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=323;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
 
 --
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=155;
+  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
+
+--
+-- AUTO_INCREMENT for table `customer_addresses`
+--
+ALTER TABLE `customer_addresses`
+  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=267;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=290;
 
 --
 -- AUTO_INCREMENT for table `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
 
 --
 -- AUTO_INCREMENT for table `services`
@@ -1270,6 +1389,12 @@ ALTER TABLE `users`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
+-- AUTO_INCREMENT for table `user_addresses`
+--
+ALTER TABLE `user_addresses`
+  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
 -- Constraints for dumped tables
 --
 
@@ -1288,6 +1413,12 @@ ALTER TABLE `appointments`
   ADD CONSTRAINT `appointments_ibfk_3` FOREIGN KEY (`service_id`) REFERENCES `services` (`service_id`),
   ADD CONSTRAINT `fk_cancelled_by` FOREIGN KEY (`cancelled_by`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `fk_deletion_marked_by` FOREIGN KEY (`deletion_marked_by`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `customer_addresses`
+--
+ALTER TABLE `customer_addresses`
+  ADD CONSTRAINT `customer_addresses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `notifications`
@@ -1315,6 +1446,12 @@ ALTER TABLE `services`
 --
 ALTER TABLE `technician_profiles`
   ADD CONSTRAINT `technician_profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_addresses`
+--
+ALTER TABLE `user_addresses`
+  ADD CONSTRAINT `user_addresses_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

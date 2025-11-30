@@ -59,13 +59,13 @@ exports.addAddress = (req, res) => {
 
   // If setting as default, unset other defaults first
   if (isDefault) {
-    db.query('UPDATE customer_addresses SET is_default = 0 WHERE user_id = ?', [userId], (err) => {
+    (req.db || db).query('UPDATE customer_addresses SET is_default = 0 WHERE user_id = ?', [userId], (err) => {
       if (err) console.error('Error resetting default addresses:', err);
     });
   }
 
   const query = 'INSERT INTO customer_addresses (user_id, address_line, address_label, is_default) VALUES (?, ?, ?, ?)';
-  db.query(query, [userId, address, label || 'Home', isDefault ? 1 : 0], (err, result) => {
+  (req.db || db).query(query, [userId, address, label || 'Home', isDefault ? 1 : 0], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error adding address.' });
@@ -84,7 +84,7 @@ exports.updateProfile = (req, res) => {
     WHERE user_id = ?
   `;
 
-  db.query(query, [firstName, lastName, email, phone, address, userId], (err, result) => {
+  (req.db || db).query(query, [firstName, lastName, email, phone, address, userId], (err, result) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error updating profile.' });
@@ -103,7 +103,7 @@ exports.changePassword = (req, res) => {
 
   // Get current password hash
   const query = 'SELECT password_hash FROM users WHERE user_id = ?';
-  db.query(query, [userId], async (err, results) => {
+  (req.db || db).query(query, [userId], async (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error.' });
@@ -125,7 +125,7 @@ exports.changePassword = (req, res) => {
 
     // Update password
     const updateQuery = 'UPDATE users SET password_hash = ? WHERE user_id = ?';
-    db.query(updateQuery, [hashedPassword, userId], (err, result) => {
+    (req.db || db).query(updateQuery, [hashedPassword, userId], (err, result) => {
       if (err) {
         console.error(err);
         return res.status(500).json({ message: 'Database error updating password.' });
@@ -140,7 +140,7 @@ exports.deleteAccount = (req, res) => {
 
   // Check for active appointments first to give a better error message
   const checkQuery = "SELECT COUNT(*) as count FROM appointments WHERE customer_id = ? AND status IN ('Pending', 'Confirmed', 'In Progress')";
-  db.query(checkQuery, [userId], (err, results) => {
+  (req.db || db).query(checkQuery, [userId], (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error.' });
@@ -154,7 +154,7 @@ exports.deleteAccount = (req, res) => {
     // If we want to allow deletion even with history, we might need to anonymize or cascade delete.
     // For now, let's try to delete and catch the error.
     const deleteQuery = 'DELETE FROM users WHERE user_id = ?';
-    db.query(deleteQuery, [userId], (err, result) => {
+    (req.db || db).query(deleteQuery, [userId], (err, result) => {
       if (err) {
         console.error(err);
         // Check for foreign key constraint error

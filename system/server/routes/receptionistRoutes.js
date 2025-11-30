@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const receptionistController = require('../controllers/receptionistController');
 const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const auditMiddleware = require('../middleware/auditMiddleware');
 
 // Protect all routes
 router.use(verifyToken);
 router.use(checkRole(['Receptionist', 'Admin']));
+router.use(auditMiddleware);
 
 router.get('/dashboard-stats', receptionistController.getDashboardStats);
 router.get('/appointments', receptionistController.getAllAppointments);
@@ -20,5 +22,7 @@ router.delete('/appointments/recycle-bin', receptionistController.emptyRecycleBi
 router.get('/services', receptionistController.getServices);
 router.get('/technicians', receptionistController.getTechnicians);
 router.get('/categories', receptionistController.getAllCategories);
+
+router.get('/users', receptionistController.searchUsers);
 
 module.exports = router;

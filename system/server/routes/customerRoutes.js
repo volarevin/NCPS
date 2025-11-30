@@ -2,10 +2,12 @@ const express = require('express');
 const router = express.Router();
 const customerController = require('../controllers/customerController');
 const { verifyToken, checkRole } = require('../middleware/authMiddleware');
+const auditMiddleware = require('../middleware/auditMiddleware');
 
 // Protect all routes
 router.use(verifyToken);
 router.use(checkRole(['Customer']));
+router.use(auditMiddleware);
 
 router.get('/stats', customerController.getDashboardStats);
 router.get('/appointments', customerController.getAppointments);

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
 import { RecycleBinDialog } from "./RecycleBinDialog";
-import { CreateAppointmentDialog } from "./CreateAppointmentDialog";
+import { CreateWalkInDialog } from "./CreateWalkInDialog";
 import { StatusChangeDialog } from "./StatusChangeDialog";
 import {
   Calendar,
@@ -424,7 +424,7 @@ export function Appointments() {
                 className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-all shadow-sm hover:shadow-md hover:scale-105"
             >
                 <Plus className="w-4 h-4" />
-                New Appointment
+                Book Appointment
             </button>
           </div>
         }
@@ -671,7 +671,7 @@ export function Appointments() {
         onOpenChange={setIsRecycleBinOpen}
       />
 
-      <CreateAppointmentDialog 
+      <CreateWalkInDialog 
         open={isCreateDialogOpen} 
         onOpenChange={setIsCreateDialogOpen}
         onSuccess={() => {

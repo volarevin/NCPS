@@ -225,14 +225,14 @@ exports.createAppointment = (req, res) => {
       INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, customer_notes, status, service_address)
       VALUES (?, ?, ?, ?, ?, 'Pending', ?)
     `;
-    db.query(query, [customerId, serviceId, technicianId || null, appointmentDate, notes, address], (err, result) => {
+    (req.db || db).query(query, [customerId, serviceId, technicianId || null, appointmentDate, notes, address], (err, result) => {
       if (err) return res.status(500).json({ error: err.message });
       res.json({ message: 'Appointment created successfully', id: result.insertId });
     });
   };
 
   // Check if user exists
-  db.query('SELECT user_id FROM users WHERE email = ?', [email], (err, results) => {
+  (req.db || db).query('SELECT user_id FROM users WHERE email = ?', [email], (err, results) => {
     if (err) return res.status(500).json({ error: err.message });
 
     if (results.length > 0) {
@@ -249,7 +249,7 @@ exports.createAppointment = (req, res) => {
         INSERT INTO users (username, first_name, last_name, email, phone_number, address, password_hash, role, status)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'Customer', 'Active')
       `;
-      db.query(createUserQuery, [username, firstName, lastName, email, phone, address, defaultPass], (err, result) => {
+      (req.db || db).query(createUserQuery, [username, firstName, lastName, email, phone, address, defaultPass], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         insertAppointment(result.insertId);
       });
@@ -278,7 +278,7 @@ exports.updateAppointmentStatus = (req, res) => {
   query += ' WHERE appointment_id = ?';
   params.push(id);
 
-  db.query(query, params, (err, result) => {
+  (req.db || db).query(query, params, (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Status updated successfully' });
   });
@@ -291,7 +291,7 @@ exports.updateAppointmentDetails = (req, res) => {
   const appointmentDate = `${date} ${time}`;
   const query = 'UPDATE appointments SET appointment_date = ?, technician_id = ? WHERE appointment_id = ?';
   
-  db.query(query, [appointmentDate, technicianId || null, id], (err, result) => {
+  (req.db || db).query(query, [appointmentDate, technicianId || null, id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Appointment details updated successfully' });
   });
@@ -307,7 +307,7 @@ exports.softDeleteAppointment = (req, res) => {
     WHERE appointment_id = ?
   `;
   
-  db.query(query, [req.userId, id], (err, result) => {
+  (req.db || db).query(query, [req.userId, id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Appointment moved to recycle bin' });
   });
@@ -338,7 +338,7 @@ exports.restoreAppointment = (req, res) => {
   const { id } = req.params;
   const query = 'UPDATE appointments SET marked_for_deletion = 0, deletion_marked_at = NULL, deletion_marked_by = NULL WHERE appointment_id = ?';
   
-  db.query(query, [id], (err, result) => {
+  (req.db || db).query(query, [id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Appointment restored' });
   });
@@ -348,7 +348,7 @@ exports.permanentDeleteAppointment = (req, res) => {
   const { id } = req.params;
   const query = 'DELETE FROM appointments WHERE appointment_id = ? AND marked_for_deletion = 1';
   
-  db.query(query, [id], (err, result) => {
+  (req.db || db).query(query, [id], (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Appointment permanently deleted' });
   });
@@ -357,8 +357,31 @@ exports.permanentDeleteAppointment = (req, res) => {
 exports.emptyRecycleBin = (req, res) => {
   const query = 'DELETE FROM appointments WHERE marked_for_deletion = 1';
   
-  db.query(query, (err, result) => {
+  (req.db || db).query(query, (err, result) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json({ message: 'Recycle bin emptied' });
   });
 };
+
+exports.searchUsers = (req, res) => {
+  const { search } = req.query;
+  let query = `SELECT user_id, first_name, last_name, email, phone_number, profile_picture, address, role FROM users WHERE role = 'Customer'`;
+  const params = [];
+
+  if (search) {
+    query += ` AND (first_name LIKE ? OR last_name LIKE ? OR email LIKE ? OR phone_number LIKE ?)`;
+    const term = `%${search}%`;
+    params.push(term, term, term, term);
+  }
+  
+  query += ` LIMIT 20`;
+
+  (req.db || db).query(query, params, (err, results) => {
+    if (err) {
+      console.error('Error searching users:', err);
+      return res.status(500).json({ message: 'Error searching users' });
+    }
+    res.json(results);
+  });
+};
+

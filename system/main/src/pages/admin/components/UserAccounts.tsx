@@ -95,12 +95,25 @@ export function UserAccounts() {
       });
       const logs = await response.json();
       
-      const formattedLogs = logs.map((log: any) => ({
+      const formattedLogs = logs.map((log: any) => {
+        let details = '';
+        try {
+           const changes = typeof log.changes === 'string' ? JSON.parse(log.changes) : log.changes;
+           if (changes?.note) details = changes.note;
+           else if (changes?.meta) details = changes.meta;
+           else if (log.table_name) details = `${log.action} on ${log.table_name}`;
+           else details = JSON.stringify(changes);
+        } catch {
+           details = 'Details unavailable';
+        }
+
+        return {
           id: log.log_id.toString(),
-          action: log.action_type,
+          action: log.action,
           timestamp: new Date(log.created_at).toLocaleString(),
-          details: log.description
-      }));
+          details: details
+        };
+      });
       
       setSelectedUser({ ...user, activityLogs: formattedLogs });
     } catch (error) {
