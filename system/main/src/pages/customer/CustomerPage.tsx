@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { CustomerSidebar } from './components/CustomerSidebar';
 import { CustomerDashboard } from './components/CustomerDashboard';
 import { CustomerAppointments } from './components/CustomerAppointments';
-import { CustomerProfile } from './components/CustomerProfile';
+import ProfilePage from '../common/ProfilePage';
 import { CustomerServices } from './components/CustomerServices';
 import { MobileHeader } from './components/MobileHeader';
 import { MobileSidebar } from './components/MobileSidebar';
@@ -53,7 +53,7 @@ export default function CustomerPage() {
         {currentPage === 'dashboard' && <CustomerDashboard />}
         {currentPage === 'services' && <CustomerServices />}
         {currentPage === 'appointments' && <CustomerAppointments />}
-        {currentPage === 'profile' && <CustomerProfile />}
+        {currentPage === 'profile' && <ProfilePage />}
       </main>
     </div>
   );

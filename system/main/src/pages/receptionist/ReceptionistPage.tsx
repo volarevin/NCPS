@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { AppointmentSchedule, Appointment } from './components/AppointmentSchedule';
 import { Dashboard } from './components/Dashboard';
-import { MyAccount } from './components/MyAccount';
+import ProfilePage from '../common/ProfilePage';
 import { MobileHeader } from './components/MobileHeader';
 
 export default function ReceptionistPage() {
@@ -40,7 +40,7 @@ export default function ReceptionistPage() {
                 onClearSelection={() => setSelectedAppointment(null)}
               />
             )}
-            {currentPage === 'account' && <MyAccount />}
+            {currentPage === 'account' && <ProfilePage />}
           </div>
         </main>
       </div>

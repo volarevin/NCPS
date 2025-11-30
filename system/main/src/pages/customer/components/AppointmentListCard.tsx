@@ -17,6 +17,8 @@ interface AppointmentListCardProps {
     notes?: string;
     rating?: number;
     feedback?: string;
+    createdAt?: Date;
+    updatedAt?: Date;
   };
   onView: (appointment: any) => void;
   onCancel: (appointment: any) => void;
@@ -131,6 +133,15 @@ export function AppointmentListCard({ appointment, onView, onCancel, onRate, onE
               <Star className="w-3.5 h-3.5 fill-current" />
               <span>{appointment.rating}/5</span>
             </div>
+          )}
+        </div>
+
+        <div className="mt-3 flex flex-col items-end text-[10px] text-gray-400 gap-0.5">
+          {appointment.createdAt && (
+            <span>Date Added: {appointment.createdAt.toLocaleDateString()} {appointment.createdAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+          )}
+          {appointment.updatedAt && (
+            <span>Last Updated: {appointment.updatedAt.toLocaleDateString()} {appointment.updatedAt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
           )}
         </div>
       </div>

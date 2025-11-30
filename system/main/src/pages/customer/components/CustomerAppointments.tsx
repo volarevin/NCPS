@@ -22,7 +22,7 @@ export function CustomerAppointments() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<AppointmentStatus>('all');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [sortBy, setSortBy] = useState<'date' | 'created' | 'updated'>('date');
+  const [sortBy, setSortBy] = useState<'date' | 'created' | 'updated'>('updated');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -173,78 +173,81 @@ export function CustomerAppointments() {
 
       {/* Filters and Search */}
       <div className="bg-white rounded-xl shadow-sm p-3 md:p-4 mb-4 md:mb-6 border border-gray-100">
-        <div className="flex flex-col lg:flex-row gap-4 justify-between">
-          <div className="flex gap-2 overflow-x-auto pb-2 lg:pb-0 no-scrollbar">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as AppointmentStatus)}
-                className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? 'bg-[#1A5560] text-white shadow-md'
-                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+        <div className="flex flex-col gap-4">
+          {/* Search Bar at Top */}
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              placeholder="Search appointments..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 border-gray-200 focus:border-[#3FA9BC] focus:ring-[#3FA9BC] h-9 md:h-10 text-sm w-full"
+            />
           </div>
-          
-          <div className="flex gap-2 items-center">
-            <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                <SelectTrigger className="w-[140px] h-9 md:h-10 bg-white">
-                    <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="date">Appointment Date</SelectItem>
-                    <SelectItem value="created">Date Created</SelectItem>
-                    <SelectItem value="updated">Last Updated</SelectItem>
-                </SelectContent>
-            </Select>
 
-            <Button
-                variant="outline"
-                size="icon"
-                className="h-9 w-9 md:h-10 md:w-10 bg-white"
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                title={sortOrder === 'asc' ? "Ascending" : "Descending"}
-            >
-                <ArrowUpDown className="h-4 w-4" />
-            </Button>
-
-            <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
-                  viewMode === 'list' 
-                    ? 'bg-white shadow-sm text-[#1A5560]' 
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
-                }`}
-              >
-                <List className="w-4 h-4" />
-                <span className="hidden sm:inline">List</span>
-              </button>
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
-                  viewMode === 'calendar' 
-                    ? 'bg-white shadow-sm text-[#1A5560]' 
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
-                }`}
-              >
-                <Calendar className="w-4 h-4" />
-                <span className="hidden sm:inline">Calendar</span>
-              </button>
+          <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+            <div className="flex flex-wrap gap-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as AppointmentStatus)}
+                  className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'bg-[#1A5560] text-white shadow-md'
+                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
             </div>
+            
+            <div className="flex gap-2 items-center w-full lg:w-auto justify-end">
+              <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                  <SelectTrigger className="w-[140px] h-9 md:h-10 bg-white">
+                      <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                      <SelectItem value="date">Appointment Date</SelectItem>
+                      <SelectItem value="created">Date Created</SelectItem>
+                      <SelectItem value="updated">Last Updated</SelectItem>
+                  </SelectContent>
+              </Select>
 
-            <div className="relative w-full lg:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="Search appointments..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 border-gray-200 focus:border-[#3FA9BC] focus:ring-[#3FA9BC] h-9 md:h-10 text-sm"
-              />
+              <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-9 w-9 md:h-10 md:w-10 bg-white"
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  title={sortOrder === 'asc' ? "Ascending" : "Descending"}
+              >
+                  <ArrowUpDown className="h-4 w-4" />
+              </Button>
+
+              <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
+                    viewMode === 'list' 
+                      ? 'bg-white shadow-sm text-[#1A5560]' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                  }`}
+                >
+                  <List className="w-4 h-4" />
+                  <span className="hidden sm:inline">List</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('calendar')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
+                    viewMode === 'calendar' 
+                      ? 'bg-white shadow-sm text-[#1A5560]' 
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                  }`}
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="hidden sm:inline">Calendar</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

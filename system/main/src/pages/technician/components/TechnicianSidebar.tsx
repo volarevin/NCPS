@@ -32,7 +32,7 @@ export function TechnicianSidebar({ currentPage, onNavigate, className = "" }: T
     { id: "dashboard", name: "Dashboard", icon: LayoutDashboard },
     { id: "appointments", name: "Appointments", icon: Calendar },
     { id: "ratings", name: "Ratings", icon: Star },
-    { id: "profile", name: "My Account", icon: User },
+    { id: "profile", name: "My Profile", icon: User },
   ];
 
   const handleLogout = () => {

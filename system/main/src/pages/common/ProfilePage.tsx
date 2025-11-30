@@ -1,0 +1,560 @@
+import { useState, useEffect, useRef } from 'react';
+import { User, Mail, Phone, MapPin, Lock, Plus, Trash2, Star, Edit2, Save, X, Camera } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { useFeedback } from "@/context/FeedbackContext";
+import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+interface Address {
+  address_id: number;
+  address_line: string;
+  is_primary: boolean;
+}
+
+interface UserProfile {
+  user_id: number;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  role: string;
+  profile_picture?: string;
+  addresses: Address[];
+}
+
+export default function ProfilePage() {
+  const { showPromise } = useFeedback();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({ username: '', firstName: '', lastName: '', email: '', phone: '' });
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Address Dialog State
+  const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
+  const [addressForm, setAddressForm] = useState({ id: 0, addressLine: '' });
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+
+  // Password Dialog State
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ current: '', new: '', confirm: '' });
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/profile', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setProfile(data);
+        setEditForm({
+          username: data.username,
+          firstName: data.first_name,
+          lastName: data.last_name,
+          email: data.email,
+          phone: data.phone_number
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    const promise = async () => {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/profile', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify(editForm)
+      });
+      
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to update profile');
+      }
+      
+      await fetchProfile();
+      setIsEditing(false);
+      return 'Profile updated successfully';
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating profile...',
+      success: (data) => data,
+      error: (err) => err.message
+    });
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profilePicture', file);
+
+    const promise = async () => {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/profile/picture', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+        body: formData
+      });
+
+      if (!response.ok) throw new Error('Failed to upload image');
+      await fetchProfile();
+      return 'Profile picture updated';
+    };
+
+    showPromise(promise(), {
+      loading: 'Uploading image...',
+      success: (data) => data,
+      error: 'Failed to upload image'
+    });
+    
+    // Reset input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleAddressSubmit = async () => {
+    const promise = async () => {
+      const token = sessionStorage.getItem('token');
+      const url = isEditingAddress 
+        ? `http://localhost:5000/api/profile/addresses/${addressForm.id}`
+        : 'http://localhost:5000/api/profile/addresses';
+      
+      const method = isEditingAddress ? 'PUT' : 'POST';
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ addressLine: addressForm.addressLine })
+      });
+
+      if (!response.ok) throw new Error('Failed to save address');
+      
+      await fetchProfile();
+      setIsAddressDialogOpen(false);
+      return isEditingAddress ? 'Address updated' : 'Address added';
+    };
+
+    showPromise(promise(), {
+      loading: 'Saving address...',
+      success: (data) => data,
+      error: 'Failed to save address'
+    });
+  };
+
+  const handleDeleteAddress = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this address?')) return;
+
+    const promise = async () => {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/profile/addresses/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) throw new Error('Failed to delete address');
+      await fetchProfile();
+      return 'Address deleted';
+    };
+
+    showPromise(promise(), {
+      loading: 'Deleting address...',
+      success: (data) => data,
+      error: 'Failed to delete address'
+    });
+  };
+
+  const handleSetPrimaryAddress = async (id: number) => {
+    const promise = async () => {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/profile/addresses/${id}/primary`, {
+        method: 'PUT',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!response.ok) throw new Error('Failed to set primary address');
+      await fetchProfile();
+      return 'Primary address updated';
+    };
+
+    showPromise(promise(), {
+      loading: 'Updating primary address...',
+      success: (data) => data,
+      error: 'Failed to update primary address'
+    });
+  };
+
+  const handleChangePassword = async () => {
+    if (passwordForm.new !== passwordForm.confirm) {
+        showPromise(Promise.reject(new Error("Passwords do not match")), {
+            loading: 'Validating...',
+            success: () => '',
+            error: (err) => err.message
+        });
+        return; 
+    }
+
+    const promise = async () => {
+      const token = sessionStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/profile/password', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` 
+        },
+        body: JSON.stringify({ 
+            currentPassword: passwordForm.current,
+            newPassword: passwordForm.new
+        })
+      });
+
+      if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.message || 'Failed to change password');
+      }
+      
+      setIsPasswordDialogOpen(false);
+      setPasswordForm({ current: '', new: '', confirm: '' });
+      return 'Password changed successfully';
+    };
+
+    showPromise(promise(), {
+      loading: 'Changing password...',
+      success: (data) => data,
+      error: (err) => err.message
+    });
+  };
+
+  if (!profile) return <div className="p-8">Loading...</div>;
+
+  return (
+    <div className="p-6 max-w-5xl mx-auto space-y-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-[#0B4F6C]">My Profile</h1>
+          <p className="text-gray-500 mt-1">Manage your personal information and account settings</p>
+        </div>
+        <Badge variant="outline" className="px-4 py-1 text-sm border-[#3FA9BC] text-[#3FA9BC] bg-[#F0F9FA]">
+          {profile.role} Account
+        </Badge>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column: Personal Info */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card className="border-none shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xl text-[#0B4F6C] flex items-center gap-2">
+                <User className="w-5 h-5" /> Personal Information
+              </CardTitle>
+              {!isEditing ? (
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-[#3FA9BC]">
+                  <Edit2 className="w-4 h-4 mr-2" /> Edit
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-gray-500">
+                    <X className="w-4 h-4 mr-2" /> Cancel
+                  </Button>
+                  <Button size="sm" onClick={handleUpdateProfile} className="bg-[#3FA9BC] hover:bg-[#2A6570]">
+                    <Save className="w-4 h-4 mr-2" /> Save
+                  </Button>
+                </div>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Profile Picture Section */}
+              <div className="flex items-center gap-6 mb-6">
+                <div className="relative group">
+                  <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
+                    <AvatarImage src={profile.profile_picture ? `http://localhost:5000${profile.profile_picture}` : undefined} />
+                    <AvatarFallback className="bg-[#0B4F6C] text-white text-2xl">
+                      {profile.first_name[0]}{profile.last_name[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div 
+                    className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Camera className="w-8 h-8 text-white" />
+                  </div>
+                  <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    className="hidden" 
+                    accept="image/png, image/jpeg"
+                    onChange={handleImageUpload}
+                  />
+                </div>
+                <div>
+                  <h3 className="font-medium text-lg">{profile.first_name} {profile.last_name}</h3>
+                  <p className="text-gray-500 text-sm">@{profile.username}</p>
+                  <Button 
+                    variant="link" 
+                    className="p-0 h-auto text-[#3FA9BC] mt-1"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    Change Profile Picture
+                  </Button>
+                </div>
+              </div>
+
+              <Separator />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-500">Username</Label>
+                  {isEditing ? (
+                    <Input 
+                      value={editForm.username} 
+                      onChange={(e) => setEditForm({...editForm, username: e.target.value})}
+                    />
+                  ) : (
+                    <div className="font-medium text-lg">{profile.username}</div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-500">First Name</Label>
+                  {isEditing ? (
+                    <Input 
+                      value={editForm.firstName} 
+                      onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
+                    />
+                  ) : (
+                    <div className="font-medium text-lg">{profile.first_name}</div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-500">Last Name</Label>
+                  {isEditing ? (
+                    <Input 
+                      value={editForm.lastName} 
+                      onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
+                    />
+                  ) : (
+                    <div className="font-medium text-lg">{profile.last_name}</div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-500">Email Address</Label>
+                  {isEditing ? (
+                    <Input 
+                      value={editForm.email} 
+                      onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 font-medium">
+                      <Mail className="w-4 h-4 text-gray-400" /> {profile.email}
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-500">Phone Number</Label>
+                  {isEditing ? (
+                    <Input 
+                      value={editForm.phone} 
+                      onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 font-medium">
+                      <Phone className="w-4 h-4 text-gray-400" /> {profile.phone_number}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-xl text-[#0B4F6C] flex items-center gap-2">
+                <MapPin className="w-5 h-5" /> Address Book
+              </CardTitle>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => {
+                  setAddressForm({ id: 0, addressLine: '' });
+                  setIsEditingAddress(false);
+                  setIsAddressDialogOpen(true);
+                }}
+                className="border-[#3FA9BC] text-[#3FA9BC] hover:bg-[#F0F9FA]"
+              >
+                <Plus className="w-4 h-4 mr-2" /> Add Address
+              </Button>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {profile.addresses.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                  No addresses found. Add one to get started.
+                </div>
+              ) : (
+                profile.addresses.map((addr) => (
+                  <div 
+                    key={addr.address_id} 
+                    className={`p-4 rounded-lg border transition-all ${
+                      addr.is_primary 
+                        ? 'bg-[#F0F9FA] border-[#3FA9BC] shadow-sm' 
+                        : 'bg-white border-gray-100 hover:border-gray-200'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-gray-900">{addr.address_line}</span>
+                          {addr.is_primary && (
+                            <Badge className="bg-[#3FA9BC] hover:bg-[#2A6570] text-[10px]">Primary</Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {!addr.is_primary && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            title="Set as Primary"
+                            onClick={() => handleSetPrimaryAddress(addr.address_id)}
+                            className="text-gray-400 hover:text-[#3FA9BC]"
+                          >
+                            <Star className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => {
+                            setAddressForm({ id: addr.address_id, addressLine: addr.address_line });
+                            setIsEditingAddress(true);
+                            setIsAddressDialogOpen(true);
+                          }}
+                          className="text-gray-400 hover:text-blue-600"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleDeleteAddress(addr.address_id)}
+                          className="text-gray-400 hover:text-red-600"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Right Column: Security */}
+        <div className="space-y-6">
+          <Card className="border-none shadow-md bg-white">
+            <CardHeader>
+              <CardTitle className="text-xl text-[#0B4F6C] flex items-center gap-2">
+                <Lock className="w-5 h-5" /> Security
+              </CardTitle>
+              <CardDescription>Manage your password and account security</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                <h3 className="font-medium text-gray-900 mb-1">Password</h3>
+                <p className="text-sm text-gray-500 mb-4">Last changed: Never</p>
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => setIsPasswordDialogOpen(true)}
+                >
+                  Change Password
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Address Dialog */}
+      <Dialog open={isAddressDialogOpen} onOpenChange={setIsAddressDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEditingAddress ? 'Edit Address' : 'Add New Address'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Address Line</Label>
+              <Textarea 
+                placeholder="Enter full address..." 
+                value={addressForm.addressLine}
+                onChange={(e) => setAddressForm({...addressForm, addressLine: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddressDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleAddressSubmit} className="bg-[#3FA9BC] hover:bg-[#2A6570]">Save Address</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Dialog */}
+      <Dialog open={isPasswordDialogOpen} onOpenChange={setIsPasswordDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Current Password</Label>
+              <Input 
+                type="password"
+                value={passwordForm.current}
+                onChange={(e) => setPasswordForm({...passwordForm, current: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>New Password</Label>
+              <Input 
+                type="password"
+                value={passwordForm.new}
+                onChange={(e) => setPasswordForm({...passwordForm, new: e.target.value})}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Confirm New Password</Label>
+              <Input 
+                type="password"
+                value={passwordForm.confirm}
+                onChange={(e) => setPasswordForm({...passwordForm, confirm: e.target.value})}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsPasswordDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleChangePassword} className="bg-[#3FA9BC] hover:bg-[#2A6570]">Update Password</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

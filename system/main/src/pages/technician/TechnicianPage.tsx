@@ -6,7 +6,7 @@ import { Badge } from "../../components/ui/badge";
 import { TechnicianSidebar } from "./components/TechnicianSidebar";
 import { TechnicianDashboardContent } from "./components/TechnicianDashboardContent";
 import { TechnicianAppointments } from "./components/TechnicianAppointments";
-import { TechnicianProfile } from "./components/TechnicianProfile";
+import ProfilePage from "../common/ProfilePage";
 import { TechnicianRatings } from "./components/TechnicianRatings";
 import AppointmentDetailsModal from "./components/AppointmentDetailsModal";
 import { MobileHeader } from "./components/MobileHeader";
@@ -388,16 +388,7 @@ export default function TechnicianPage() {
           />
         );
       case "profile":
-        return (
-          <TechnicianProfile
-            technicianProfile={technicianProfile}
-            setTechnicianProfile={setTechnicianProfile}
-            updateProfile={updateProfile}
-            technicianRatings={technicianRatings}
-            handleDeleteAccount={handleDeleteAccount}
-            renderStars={renderStars}
-          />
-        );
+        return <ProfilePage />;
       default:
         return null;
     }

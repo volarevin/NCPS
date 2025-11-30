@@ -28,7 +28,7 @@ export function CustomerSidebar({ currentPage, onNavigate }: CustomerSidebarProp
     { id: 'dashboard' as Page, label: 'Dashboard', icon: LayoutDashboard },
     { id: 'services' as Page, label: 'Services', icon: Wrench },
     { id: 'appointments' as Page, label: 'Appointments', icon: Calendar },
-    { id: 'profile' as Page, label: 'My Account', icon: User },
+    { id: 'profile' as Page, label: 'My Profile', icon: User },
   ];
 
   const handleLogout = () => {
