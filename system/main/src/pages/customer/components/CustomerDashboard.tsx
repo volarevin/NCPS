@@ -1,9 +1,9 @@
 import { 
-  Calendar, Clock, Wrench, CheckCircle2, AlertCircle, Plus
+  Calendar, Clock, Wrench, CheckCircle2, AlertCircle, Plus, Bell
 } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { NextAppointmentCard } from './NextAppointmentCard';
-import { AppointmentUpdateCard } from './AppointmentUpdateCard';
+import { NotificationCard } from './NotificationCard';
 import { useState, useEffect } from 'react';
 import { ViewAppointmentDialog } from './ViewAppointmentDialog';
 import { EditAppointmentDialog } from './EditAppointmentDialog';
@@ -21,7 +21,8 @@ export function CustomerDashboard() {
   const [dashboardStats, setDashboardStats] = useState<any>(null);
   const [nextAppointment, setNextAppointment] = useState<any>(null);
   const [todaysAppointment, setTodaysAppointment] = useState<any>(null);
-  const [recentUpdates, setRecentUpdates] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [allAppointments, setAllAppointments] = useState<any[]>([]);
   const [featuredServices, setFeaturedServices] = useState<any[]>([]);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [user, setUser] = useState<any>(null);
@@ -60,6 +61,7 @@ export function CustomerDashboard() {
         }
 
         const apptData = await apptRes.json();
+        setAllAppointments(apptData);
         
         const now = new Date();
         const todayStr = now.toDateString();
@@ -72,7 +74,7 @@ export function CustomerDashboard() {
 
         if (todayAppt) {
              setTodaysAppointment({
-                id: todayAppt.id,
+                id: todayAppt.appointment_id,
                 service: todayAppt.service_name,
                 date: 'Today',
                 time: new Date(todayAppt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
@@ -96,7 +98,7 @@ export function CustomerDashboard() {
 
         if (upcoming) {
           setNextAppointment({
-            id: upcoming.id,
+            id: upcoming.appointment_id,
             service: upcoming.service_name,
             date: new Date(upcoming.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
             time: new Date(upcoming.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
@@ -111,24 +113,12 @@ export function CustomerDashboard() {
             setNextAppointment(null);
         }
 
-        // Recent Updates
-        const sorted = [...apptData].sort((a: any, b: any) => new Date(b.appointment_date).getTime() - new Date(a.appointment_date).getTime());
-        const updates = sorted.slice(0, 3).map((a: any) => ({
-            id: a.id,
-            service: a.service_name,
-            date: new Date(a.appointment_date).toLocaleDateString(),
-            time: new Date(a.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            status: a.status.toLowerCase(),
-            message: `Status: ${a.status}`,
-            // Full object for dialog
-            description: a.customer_notes,
-            technician: a.tech_first_name ? `Tech ${a.tech_first_name} ${a.tech_last_name}` : 'Pending Assignment',
-            technicianPhone: '',
-            technicianEmail: '',
-            address: '123 Main St, Nasugbu, Batangas',
-            notes: a.customer_notes || 'No notes provided.',
-        }));
-        setRecentUpdates(updates);
+        // Fetch Notifications
+        const notifRes = await fetch('http://localhost:5000/api/customer/notifications', { headers });
+        if (notifRes.ok) {
+            const notifData = await notifRes.json();
+            setNotifications(notifData);
+        }
 
         // Fetch Featured Services
         const servicesRes = await fetch('http://localhost:5000/api/customer/featured-services', { headers });
@@ -190,6 +180,29 @@ export function CustomerDashboard() {
   };
 
 
+
+  const handleNotificationClick = (notification: any) => {
+    if (notification.related_appointment_id) {
+        const appt = allAppointments.find(a => a.appointment_id === notification.related_appointment_id);
+        if (appt) {
+            const formattedAppt = {
+                id: appt.appointment_id,
+                service: appt.service_name,
+                date: new Date(appt.appointment_date).toLocaleDateString(),
+                time: new Date(appt.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                status: appt.status.toLowerCase(),
+                technician: appt.tech_first_name ? `Tech ${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
+                technicianPhone: appt.tech_phone || '',
+                technicianEmail: appt.tech_email || '',
+                address: appt.service_address || 'No address provided',
+                notes: appt.customer_notes || 'No notes provided.',
+                description: appt.customer_notes,
+            };
+            setSelectedAppointment(formattedAppt);
+            setIsViewDialogOpen(true);
+        }
+    }
+  };
 
   return (
     <div className="p-3 md:p-8 animate-fade-in max-w-7xl mx-auto space-y-6">
@@ -270,27 +283,24 @@ export function CustomerDashboard() {
           onReschedule={() => setIsEditDialogOpen(true)}
         />
 
-        {/* Recent Updates */}
+        {/* Notifications */}
         <div className="bg-white rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-shadow duration-200 border border-gray-100">
           <div className="flex items-center gap-2 mb-3 md:mb-6">
-            <AlertCircle className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
-            <h2 className="text-[#0B4F6C] font-semibold text-sm md:text-lg">Recent Updates</h2>
+            <Bell className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
+            <h2 className="text-[#0B4F6C] font-semibold text-sm md:text-lg">Notifications</h2>
           </div>
-          <div className="space-y-3 md:space-y-4">
-            {recentUpdates.length > 0 ? (
-              recentUpdates.map((update) => (
-                <AppointmentUpdateCard 
-                    key={update.id} 
-                    update={update} 
-                    onClick={() => {
-                        setSelectedAppointment(update);
-                        setIsViewDialogOpen(true);
-                    }}
+          <div className="space-y-3 md:space-y-4 max-h-[400px] overflow-y-auto pr-2">
+            {notifications.length > 0 ? (
+              notifications.map((notif) => (
+                <NotificationCard 
+                    key={notif.notification_id} 
+                    notification={notif} 
+                    onClick={() => handleNotificationClick(notif)}
                 />
               ))
             ) : (
               <p className="text-center text-gray-500 text-sm md:text-base py-4">
-                No recent updates available.
+                No new notifications.
               </p>
             )}
           </div>

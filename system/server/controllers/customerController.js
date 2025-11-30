@@ -1,6 +1,27 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
 
+exports.getNotifications = (req, res) => {
+  const userId = req.userId;
+  const query = `
+    SELECT n.*, s.name as service_name, a.appointment_date
+    FROM notifications n
+    LEFT JOIN appointments a ON n.related_appointment_id = a.appointment_id
+    LEFT JOIN services s ON a.service_id = s.service_id
+    WHERE n.user_id = ? 
+    ORDER BY n.created_at DESC 
+    LIMIT 10
+  `;
+  
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error fetching notifications.' });
+    }
+    res.json(results);
+  });
+};
+
 exports.getDashboardStats = (req, res) => {
   const userId = req.userId;
   const query = 'CALL sp_get_customer_stats(?)';
