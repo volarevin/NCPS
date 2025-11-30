@@ -86,7 +86,7 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
         <div className="flex flex-col h-full justify-between">
             <div className={`font-medium text-sm flex justify-between items-start ${isToday ? 'text-[#0B4F6C] dark:text-primary' : 'text-gray-700 dark:text-foreground'}`}>
                 <span className={`
-                    ${isToday ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
+                    ${isToday ? "bg-[#0B4F6C] dark:bg-sky-600 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
                 `}>
                     {day}
                 </span>
@@ -126,9 +126,9 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
 
   return (
     <div className="space-y-4 animate-fade-in">
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
-        <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <CalendarIcon className="w-5 h-5 text-[#0B4F6C]" />
+      <div className="flex items-center justify-between bg-white dark:bg-card p-4 rounded-xl shadow-sm border border-gray-100 dark:border-border">
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
             {monthNames[month]} {year}
         </h2>
         <div className="flex gap-2">
@@ -141,10 +141,10 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/50">
+      <div className="bg-white dark:bg-card rounded-xl shadow-sm border border-gray-100 dark:border-border overflow-hidden">
+        <div className="grid grid-cols-7 border-b border-gray-100 dark:border-border bg-gray-50/50 dark:bg-muted/50">
             {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <div key={day} className="py-3 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div key={day} className="py-3 text-center text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wider">
                     {day}
                 </div>
             ))}
@@ -166,24 +166,24 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
                     getAppointmentsForDate(selectedDate).map((apt) => (
                         <div 
                             key={apt.id} 
-                            className="p-3 rounded-lg border border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                            className="p-3 rounded-lg border border-gray-100 dark:border-border hover:bg-gray-50 dark:hover:bg-muted/50 cursor-pointer transition-colors"
                             onClick={() => {
                                 onAppointmentClick(apt);
                                 setIsDialogOpen(false);
                             }}
                         >
                             <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-medium text-gray-900">{apt.clientName}</h4>
+                                <h4 className="font-medium text-gray-900 dark:text-foreground">{apt.clientName}</h4>
                                 <Badge variant="secondary" className={`
-                                    ${apt.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                      apt.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                                      apt.status === 'cancelled' ? 'bg-red-100 text-red-700' :
-                                      'bg-orange-100 text-orange-700'}
+                                    ${apt.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                      apt.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                      apt.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                      'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'}
                                 `}>
                                     {apt.status}
                                 </Badge>
                             </div>
-                            <div className="space-y-1 text-sm text-gray-500">
+                            <div className="space-y-1 text-sm text-gray-500 dark:text-muted-foreground">
                                 <div className="flex items-center gap-2">
                                     <Clock className="w-3.5 h-3.5" />
                                     {apt.time}
@@ -200,7 +200,7 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
                         </div>
                     ))
                 ) : (
-                    <p className="text-center text-gray-500 py-8">No appointments scheduled for this day.</p>
+                    <p className="text-center text-gray-500 dark:text-muted-foreground py-8">No appointments scheduled for this day.</p>
                 )}
             </div>
         </DialogContent>

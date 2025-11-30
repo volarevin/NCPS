@@ -127,15 +127,15 @@ export function CategorySettingsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] bg-white dark:bg-card dark:text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-[#0B4F6C]">
+          <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
             Category Settings
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="grid grid-cols-12 gap-4 font-medium text-sm text-gray-500 border-b pb-2">
+          <div className="grid grid-cols-12 gap-4 font-medium text-sm text-gray-500 dark:text-muted-foreground border-b dark:border-border pb-2">
             <div className="col-span-4">Category Name</div>
             <div className="col-span-3">Color</div>
             <div className="col-span-3">Icon</div>
@@ -144,7 +144,7 @@ export function CategorySettingsDialog({
 
           {categories.map((cat) => (
             <div key={cat.category_id} className="grid grid-cols-12 gap-4 items-center">
-              <div className="col-span-4 font-medium text-gray-800">
+              <div className="col-span-4 font-medium text-gray-800 dark:text-foreground">
                 {cat.name}
               </div>
 
@@ -156,9 +156,9 @@ export function CategorySettingsDialog({
                             type="color" 
                             value={editColor} 
                             onChange={(e) => setEditColor(e.target.value)}
-                            className="w-8 h-8 rounded cursor-pointer border-0 p-0"
+                            className="w-8 h-8 rounded cursor-pointer border-0 p-0 bg-transparent"
                         />
-                        <span className="text-xs text-gray-500">{editColor}</span>
+                        <span className="text-xs text-gray-500 dark:text-muted-foreground">{editColor}</span>
                     </div>
                   </div>
                   <div className="col-span-3">
@@ -166,10 +166,10 @@ export function CategorySettingsDialog({
                         value={editIcon} 
                         onValueChange={setEditIcon}
                     >
-                        <SelectTrigger className="h-8">
+                        <SelectTrigger className="h-8 bg-white dark:bg-background dark:text-foreground dark:border-input">
                             <SelectValue placeholder="Select icon" />
                         </SelectTrigger>
-                        <SelectContent className="max-h-[200px]">
+                        <SelectContent className="max-h-[200px] bg-white dark:bg-popover dark:text-popover-foreground">
                             {Object.keys(iconMap).sort().map((iconName) => {
                                 const Icon = iconMap[iconName] || Box;
                                 return (
@@ -185,10 +185,10 @@ export function CategorySettingsDialog({
                     </Select>
                   </div>
                   <div className="col-span-2 flex justify-end gap-2">
-                    <button onClick={() => handleSave(cat.category_id)} className="text-green-600 hover:bg-green-50 p-1 rounded">
+                    <button onClick={() => handleSave(cat.category_id)} className="text-green-600 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20 p-1 rounded">
                         <Save className="w-4 h-4" />
                     </button>
-                    <button onClick={handleCancel} className="text-gray-500 hover:bg-gray-100 p-1 rounded">
+                    <button onClick={handleCancel} className="text-gray-500 hover:bg-gray-100 dark:text-muted-foreground dark:hover:bg-muted/50 p-1 rounded">
                         <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -200,19 +200,19 @@ export function CategorySettingsDialog({
                         className="w-6 h-6 rounded-full border border-gray-200 shadow-sm" 
                         style={{ backgroundColor: cat.color }}
                     />
-                    <span className="text-xs text-gray-500">{cat.color}</span>
+                    <span className="text-xs text-gray-500 dark:text-muted-foreground">{cat.color}</span>
                   </div>
                   <div className="col-span-3 flex items-center gap-2">
                     {(() => {
                         const Icon = iconMap[cat.icon] || Box;
-                        return <Icon className="w-5 h-5 text-gray-600" />;
+                        return <Icon className="w-5 h-5 text-gray-600 dark:text-muted-foreground" />;
                     })()}
-                    <span className="text-sm text-gray-600">{cat.icon}</span>
+                    <span className="text-sm text-gray-600 dark:text-muted-foreground">{cat.icon}</span>
                   </div>
                   <div className="col-span-2 text-right">
                     <button 
                         onClick={() => handleEdit(cat)}
-                        className="text-blue-600 hover:bg-blue-50 p-1 rounded transition-colors"
+                        className="text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20 p-1 rounded transition-colors"
                     >
                         <Edit className="w-4 h-4" />
                     </button>

@@ -210,38 +210,38 @@ export function CustomerProfile() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-6">
         {/* Profile Information */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
-          <h2 className="text-[#1A5560] mb-4 md:mb-6 text-base md:text-xl">Profile Information</h2>
+        <div className="lg:col-span-2 bg-white dark:bg-card rounded-xl shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
+          <h2 className="text-[#1A5560] dark:text-primary mb-4 md:mb-6 text-base md:text-xl">Profile Information</h2>
           
           <div className="space-y-3 md:space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               <div className="space-y-1.5 md:space-y-2">
-                <Label htmlFor="firstName" className="text-[#1A5560] text-xs md:text-sm">
+                <Label htmlFor="firstName" className="text-[#1A5560] dark:text-foreground text-xs md:text-sm">
                   First Name
                 </Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     disabled={!isEditing}
-                    className="pl-9 border-[#1A5560]/20 focus:border-[#3FA9BC] h-9 text-sm"
+                    className="pl-9 border-[#1A5560]/20 dark:border-input focus:border-[#3FA9BC] dark:focus:border-primary h-9 text-sm dark:bg-background"
                   />
                 </div>
               </div>
               <div className="space-y-1.5 md:space-y-2">
-                <Label htmlFor="lastName" className="text-[#1A5560] text-xs md:text-sm">
+                <Label htmlFor="lastName" className="text-[#1A5560] dark:text-foreground text-xs md:text-sm">
                   Last Name
                 </Label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     disabled={!isEditing}
-                    className="pl-9 border-[#1A5560]/20 focus:border-[#3FA9BC] h-9 text-sm"
+                    className="pl-9 border-[#1A5560]/20 dark:border-input focus:border-[#3FA9BC] dark:focus:border-primary h-9 text-sm dark:bg-background"
                   />
                 </div>
               </div>
@@ -249,50 +249,50 @@ export function CustomerProfile() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
               <div className="space-y-1.5 md:space-y-2">
-                <Label htmlFor="email" className="text-[#1A5560] text-xs md:text-sm">
+                <Label htmlFor="email" className="text-[#1A5560] dark:text-foreground text-xs md:text-sm">
                   Email Address
                 </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     disabled={!isEditing}
-                    className="pl-9 border-[#1A5560]/20 focus:border-[#3FA9BC] h-9 text-sm"
+                    className="pl-9 border-[#1A5560]/20 dark:border-input focus:border-[#3FA9BC] dark:focus:border-primary h-9 text-sm dark:bg-background"
                   />
                 </div>
               </div>
               <div className="space-y-1.5 md:space-y-2">
-                <Label htmlFor="phone" className="text-[#1A5560] text-xs md:text-sm">
+                <Label htmlFor="phone" className="text-[#1A5560] dark:text-foreground text-xs md:text-sm">
                   Phone Number
                 </Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                   <Input
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     disabled={!isEditing}
-                    className="pl-9 border-[#1A5560]/20 focus:border-[#3FA9BC] h-9 text-sm"
+                    className="pl-9 border-[#1A5560]/20 dark:border-input focus:border-[#3FA9BC] dark:focus:border-primary h-9 text-sm dark:bg-background"
                   />
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5 md:space-y-2">
-              <Label htmlFor="address" className="text-[#1A5560] text-xs md:text-sm">
+              <Label htmlFor="address" className="text-[#1A5560] dark:text-foreground text-xs md:text-sm">
                 Address
               </Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                 <Textarea
                   id="address"
                   value={formData.address}
                   onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   disabled={!isEditing}
-                  className="pl-9 border-[#1A5560]/20 focus:border-[#3FA9BC] min-h-[80px] text-sm"
+                  className="pl-9 border-[#1A5560]/20 dark:border-input focus:border-[#3FA9BC] dark:focus:border-primary min-h-[80px] text-sm dark:bg-background"
                 />
               </div>
             </div>
@@ -302,24 +302,24 @@ export function CustomerProfile() {
         {/* Account Settings */}
         <div className="space-y-3 md:space-y-6">
           {/* Security */}
-          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
-            <h2 className="text-[#1A5560] mb-4 text-base md:text-xl">Security</h2>
+          <div className="bg-white dark:bg-card rounded-xl shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow duration-200">
+            <h2 className="text-[#1A5560] dark:text-primary mb-4 text-base md:text-xl">Security</h2>
             <div className="space-y-3 md:space-y-4">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-muted/50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Lock className="w-4 h-4 text-blue-600" />
+                  <div className="bg-blue-100 dark:bg-blue-900/20 p-2 rounded-full">
+                    <Lock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <p className="text-[#1A5560] font-medium text-sm">Password</p>
-                    <p className="text-xs text-[#1A5560]/60">Last changed 3 months ago</p>
+                    <p className="text-[#1A5560] dark:text-foreground font-medium text-sm">Password</p>
+                    <p className="text-xs text-[#1A5560]/60 dark:text-muted-foreground">Last changed 3 months ago</p>
                   </div>
                 </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowPasswordDialog(true)}
-                  className="text-[#3FA9BC] border-[#3FA9BC] hover:bg-[#3FA9BC]/10 h-8 text-xs"
+                  className="text-[#3FA9BC] dark:text-primary border-[#3FA9BC] dark:border-primary hover:bg-[#3FA9BC]/10 dark:hover:bg-primary/10 h-8 text-xs"
                 >
                   Change
                 </Button>
@@ -328,9 +328,9 @@ export function CustomerProfile() {
           </div>
 
           {/* Danger Zone */}
-          <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow duration-200 border border-red-100">
-            <h2 className="text-red-600 mb-4 text-base md:text-xl">Danger Zone</h2>
-            <p className="text-xs md:text-sm text-gray-600 mb-4">
+          <div className="bg-white dark:bg-card rounded-xl shadow-sm p-4 md:p-6 hover:shadow-md transition-shadow duration-200 border border-red-100 dark:border-red-900/20">
+            <h2 className="text-red-600 dark:text-red-400 mb-4 text-base md:text-xl">Danger Zone</h2>
+            <p className="text-xs md:text-sm text-gray-600 dark:text-muted-foreground mb-4">
               Once you delete your account, there is no going back. Please be certain.
             </p>
             <Button

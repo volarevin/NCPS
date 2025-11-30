@@ -198,22 +198,22 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-5xl w-full sm:max-w-5xl h-[85vh] p-0 flex flex-col overflow-hidden">
-        <div className="p-6 border-b">
+      <DialogContent className="max-w-5xl w-full sm:max-w-5xl h-[85vh] p-0 flex flex-col overflow-hidden bg-white dark:bg-card dark:text-foreground">
+        <div className="p-6 border-b dark:border-border">
           <DialogHeader>
-            <DialogTitle className="text-2xl">Book Walk-in / Phone Appointment</DialogTitle>
+            <DialogTitle className="text-2xl dark:text-foreground">Book Walk-in / Phone Appointment</DialogTitle>
           </DialogHeader>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left Column: Customer Selection - Takes more space */}
-            <div className="lg:col-span-7 space-y-6 lg:border-r lg:pr-12">
+            <div className="lg:col-span-7 space-y-6 lg:border-r lg:pr-12 dark:border-border">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-                <TabsTrigger value="existing" className="py-2 whitespace-nowrap">Existing User</TabsTrigger>
-                <TabsTrigger value="new" className="py-2 whitespace-nowrap">Create New User</TabsTrigger>
-                <TabsTrigger value="guest" className="py-2 whitespace-nowrap">Guest Walk-in</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 h-auto p-1 bg-muted dark:bg-muted/50">
+                <TabsTrigger value="existing" className="py-2 whitespace-nowrap data-[state=active]:bg-background dark:data-[state=active]:bg-card dark:text-foreground">Existing User</TabsTrigger>
+                <TabsTrigger value="new" className="py-2 whitespace-nowrap data-[state=active]:bg-background dark:data-[state=active]:bg-card dark:text-foreground">Create New User</TabsTrigger>
+                <TabsTrigger value="guest" className="py-2 whitespace-nowrap data-[state=active]:bg-background dark:data-[state=active]:bg-card dark:text-foreground">Guest Walk-in</TabsTrigger>
               </TabsList>
 
               <TabsContent value="existing" className="space-y-4 mt-4">
@@ -221,16 +221,16 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
                   <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search by name, email, or phone..."
-                    className="pl-8"
+                    className="pl-8 bg-white dark:bg-background dark:border-input dark:text-foreground"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   {searchResults.length > 0 && (
-                    <div className="border rounded-md shadow-sm mt-2 max-h-[400px] overflow-y-auto divide-y">
+                    <div className="border dark:border-border rounded-md shadow-sm mt-2 max-h-[400px] overflow-y-auto divide-y dark:divide-border bg-white dark:bg-popover">
                       {searchResults.map(user => (
                         <div 
                           key={user.user_id} 
-                          className="p-3 hover:bg-gray-50 cursor-pointer flex items-center gap-4 transition-colors"
+                          className="p-3 hover:bg-gray-50 dark:hover:bg-muted/50 cursor-pointer flex items-center gap-4 transition-colors"
                           onClick={() => handleUserSelect(user)}
                         >
                           <Avatar className="h-10 w-10">
@@ -238,8 +238,8 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
                             <AvatarFallback>{user.first_name[0]}</AvatarFallback>
                           </Avatar>
                           <div>
-                            <p className="font-medium text-gray-900">{user.first_name} {user.last_name}</p>
-                            <p className="text-sm text-gray-500">{user.email} • {user.phone_number}</p>
+                            <p className="font-medium text-gray-900 dark:text-foreground">{user.first_name} {user.last_name}</p>
+                            <p className="text-sm text-gray-500 dark:text-muted-foreground">{user.email} • {user.phone_number}</p>
                           </div>
                         </div>
                       ))}
@@ -248,16 +248,16 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
                 </div>
 
                 {selectedUser && (
-                  <div className="bg-blue-50 p-4 rounded-md border border-blue-100 flex items-start gap-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-md border border-blue-100 dark:border-blue-900/50 flex items-start gap-4">
                     <Avatar className="h-12 w-12">
                       <AvatarImage src={getProfilePictureUrl(selectedUser.profile_picture)} />
                       <AvatarFallback>{selectedUser.first_name[0]}</AvatarFallback>
                     </Avatar>
                     <div>
-                      <h3 className="font-semibold text-blue-900">{selectedUser.first_name} {selectedUser.last_name}</h3>
-                      <p className="text-sm text-blue-700">{selectedUser.email}</p>
-                      <p className="text-sm text-blue-700">{selectedUser.phone_number}</p>
-                      <Button variant="link" className="p-0 h-auto text-xs text-blue-600" onClick={() => setSelectedUser(null)}>
+                      <h3 className="font-semibold text-blue-900 dark:text-blue-100">{selectedUser.first_name} {selectedUser.last_name}</h3>
+                      <p className="text-sm text-blue-700 dark:text-blue-200">{selectedUser.email}</p>
+                      <p className="text-sm text-blue-700 dark:text-blue-200">{selectedUser.phone_number}</p>
+                      <Button variant="link" className="p-0 h-auto text-xs text-blue-600 dark:text-blue-400" onClick={() => setSelectedUser(null)}>
                         Change Customer
                       </Button>
                     </div>
@@ -268,42 +268,42 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
               <TabsContent value="new" className="space-y-3 mt-4">
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1">
-                    <Label>First Name</Label>
-                    <Input value={newUser.firstName} onChange={e => setNewUser({...newUser, firstName: e.target.value})} />
+                    <Label className="dark:text-foreground">First Name</Label>
+                    <Input value={newUser.firstName} onChange={e => setNewUser({...newUser, firstName: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                   </div>
                   <div className="space-y-1">
-                    <Label>Last Name</Label>
-                    <Input value={newUser.lastName} onChange={e => setNewUser({...newUser, lastName: e.target.value})} />
+                    <Label className="dark:text-foreground">Last Name</Label>
+                    <Input value={newUser.lastName} onChange={e => setNewUser({...newUser, lastName: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                   </div>
                 </div>
                 <div className="space-y-1">
-                  <Label>Email</Label>
-                  <Input type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} />
+                  <Label className="dark:text-foreground">Email</Label>
+                  <Input type="email" value={newUser.email} onChange={e => setNewUser({...newUser, email: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                 </div>
                 <div className="space-y-1">
-                  <Label>Phone</Label>
-                  <Input value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} />
+                  <Label className="dark:text-foreground">Phone</Label>
+                  <Input value={newUser.phone} onChange={e => setNewUser({...newUser, phone: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                 </div>
                 <div className="space-y-1">
-                  <Label>Address (Optional)</Label>
-                  <Textarea value={newUser.address} onChange={e => setNewUser({...newUser, address: e.target.value})} />
+                  <Label className="dark:text-foreground">Address (Optional)</Label>
+                  <Textarea value={newUser.address} onChange={e => setNewUser({...newUser, address: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                 </div>
               </TabsContent>
 
               <TabsContent value="guest" className="space-y-3 mt-4">
                 <div className="space-y-1">
-                  <Label>Full Name</Label>
-                  <Input value={guest.name} onChange={e => setGuest({...guest, name: e.target.value})} />
+                  <Label className="dark:text-foreground">Full Name</Label>
+                  <Input value={guest.name} onChange={e => setGuest({...guest, name: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                 </div>
                 <div className="space-y-1">
-                  <Label>Phone</Label>
-                  <Input value={guest.phone} onChange={e => setGuest({...guest, phone: e.target.value})} />
+                  <Label className="dark:text-foreground">Phone</Label>
+                  <Input value={guest.phone} onChange={e => setGuest({...guest, phone: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                 </div>
                 <div className="space-y-1">
-                  <Label>Email (Optional)</Label>
-                  <Input type="email" value={guest.email} onChange={e => setGuest({...guest, email: e.target.value})} />
+                  <Label className="dark:text-foreground">Email (Optional)</Label>
+                  <Input type="email" value={guest.email} onChange={e => setGuest({...guest, email: e.target.value})} className="bg-white dark:bg-background dark:border-input dark:text-foreground" />
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
+                <p className="text-xs text-gray-500 dark:text-muted-foreground mt-2">
                   Guest appointments are not linked to a user account.
                 </p>
               </TabsContent>
@@ -312,18 +312,18 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
 
             {/* Right Column: Appointment Details */}
             <div className="lg:col-span-5 space-y-6 pl-2">
-              <h3 className="font-semibold flex items-center gap-2 text-lg">
+              <h3 className="font-semibold flex items-center gap-2 text-lg dark:text-foreground">
                 <Calendar className="h-5 w-5" /> Appointment Details
               </h3>
               
-              <div className="space-y-4 bg-gray-50 p-6 rounded-lg border">
+              <div className="space-y-4 bg-gray-50 dark:bg-muted/20 p-6 rounded-lg border dark:border-border">
                 <div className="space-y-2">
-                  <Label>Service</Label>
+                  <Label className="dark:text-foreground">Service</Label>
                   <Select value={appointment.service_id} onValueChange={v => setAppointment({...appointment, service_id: v})}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
                       <SelectValue placeholder="Select a service" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
                       {services.map(s => (
                         <SelectItem key={s.service_id} value={s.service_id.toString()}>
                           {s.name} - ₱{s.estimated_price}
@@ -335,35 +335,35 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Date</Label>
-                    <Input type="date" className="bg-white" value={appointment.date} onChange={e => setAppointment({...appointment, date: e.target.value})} />
+                    <Label className="dark:text-foreground">Date</Label>
+                    <Input type="date" className="bg-white dark:bg-background dark:border-input dark:text-foreground" value={appointment.date} onChange={e => setAppointment({...appointment, date: e.target.value})} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Time</Label>
-                    <Input type="time" className="bg-white" value={appointment.time} onChange={e => setAppointment({...appointment, time: e.target.value})} />
+                    <Label className="dark:text-foreground">Time</Label>
+                    <Input type="time" className="bg-white dark:bg-background dark:border-input dark:text-foreground" value={appointment.time} onChange={e => setAppointment({...appointment, time: e.target.value})} />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Service Address</Label>
+                  <Label className="dark:text-foreground">Service Address</Label>
                   <div className="flex gap-2">
-                    <MapPin className="h-4 w-4 mt-3 text-gray-500" />
+                    <MapPin className="h-4 w-4 mt-3 text-gray-500 dark:text-muted-foreground" />
                     <Textarea 
                       value={appointment.address} 
                       onChange={e => setAppointment({...appointment, address: e.target.value})} 
                       placeholder="Enter service address..."
-                      className="flex-1 bg-white"
+                      className="flex-1 bg-white dark:bg-background dark:border-input dark:text-foreground"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Notes (Optional)</Label>
+                  <Label className="dark:text-foreground">Notes (Optional)</Label>
                   <Textarea 
                     value={appointment.notes} 
                     onChange={e => setAppointment({...appointment, notes: e.target.value})} 
                     placeholder="Special instructions..."
-                    className="bg-white"
+                    className="bg-white dark:bg-background dark:border-input dark:text-foreground"
                   />
                 </div>
               </div>
@@ -371,9 +371,9 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
           </div>
         </div>
 
-        <div className="p-8 border-t bg-gray-50 mt-auto">
+        <div className="p-8 border-t dark:border-border bg-gray-50 dark:bg-muted/20 mt-auto">
           <DialogFooter>
-            <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-background dark:text-foreground dark:border-input dark:hover:bg-muted">Cancel</Button>
             <Button onClick={handleSubmit} disabled={!isFormValid()}>Book Appointment</Button>
           </DialogFooter>
         </div>

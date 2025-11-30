@@ -223,7 +223,7 @@ export function Services() {
                 </button>
                 <button
                     onClick={handleAddService}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0B4F6C] dark:bg-primary text-white hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0B4F6C] dark:bg-sky-600 text-white hover:bg-[#093e54] dark:hover:bg-sky-700 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     <span>Add Service</span>
@@ -273,8 +273,8 @@ export function Services() {
                 onClick={() => setSelectedCategory("All")}
                 className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg transition-all text-xs md:text-sm shadow-sm ${
                   selectedCategory === "All"
-                    ? "bg-[#0B4F6C] dark:bg-primary text-white shadow-md scale-105"
-                    : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
+                    ? "bg-[#0B4F6C] dark:bg-sky-600 text-white shadow-md scale-105"
+                    : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
                 }`}
             >
                 <Menu className="w-4 h-4" />
@@ -286,8 +286,8 @@ export function Services() {
                 onClick={() => setSelectedCategory(category.name)}
                 className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg transition-all text-xs md:text-sm shadow-sm ${
                   selectedCategory === category.name
-                    ? "bg-[#0B4F6C] dark:bg-primary text-white shadow-md scale-105"
-                    : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
+                    ? "bg-[#0B4F6C] dark:bg-sky-600 text-white shadow-md scale-105"
+                    : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
                 }`}
               >
                 <span className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">

@@ -75,19 +75,19 @@ export function StatusChangeDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] bg-white dark:bg-card dark:text-foreground">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
-          {description && <p className="text-sm text-gray-500">{description}</p>}
+          <DialogTitle className="dark:text-foreground">{title}</DialogTitle>
+          {description && <p className="text-sm text-gray-500 dark:text-muted-foreground">{description}</p>}
         </DialogHeader>
         <div className="py-4 space-y-4">
           <div className="space-y-2">
-            <Label>Reason Category <span className="text-red-500">*</span></Label>
+            <Label className="dark:text-foreground">Reason Category <span className="text-red-500">*</span></Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
+              <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
                 {categories.map((cat) => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
@@ -96,7 +96,7 @@ export function StatusChangeDialog({
           </div>
           
           <div className="space-y-2">
-            <Label>
+            <Label className="dark:text-foreground">
               Additional Details 
               {category === "Other" ? <span className="text-red-500">*</span> : <span className="text-gray-400 text-xs ml-1">(Optional)</span>}
             </Label>

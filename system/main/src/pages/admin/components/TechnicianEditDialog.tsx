@@ -68,7 +68,7 @@ export function TechnicianEditDialog({
                 id="first_name"
                 value={formData.first_name}
                 onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                className="dark:bg-muted/50 dark:border-border"
+                className="dark:bg-background dark:border-input dark:text-foreground"
               />
             </div>
             <div className="space-y-2">
@@ -77,7 +77,7 @@ export function TechnicianEditDialog({
                 id="last_name"
                 value={formData.last_name}
                 onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                className="dark:bg-muted/50 dark:border-border"
+                className="dark:bg-background dark:border-input dark:text-foreground"
               />
             </div>
           </div>
@@ -88,7 +88,7 @@ export function TechnicianEditDialog({
               id="phone"
               value={formData.phone_number}
               onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-              className="dark:bg-muted/50 dark:border-border"
+              className="dark:bg-background dark:border-input dark:text-foreground"
             />
           </div>
 
@@ -98,7 +98,7 @@ export function TechnicianEditDialog({
               id="address"
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className="dark:bg-muted/50 dark:border-border"
+              className="dark:bg-background dark:border-input dark:text-foreground"
             />
           </div>
 
@@ -108,10 +108,10 @@ export function TechnicianEditDialog({
               value={formData.specialty}
               onValueChange={(val) => setFormData({ ...formData, specialty: val })}
             >
-              <SelectTrigger className="dark:bg-muted/50 dark:border-border">
+              <SelectTrigger className="dark:bg-background dark:border-input dark:text-foreground">
                 <SelectValue placeholder="Select specialty" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-popover dark:text-popover-foreground dark:border-border">
                 {SPECIALTIES.map((specialty) => (
                   <SelectItem key={specialty.value} value={specialty.value}>
                     <div className="flex items-center gap-2">
@@ -145,7 +145,7 @@ export function TechnicianEditDialog({
             </Button>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-background dark:text-foreground dark:hover:bg-muted dark:border-input">
               Cancel
             </Button>
             <Button onClick={handleSave} className="bg-[#0B4F6C] hover:bg-[#093d54] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90">

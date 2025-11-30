@@ -170,33 +170,33 @@ export function AuditLogs() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Audit Logs</h2>
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-foreground">Audit Logs</h2>
           <p className="text-muted-foreground">Track system changes and user activities.</p>
         </div>
-        <Button onClick={handleExport} variant="outline" className="gap-2">
+        <Button onClick={handleExport} variant="outline" className="gap-2 dark:bg-card dark:text-foreground dark:border-border dark:hover:bg-muted">
           <Download className="h-4 w-4" />
           Export CSV
         </Button>
       </div>
 
-      <Card>
+      <Card className="dark:bg-card dark:border-border">
         <CardHeader className="pb-3">
           <div className="flex flex-col md:flex-row gap-4 justify-between">
             <div className="relative w-full md:w-96">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search logs..."
-                className="pl-8"
+                className="pl-8 dark:bg-background dark:border-input dark:text-foreground"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <div className="flex gap-2 flex-wrap">
               <Select value={actionFilter} onValueChange={setActionFilter}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[140px] dark:bg-background dark:border-input dark:text-foreground">
                   <SelectValue placeholder="Action" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="dark:bg-popover dark:text-popover-foreground">
                   <SelectItem value="all">All Actions</SelectItem>
                   <SelectItem value="CREATE">Create</SelectItem>
                   <SelectItem value="UPDATE">Update</SelectItem>

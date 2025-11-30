@@ -83,7 +83,7 @@ export function UserDetailsDialog({
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground rounded-lg hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-[#0B4F6C] dark:bg-sky-600 text-white rounded-lg hover:bg-[#093e54] dark:hover:bg-sky-700 transition-colors text-sm font-medium"
                 >
                   Edit Profile
                 </button>
@@ -193,7 +193,7 @@ export function UserDetailsDialog({
                             fullName: e.target.value,
                           })
                         }
-                        className="bg-background dark:bg-muted/50 dark:border-border"
+                        className="bg-background dark:bg-background dark:border-border"
                       />
                     </div>
                     <div className="space-y-2">
@@ -209,7 +209,7 @@ export function UserDetailsDialog({
                               email: e.target.value,
                             })
                           }
-                          className="pl-10 bg-background dark:bg-muted/50 dark:border-border"
+                          className="pl-10 bg-background dark:bg-background dark:border-border"
                         />
                       </div>
                     </div>
@@ -226,7 +226,7 @@ export function UserDetailsDialog({
                               phone: e.target.value,
                             })
                           }
-                          className="pl-10 bg-background dark:bg-muted/50 dark:border-border"
+                          className="pl-10 bg-background dark:bg-background dark:border-border"
                         />
                       </div>
                     </div>

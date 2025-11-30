@@ -35,8 +35,8 @@ export function ConfirmActionDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            <div className={`p-2 rounded-full ${variant === 'destructive' ? 'bg-red-100' : 'bg-blue-100'}`}>
-              <AlertTriangle className={`w-5 h-5 ${variant === 'destructive' ? 'text-red-600' : 'text-blue-600'}`} />
+            <div className={`p-2 rounded-full ${variant === 'destructive' ? 'bg-red-100 dark:bg-red-900/20' : 'bg-blue-100 dark:bg-blue-900/20'}`}>
+              <AlertTriangle className={`w-5 h-5 ${variant === 'destructive' ? 'text-red-600 dark:text-red-400' : 'text-blue-600 dark:text-blue-400'}`} />
             </div>
             <DialogTitle>{title}</DialogTitle>
           </div>

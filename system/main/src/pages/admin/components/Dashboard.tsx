@@ -238,7 +238,7 @@ export function Dashboard() {
                   name="Revenue"
                   stroke="#FFB366" 
                   strokeWidth={3}
-                  dot={{ r: 4, fill: "#FFB366", strokeWidth: 2, stroke: "#fff" }}
+                  dot={{ r: 4, fill: "#FFB366", strokeWidth: 2, stroke: "hsl(var(--card))" }}
                 />
               </ComposedChart>
             </ResponsiveContainer>

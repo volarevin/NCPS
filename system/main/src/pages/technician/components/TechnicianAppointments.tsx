@@ -153,7 +153,7 @@ export function TechnicianAppointments({
                 onClick={() => setStatusFilter(filter.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
                   statusFilter === filter.id
-                    ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground border-[#0B4F6C] dark:border-primary shadow-md"
+                    ? "bg-[#0B4F6C] dark:bg-sky-600 text-white border-[#0B4F6C] dark:border-sky-600 shadow-md"
                     : "bg-white dark:bg-card text-gray-700 dark:text-foreground border-gray-300 dark:border-input hover:border-[#0B4F6C] dark:hover:border-primary hover:text-[#0B4F6C] dark:hover:text-primary"
                 }`}
               >
@@ -270,12 +270,12 @@ export function TechnicianAppointments({
 
         {/* Quick Stats / Summary */}
         <div className="space-y-6">
-          <Card className="bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground border-none shadow-lg">
+          <Card className="bg-[#0B4F6C] dark:bg-sky-600 text-white border-none shadow-lg">
             <CardContent className="p-6">
               <h3 className="font-bold text-lg mb-4">Weekly Summary</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-white/80 dark:text-primary-foreground/80">Completed Jobs</span>
+                  <span className="text-white/80">Completed Jobs</span>
                   <span className="font-bold text-2xl">{completedCount}</span>
                 </div>
                 <Separator className="bg-white/20 dark:bg-primary-foreground/20" />

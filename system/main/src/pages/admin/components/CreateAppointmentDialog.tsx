@@ -116,21 +116,21 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white dark:bg-card dark:text-foreground">
         <DialogHeader>
           <DialogTitle>Create New Appointment</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="customer">Customer</Label>
+            <Label htmlFor="customer" className="dark:text-foreground">Customer</Label>
             <Select 
               value={formData.customer_id} 
               onValueChange={(val) => setFormData({...formData, customer_id: val})}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
                 <SelectValue placeholder="Select a customer" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
                 {users.map((user) => (
                   <SelectItem key={user.user_id} value={user.user_id.toString()}>
                     {user.first_name} {user.last_name} ({user.email})
@@ -141,15 +141,15 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="service">Service</Label>
+            <Label htmlFor="service" className="dark:text-foreground">Service</Label>
             <Select 
               value={formData.service_id} 
               onValueChange={(val) => setFormData({...formData, service_id: val})}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
                 <SelectValue placeholder="Select a service" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
                 {services.map((service) => (
                   <SelectItem key={service.service_id} value={service.service_id.toString()}>
                     {service.name}
@@ -160,44 +160,48 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Service Address</Label>
+            <Label htmlFor="address" className="dark:text-foreground">Service Address</Label>
             <Input 
               id="address" 
               placeholder="Enter service address"
               value={formData.address}
               onChange={(e) => setFormData({...formData, address: e.target.value})}
+              className="bg-white dark:bg-background dark:border-input dark:text-foreground"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="date">Date</Label>
+              <Label htmlFor="date" className="dark:text-foreground">Date</Label>
               <Input 
                 id="date" 
                 type="date" 
                 required
                 value={formData.appointment_date}
                 onChange={(e) => setFormData({...formData, appointment_date: e.target.value})}
+                className="bg-white dark:bg-background dark:border-input dark:text-foreground"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="time">Time</Label>
+              <Label htmlFor="time" className="dark:text-foreground">Time</Label>
               <Input 
                 id="time" 
                 type="time" 
                 required
                 value={formData.time}
                 onChange={(e) => setFormData({...formData, time: e.target.value})}
+                className="bg-white dark:bg-background dark:border-input dark:text-foreground"
               />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
+            <Label htmlFor="notes" className="dark:text-foreground">Notes</Label>
             <Textarea 
               id="notes" 
               placeholder="Additional notes..."
               value={formData.notes}
+              className="bg-white dark:bg-background dark:border-input dark:text-foreground"
               onChange={(e) => setFormData({...formData, notes: e.target.value})}
             />
           </div>

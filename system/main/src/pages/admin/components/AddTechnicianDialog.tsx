@@ -120,7 +120,7 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8 dark:bg-muted/50 dark:border-border"
+                className="pl-8 dark:bg-background dark:border-border"
               />
             </div>
             <ScrollArea className="h-[400px] border dark:border-border rounded-md p-2">
@@ -163,10 +163,10 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
           <div className="space-y-2">
             <Label className="dark:text-foreground">Assign Specialty</Label>
             <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-              <SelectTrigger className="dark:bg-muted/50 dark:border-border">
+              <SelectTrigger className="dark:bg-background dark:border-border">
                 <SelectValue placeholder="Select specialty" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="dark:bg-popover dark:text-popover-foreground dark:border-border">
                 {SPECIALTIES.map((spec) => (
                   <SelectItem key={spec.value} value={spec.value}>
                     <div className="flex items-center gap-2">
@@ -181,7 +181,7 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-background dark:text-foreground dark:hover:bg-muted dark:border-input">Cancel</Button>
           <Button 
             onClick={handlePromote} 
             disabled={!selectedUser || !selectedSpecialty || loading}

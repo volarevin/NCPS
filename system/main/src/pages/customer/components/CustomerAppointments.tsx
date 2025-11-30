@@ -195,7 +195,7 @@ export function CustomerAppointments() {
                   onClick={() => setActiveTab(tab.id as AppointmentStatus)}
                   className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'bg-[#1A5560] dark:bg-primary text-white shadow-md'
+                      ? 'bg-[#1A5560] dark:bg-sky-600 text-white shadow-md'
                       : 'bg-gray-50 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted/80 border border-transparent hover:border-gray-200 dark:hover:border-border'
                   }`}
                 >

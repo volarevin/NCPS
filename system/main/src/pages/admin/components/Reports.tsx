@@ -194,7 +194,7 @@ export function Reports() {
             </div>
             <button 
                 onClick={handleExport}
-                className="bg-[#0B4F6C] dark:bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors"
+                className="bg-[#0B4F6C] dark:bg-sky-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] dark:hover:bg-sky-700 transition-colors"
             >
               Export Report
             </button>
@@ -536,7 +536,7 @@ function StatCard({ icon, label, value, color }: StatCardProps) {
         </div>
         <div>
           <p className="text-gray-600 dark:text-muted-foreground text-sm">{label}</p>
-          <p className="text-2xl text-gray-800 dark:text-foreground">{value}</p>
+          <p className="text-2xl text-gray-800 dark:text-foreground font-bold">{value}</p>
         </div>
       </div>
     </div>

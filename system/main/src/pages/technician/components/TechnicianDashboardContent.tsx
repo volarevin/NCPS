@@ -76,7 +76,7 @@ export function TechnicianDashboardContent({
                 >
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#E8F5F4] dark:bg-primary/10 p-3 rounded-full text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] dark:group-hover:bg-primary group-hover:text-white transition-colors">
+                      <div className="bg-[#E8F5F4] dark:bg-primary/10 p-3 rounded-full text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] dark:group-hover:bg-sky-600 group-hover:text-white transition-colors">
                         <Clock className="w-5 h-5" />
                       </div>
                       <div>
@@ -117,7 +117,7 @@ export function TechnicianDashboardContent({
                   >
                     <CardContent className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <div className="bg-muted p-3 rounded-full text-muted-foreground group-hover:bg-[#0B4F6C] group-hover:text-white transition-colors">
+                        <div className="bg-muted p-3 rounded-full text-muted-foreground group-hover:bg-[#0B4F6C] dark:group-hover:bg-sky-600 group-hover:text-white transition-colors">
                           <Calendar className="w-5 h-5" />
                         </div>
                         <div>
@@ -150,9 +150,9 @@ export function TechnicianDashboardContent({
                           <div className={`w-2 h-2 rounded-full bg-${notification.color}-500 ${notification.type === 'assignment' ? 'animate-pulse' : ''}`}></div>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{notification.title}</p>
-                          <p className="text-xs text-gray-500 mt-1">{notification.message}</p>
-                          <p className="text-xs text-gray-400 mt-2">
+                          <p className="text-sm font-medium text-gray-900 dark:text-foreground">{notification.title}</p>
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">{notification.message}</p>
+                          <p className="text-xs text-gray-400 dark:text-muted-foreground mt-2">
                             {new Date(notification.time).toLocaleString()}
                           </p>
                         </div>
@@ -160,7 +160,7 @@ export function TechnicianDashboardContent({
                     </div>
                   ))
                 ) : (
-                  <div className="p-8 text-center text-gray-500">
+                  <div className="p-8 text-center text-gray-500 dark:text-muted-foreground">
                     <p>No new notifications.</p>
                   </div>
                 )}

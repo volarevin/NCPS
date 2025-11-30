@@ -315,14 +315,14 @@ export function Technicians() {
             placeholder="Search technicians..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-background border-border focus:border-[#0B4F6C] dark:focus:border-primary focus:ring-[#0B4F6C] dark:focus:ring-primary dark:bg-muted/50"
+            className="pl-10 bg-background border-border focus:border-[#0B4F6C] dark:focus:border-primary focus:ring-[#0B4F6C] dark:focus:ring-primary dark:bg-background"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] bg-background border-border dark:bg-muted/50">
+          <SelectTrigger className="w-[180px] bg-background border-border dark:bg-background">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-popover dark:text-popover-foreground dark:border-border">
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="available">Available</SelectItem>
             <SelectItem value="busy">Busy</SelectItem>
@@ -330,11 +330,11 @@ export function Technicians() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px] bg-background border-border dark:bg-muted/50">
+          <SelectTrigger className="w-[180px] bg-background border-border dark:bg-background">
             <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="dark:bg-popover dark:text-popover-foreground dark:border-border">
             <SelectItem value="name">Name</SelectItem>
             <SelectItem value="rating">Rating</SelectItem>
             <SelectItem value="jobs">Jobs Completed</SelectItem>

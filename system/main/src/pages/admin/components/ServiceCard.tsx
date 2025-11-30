@@ -21,11 +21,11 @@ export function ServiceCard({ name, category, color, onClick }: ServiceCardProps
   return (
     <button
       onClick={onClick}
-      className="rounded-2xl p-6 flex flex-col items-center justify-center gap-3 min-h-[140px] hover:opacity-90 transition-opacity"
+      className="rounded-2xl p-6 flex flex-col items-center justify-center gap-3 min-h-[140px] hover:opacity-90 transition-opacity border border-transparent dark:border-border"
       style={{ backgroundColor: color }}
     >
-      <div className="text-white">{getIcon()}</div>
-      <span className="text-white text-center">{name}</span>
+      <div className="text-white drop-shadow-md">{getIcon()}</div>
+      <span className="text-white text-center font-medium drop-shadow-md">{name}</span>
     </button>
   );
 }

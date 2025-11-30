@@ -102,16 +102,16 @@ export function EditServiceDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] bg-white dark:bg-card dark:text-foreground">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-[#0B4F6C]">
+          <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
             {service ? "Edit Service" : "Add New Service"}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-foreground">
               Service Name
             </label>
             <Input
@@ -121,21 +121,22 @@ export function EditServiceDialog({
                 setFormData({ ...formData, name: e.target.value })
               }
               placeholder="e.g. Laptop Repair"
+              className="bg-white dark:bg-background dark:border-input dark:text-foreground"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-foreground">
               Category
             </label>
             <Select
               value={formData.category}
               onValueChange={handleCategoryChange}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
                 {categories.map((cat) => (
                   <SelectItem key={cat.category_id} value={cat.name}>
                     {cat.name}
@@ -146,7 +147,7 @@ export function EditServiceDialog({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-gray-700 dark:text-foreground">
               Description
             </label>
             <Textarea
@@ -156,13 +157,13 @@ export function EditServiceDialog({
                 setFormData({ ...formData, description: e.target.value })
               }
               placeholder="Service description..."
-              className="h-24"
+              className="h-24 bg-white dark:bg-background dark:border-input dark:text-foreground"
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className={`space-y-2 ${service ? "col-span-2" : ""}`}>
-              <label className="text-sm font-medium text-gray-700">Price</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-foreground">Price</label>
               <Input
                 required
                 value={formData.price}
@@ -170,13 +171,14 @@ export function EditServiceDialog({
                   setFormData({ ...formData, price: e.target.value })
                 }
                 placeholder="e.g. ₱ 2,500.00"
+                className="bg-white dark:bg-background dark:border-input dark:text-foreground"
               />
             </div>
             
             {!service && (
               <>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">
+                  <label className="text-sm font-medium text-gray-700 dark:text-foreground">
                     Color Theme
                   </label>
                   <div className="flex gap-2 mt-2">
@@ -197,7 +199,7 @@ export function EditServiceDialog({
                 </div>
 
                 <div className="space-y-2 col-span-2">
-                    <label className="text-sm font-medium text-gray-700">Icon</label>
+                    <label className="text-sm font-medium text-gray-700 dark:text-foreground">Icon</label>
                     <Select
                         value={formData.icon}
                         onValueChange={(value) => setFormData({ ...formData, icon: value })}

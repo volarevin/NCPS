@@ -110,7 +110,7 @@ export function CustomerServices() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === category 
-                  ? 'bg-[#0B4F6C] dark:bg-primary text-white shadow-md' 
+                  ? 'bg-[#0B4F6C] dark:bg-sky-600 text-white shadow-md' 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >

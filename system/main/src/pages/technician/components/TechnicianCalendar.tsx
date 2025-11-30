@@ -80,7 +80,7 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
         <div className="flex flex-col h-full justify-between">
             <div className={`font-medium text-sm flex justify-between items-start ${isToday ? 'text-[#0B4F6C] dark:text-primary' : 'text-muted-foreground'}`}>
                 <span className={`
-                    ${isToday ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
+                    ${isToday ? "bg-[#0B4F6C] dark:bg-sky-600 text-white w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
                 `}>
                     {day}
                 </span>

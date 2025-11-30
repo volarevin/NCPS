@@ -380,7 +380,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
           </Button>
           <Button 
             onClick={() => setIsCreateDialogOpen(true)}
-            className="bg-[#0B4F6C] dark:bg-primary hover:bg-[#093e54] dark:hover:bg-primary/90 text-white shadow-lg shadow-blue-900/20 transition-all hover:scale-105"
+            className="bg-[#0B4F6C] dark:bg-sky-600 hover:bg-[#093e54] dark:hover:bg-sky-700 text-white shadow-lg shadow-blue-900/20 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4 mr-2" />
             New Appointment
@@ -440,7 +440,7 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
                 onClick={() => setStatusFilter(filter.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
                   statusFilter === filter.id
-                    ? "bg-[#0B4F6C] dark:bg-primary text-white border-[#0B4F6C] dark:border-primary shadow-md"
+                    ? "bg-[#0B4F6C] dark:bg-sky-600 text-white border-[#0B4F6C] dark:border-sky-600 shadow-md"
                     : "bg-white dark:bg-card text-gray-700 dark:text-muted-foreground border-gray-300 dark:border-border hover:border-[#0B4F6C] dark:hover:border-primary hover:text-[#0B4F6C] dark:hover:text-primary"
                 }`}
               >

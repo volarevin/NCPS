@@ -135,13 +135,13 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px]">
+      <DialogContent className="sm:max-w-[800px] bg-white dark:bg-card dark:text-foreground">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-800">
+          <DialogTitle className="flex items-center gap-2 text-xl font-bold text-gray-800 dark:text-foreground">
             <Trash2 className="w-5 h-5 text-red-500" />
             Recycle Bin
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="dark:text-muted-foreground">
             Manage deleted appointments. Items here can be restored or permanently deleted.
           </DialogDescription>
         </DialogHeader>
@@ -161,42 +161,42 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
             </div>
           )}
 
-          <div className="border rounded-lg overflow-hidden">
+          <div className="border dark:border-border rounded-lg overflow-hidden">
             <table className="w-full text-sm text-left">
-              <thead className="bg-gray-50 text-gray-700 font-medium">
+              <thead className="bg-gray-50 dark:bg-muted/50 text-gray-700 dark:text-muted-foreground font-medium">
                 <tr>
                   <th className="p-3">Details</th>
                   <th className="p-3">Deleted Info</th>
                   <th className="p-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-border">
                 {loading ? (
                   <tr>
-                    <td colSpan={3} className="p-8 text-center text-gray-500">
+                    <td colSpan={3} className="p-8 text-center text-gray-500 dark:text-muted-foreground">
                       Loading...
                     </td>
                   </tr>
                 ) : deletedItems.length === 0 ? (
                   <tr>
-                    <td colSpan={3} className="p-8 text-center text-gray-500">
+                    <td colSpan={3} className="p-8 text-center text-gray-500 dark:text-muted-foreground">
                       Recycle bin is empty
                     </td>
                   </tr>
                 ) : (
                   deletedItems.map((item) => (
-                    <tr key={item.appointment_id} className="hover:bg-gray-50">
+                    <tr key={item.appointment_id} className="hover:bg-gray-50 dark:hover:bg-muted/20">
                       <td className="p-3">
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-gray-900 dark:text-foreground">
                             {item.customer_first} {item.customer_last}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-500 dark:text-muted-foreground">
                             {item.service_name} • {new Date(item.appointment_date).toLocaleDateString()}
                         </div>
                       </td>
-                      <td className="p-3 text-sm text-gray-600">
+                      <td className="p-3 text-sm text-gray-600 dark:text-muted-foreground">
                         <div>{new Date(item.deletion_marked_at).toLocaleString()}</div>
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-gray-400 dark:text-muted-foreground/70">
                             by {item.marked_by_first ? `${item.marked_by_first} ${item.marked_by_last}` : 'Unknown'}
                         </div>
                       </td>
@@ -206,7 +206,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
                             variant="outline"
                             size="sm"
                             onClick={() => handleRestore(item.appointment_id)}
-                            className="h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                            className="h-8 text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200 dark:border-green-900/50 dark:hover:bg-green-900/20"
                           >
                             <RefreshCw className="w-3.5 h-3.5 mr-1" />
                             Restore
@@ -215,7 +215,7 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
                             variant="outline"
                             size="sm"
                             onClick={() => handlePermanentDelete(item.appointment_id)}
-                            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            className="h-8 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 dark:border-red-900/50 dark:hover:bg-red-900/20"
                           >
                             <X className="w-3.5 h-3.5 mr-1" />
                             Delete

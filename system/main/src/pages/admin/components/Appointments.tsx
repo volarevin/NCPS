@@ -233,19 +233,19 @@ export function Appointments() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800";
       case "upcoming":
       case "confirmed":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800";
       case "completed":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800";
       case "cancelled":
       case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800";
       case "in-progress":
-        return "bg-purple-100 text-purple-800 border-purple-200";
+        return "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700";
     }
   };
 
@@ -409,7 +409,7 @@ export function Appointments() {
              <Button
                 variant="outline"
                 onClick={() => setIsRecycleBinOpen(true)}
-                className="relative flex items-center gap-2 text-gray-600 hover:text-red-600 hover:bg-red-50 border-gray-300 transition-all hover:scale-105"
+                className="relative flex items-center gap-2 text-gray-600 hover:text-red-600 hover:bg-red-50 border-gray-300 transition-all hover:scale-105 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-red-900/20"
              >
                 <Trash2 className="w-4 h-4" />
                 Recycle Bin
@@ -490,7 +490,7 @@ export function Appointments() {
                 onClick={() => setStatusFilter(filter.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
                   statusFilter === filter.id
-                    ? "bg-[#0B4F6C] dark:bg-primary text-white border-[#0B4F6C] dark:border-primary shadow-md"
+                    ? "bg-[#0B4F6C] dark:bg-sky-600 text-white border-[#0B4F6C] dark:border-sky-600 shadow-md"
                     : "bg-white dark:bg-muted/50 text-gray-700 dark:text-muted-foreground border-gray-300 dark:border-border hover:border-[#0B4F6C] dark:hover:border-primary hover:text-[#0B4F6C] dark:hover:text-primary"
                 }`}
               >
@@ -645,12 +645,12 @@ export function Appointments() {
         ))}
 
         {filteredAppointments.length === 0 && (
-          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-300">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-gray-300" />
+          <div className="text-center py-16 bg-white dark:bg-card rounded-xl border border-dashed border-gray-300 dark:border-border">
+            <div className="w-16 h-16 bg-gray-50 dark:bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-gray-300 dark:text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-1">No appointments found</h3>
-            <p className="text-gray-500">Try adjusting your search or filters.</p>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-foreground mb-1">No appointments found</h3>
+            <p className="text-gray-500 dark:text-muted-foreground">Try adjusting your search or filters.</p>
           </div>
         )}
       </div>
