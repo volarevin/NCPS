@@ -103,16 +103,16 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
             {stats.distribution.map((item) => (
               <div key={item.star} className="flex items-center gap-4">
                 <div className="flex items-center gap-1 w-16 shrink-0">
-                  <span className="font-bold text-gray-700">{item.star}</span>
+                  <span className="font-bold text-muted-foreground">{item.star}</span>
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                 </div>
-                <div className="flex-1 h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-[#0B4F6C] rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${item.percentage}%` }}
                   />
                 </div>
-                <div className="w-12 text-right text-sm text-gray-500">
+                <div className="w-12 text-right text-sm text-muted-foreground">
                   {item.count}
                 </div>
               </div>
@@ -122,10 +122,10 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
       </div>
 
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-card p-4 rounded-xl shadow-sm border border-border">
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="w-4 h-4 text-gray-500" />
-          <span className="text-sm font-medium text-gray-700">Filter by:</span>
+          <Filter className="w-4 h-4 text-muted-foreground" />
+          <span className="text-sm font-medium text-muted-foreground">Filter by:</span>
           <div className="flex gap-2 overflow-x-auto pb-1 sm:pb-0 no-scrollbar">
             <Button 
               variant={filterStar === "all" ? "default" : "outline"} 
@@ -150,7 +150,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          <ArrowUpDown className="w-4 h-4 text-gray-500" />
+          <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Sort by" />
@@ -171,7 +171,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
           filteredRatings.map((rating) => (
             <Card 
               key={rating.id} 
-              className="group hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer border-t-4 overflow-hidden"
+              className="group hover:-translate-y-1 hover:shadow-xl transition-all duration-300 cursor-pointer border-t-4 overflow-hidden bg-card"
               style={{ 
                 borderTopColor: rating.rating >= 4 ? '#22c55e' : rating.rating >= 3 ? '#eab308' : '#ef4444' 
               }}
@@ -182,22 +182,22 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
                   <div className="flex gap-0.5">
                     {renderStars(rating.rating)}
                   </div>
-                  <Badge variant="secondary" className="bg-gray-100 text-gray-600 font-normal">
+                  <Badge variant="secondary" className="bg-muted text-muted-foreground font-normal">
                     {rating.date}
                   </Badge>
                 </div>
 
-                <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-[#0B4F6C] transition-colors">
+                <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-[#0B4F6C] transition-colors">
                   {rating.service}
                 </h3>
                 
-                <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
                   <User className="w-4 h-4" />
                   <span>{rating.customerName}</span>
                 </div>
 
-                <div className="relative bg-gray-50 p-4 rounded-xl mt-auto">
-                  <Quote className="absolute top-2 left-2 w-4 h-4 text-gray-300 -scale-x-100" />
+                <div className="relative bg-muted/50 p-4 rounded-xl mt-auto">
+                  <Quote className="absolute top-2 left-2 w-4 h-4 text-muted -scale-x-100" />
                   <p className="text-gray-600 text-sm italic line-clamp-3 pl-4">
                     "{rating.feedback}"
                   </p>

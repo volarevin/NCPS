@@ -170,7 +170,7 @@ export function TechnicianProfile({
             <CardContent className="pt-6 space-y-8">
               {/* Personal Info Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
                   <User className="w-5 h-5 text-[#0B4F6C]" />
                   Personal Information
                 </h3>
@@ -182,7 +182,7 @@ export function TechnicianProfile({
                       value={editingProfile ? formData.name : technicianProfile.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       disabled={!editingProfile}
-                      className="bg-white"
+                      className="bg-background"
                     />
                   </div>
                   <div className="space-y-2">
@@ -193,7 +193,7 @@ export function TechnicianProfile({
                       value={editingProfile ? formData.email : technicianProfile.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       disabled={!editingProfile}
-                      className="bg-white"
+                      className="bg-background"
                     />
                   </div>
                   <div className="space-y-2">
@@ -204,7 +204,7 @@ export function TechnicianProfile({
                       value={editingProfile ? formData.phone : technicianProfile.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       disabled={!editingProfile}
-                      className="bg-white"
+                      className="bg-background"
                     />
                   </div>
                   <div className="space-y-2">
@@ -215,7 +215,7 @@ export function TechnicianProfile({
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       disabled={!editingProfile}
                       placeholder="Enter your address"
-                      className="bg-white"
+                      className="bg-background"
                     />
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export function TechnicianProfile({
 
               {/* Professional Info Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
                   <Briefcase className="w-5 h-5 text-[#0B4F6C]" />
                   Professional Details
                 </h3>
@@ -237,7 +237,7 @@ export function TechnicianProfile({
                         value={formData.specialization} 
                         onValueChange={(value) => setFormData({ ...formData, specialization: value })}
                       >
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger className="bg-background">
                           <SelectValue placeholder="Select specialization" />
                         </SelectTrigger>
                         <SelectContent>
@@ -247,7 +247,7 @@ export function TechnicianProfile({
                         </SelectContent>
                       </Select>
                     ) : (
-                      <div className="flex h-10 w-full items-center rounded-md border border-input bg-gray-50 px-3 py-2 text-sm text-gray-500">
+                      <div className="flex h-10 w-full items-center rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
                         {technicianProfile.specialization}
                       </div>
                     )}
@@ -259,7 +259,7 @@ export function TechnicianProfile({
 
               {/* Bio Section */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-800">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
                   <FileText className="w-5 h-5 text-[#0B4F6C]" />
                   Professional Bio
                 </h3>
@@ -271,9 +271,9 @@ export function TechnicianProfile({
                     onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                     disabled={!editingProfile}
                     placeholder="Tell customers about your experience and expertise..."
-                    className={`min-h-[150px] resize-none ${!editingProfile ? "bg-gray-50 text-gray-500" : "bg-white"}`}
+                    className={`min-h-[150px] resize-none ${!editingProfile ? "bg-muted/50 text-muted-foreground" : "bg-background"}`}
                   />
-                  <p className="text-xs text-gray-500 text-right">
+                  <p className="text-xs text-muted-foreground text-right">
                     {formData.bio ? formData.bio.length : 0}/500 characters
                   </p>
                 </div>

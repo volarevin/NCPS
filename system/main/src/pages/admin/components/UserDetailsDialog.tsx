@@ -119,23 +119,23 @@ export function UserDetailsDialog({
                     className="w-full h-full rounded-full object-cover"
                   />
                 ) : (
-                  <User className="w-10 h-10 text-gray-400" />
+                  <User className="w-10 h-10 text-muted-foreground" />
                 )}
               </div>
-              <h3 className="font-bold text-xl text-gray-800">
+              <h3 className="font-bold text-xl text-foreground">
                 {user.fullName}
               </h3>
-              <p className="text-gray-500 text-sm">@{user.username}</p>
+              <p className="text-muted-foreground text-sm">@{user.username}</p>
               <Badge className="mt-2 bg-[#0B4F6C]">{user.role}</Badge>
             </div>
 
-            <div className="space-y-4 bg-gray-50 p-4 rounded-xl">
+            <div className="space-y-4 bg-muted/50 p-4 rounded-xl">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Joined</span>
+                <span className="text-muted-foreground">Joined</span>
                 <span className="font-medium">{user.joinedDate}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-500">Status</span>
+                <span className="text-muted-foreground">Status</span>
                 <span className="text-green-600 font-medium flex items-center gap-1">
                   <div className="w-2 h-2 rounded-full bg-green-600" />
                   Active
@@ -145,21 +145,21 @@ export function UserDetailsDialog({
 
             {/* Role Management */}
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Role Management
               </p>
               {user.role !== "admin" && (
                 <div className="flex gap-2">
                   <button
                     onClick={() => onPromote(user.id)}
-                    className="flex-1 py-2 px-4 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    className="flex-1 py-2 px-4 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
                   >
                     <ArrowUpCircle className="w-4 h-4" />
                     Promote
                   </button>
                   <button
                     onClick={() => onDemote(user.id)}
-                    className="flex-1 py-2 px-4 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    className="flex-1 py-2 px-4 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
                   >
                     <ArrowDownCircle className="w-4 h-4" />
                     Demote
@@ -177,13 +177,13 @@ export function UserDetailsDialog({
               <div className="space-y-6">
                 {/* Contact Information */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#0B4F6C]" />
                     Contact Information
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-500">Full Name</label>
+                      <label className="text-sm text-muted-foreground">Full Name</label>
                       <Input
                         disabled={!isEditing}
                         value={editedUser.fullName}
@@ -193,13 +193,13 @@ export function UserDetailsDialog({
                             fullName: e.target.value,
                           })
                         }
-                        className="bg-white"
+                        className="bg-background"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-500">Email</label>
+                      <label className="text-sm text-muted-foreground">Email</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           disabled={!isEditing}
                           value={editedUser.email}
@@ -209,14 +209,14 @@ export function UserDetailsDialog({
                               email: e.target.value,
                             })
                           }
-                          className="pl-10 bg-white"
+                          className="pl-10 bg-background"
                         />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm text-gray-500">Phone</label>
+                      <label className="text-sm text-muted-foreground">Phone</label>
                       <div className="relative">
-                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                        <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
                           disabled={!isEditing}
                           value={editedUser.phone}
@@ -226,18 +226,18 @@ export function UserDetailsDialog({
                               phone: e.target.value,
                             })
                           }
-                          className="pl-10 bg-white"
+                          className="pl-10 bg-background"
                         />
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="border-t border-gray-100" />
+                <div className="border-t border-border" />
 
                 {/* Activity Log */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                     <Activity className="w-4 h-4 text-[#0B4F6C]" />
                     Recent Activity
                   </h4>
@@ -246,19 +246,19 @@ export function UserDetailsDialog({
                       user.activityLogs.map((log) => (
                         <div
                           key={log.id}
-                          className="flex gap-4 p-3 rounded-lg bg-gray-50 border border-gray-100"
+                          className="flex gap-4 p-3 rounded-lg bg-muted/50 border border-border"
                         >
                           <div className="mt-1">
                             <div className="w-2 h-2 rounded-full bg-[#0B4F6C]" />
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-foreground">
                               {log.action}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-muted-foreground">
                               {log.details}
                             </p>
-                            <div className="flex items-center gap-1 mt-1 text-xs text-gray-400">
+                            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
                               <Calendar className="w-3 h-3" />
                               {log.timestamp}
                             </div>
@@ -266,7 +266,7 @@ export function UserDetailsDialog({
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                      <div className="text-center py-8 text-muted-foreground bg-muted/50 rounded-lg border border-dashed border-border">
                         No recent activity
                       </div>
                     )}

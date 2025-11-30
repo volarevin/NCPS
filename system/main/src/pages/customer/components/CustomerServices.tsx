@@ -93,12 +93,12 @@ export function CustomerServices() {
       />
 
       {/* Search and Filter */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-card p-4 rounded-xl shadow-sm border border-border">
         <div className="relative w-full md:w-96">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input 
             placeholder="Search services..." 
-            className="pl-9 border-gray-200 focus:border-[#4DBDCC] focus:ring-[#4DBDCC]"
+            className="pl-9 border-border focus:border-[#4DBDCC] focus:ring-[#4DBDCC]"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -111,7 +111,7 @@ export function CustomerServices() {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === category 
                   ? 'bg-[#0B4F6C] text-white shadow-md' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
               {category}
@@ -125,7 +125,7 @@ export function CustomerServices() {
         <div className="space-y-4">
           <div className="flex items-center gap-2">
             <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-            <h2 className="text-xl font-bold text-[#0B4F6C]">Most Popular</h2>
+            <h2 className="text-xl font-bold text-[#0B4F6C] dark:text-primary">Most Popular</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {popularServices.map(service => {
@@ -165,14 +165,14 @@ export function CustomerServices() {
 
       {/* All Services Grid */}
       <div className="space-y-4">
-        <h2 className="text-xl font-bold text-[#0B4F6C]">
+        <h2 className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
           {selectedCategory === 'All' ? 'All Services' : `${selectedCategory} Services`}
         </h2>
         
         {isLoading ? (
-          <div className="text-center py-12 text-gray-500">Loading services...</div>
+          <div className="text-center py-12 text-muted-foreground">Loading services...</div>
         ) : filteredServices.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+          <div className="text-center py-12 text-muted-foreground bg-muted/50 rounded-xl border border-dashed border-border">
             No services found matching your criteria.
           </div>
         ) : (
@@ -183,36 +183,36 @@ export function CustomerServices() {
                 <div 
                   key={service.service_id}
                   onClick={() => handleBookService(service)}
-                  className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col"
+                  className="bg-card rounded-xl border border-border shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col"
                 >
                   <div className="p-5 flex-1">
                     <div className="flex justify-between items-start mb-3">
-                      <div className="bg-blue-50 p-2 rounded-lg text-[#0B4F6C] group-hover:bg-[#0B4F6C] group-hover:text-white transition-colors">
+                      <div className="bg-blue-500/10 p-2 rounded-lg text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] group-hover:text-white transition-colors">
                         <IconComponent className="w-5 h-5" />
                       </div>
-                      <div className="flex items-center gap-1 text-sm font-medium text-gray-600">
+                      <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
                         <Star className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                         {service.rating}
                       </div>
                     </div>
                     
                     <div className="mb-2">
-                      <span className="text-[10px] font-bold text-[#4DBDCC] uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-[#4DBDCC] dark:text-cyan-400 uppercase tracking-wider">
                         {service.category_name}
                       </span>
-                      <h3 className="font-bold text-gray-900 group-hover:text-[#0B4F6C] transition-colors">
+                      <h3 className="font-bold text-foreground group-hover:text-[#0B4F6C] transition-colors">
                         {service.service_name}
                       </h3>
                     </div>
                     
-                    <p className="text-sm text-gray-500 line-clamp-2 mb-4">
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
                       {service.description || 'Professional service provided by our expert technicians.'}
                     </p>
                   </div>
                   
-                  <div className="px-5 py-4 border-t border-gray-50 bg-gray-50/50 rounded-b-xl flex items-center justify-between group-hover:bg-blue-50/30 transition-colors">
-                    <span className="font-bold text-[#0B4F6C]">₱{service.base_price}</span>
-                    <div className="flex items-center text-sm font-medium text-[#4DBDCC] group-hover:translate-x-1 transition-transform">
+                  <div className="px-5 py-4 border-t border-border bg-muted/30 rounded-b-xl flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
+                    <span className="font-bold text-[#0B4F6C] dark:text-primary">₱{service.base_price}</span>
+                    <div className="flex items-center text-sm font-medium text-[#4DBDCC] dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
                       Book <ChevronRight className="w-4 h-4 ml-1" />
                     </div>
                   </div>

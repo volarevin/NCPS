@@ -4,6 +4,7 @@ import { AppointmentSchedule, Appointment } from './components/AppointmentSchedu
 import { Dashboard } from './components/Dashboard';
 import ProfilePage from '../common/ProfilePage';
 import { MobileHeader } from './components/MobileHeader';
+import TopBar from '../../components/TopBar';
 
 export default function ReceptionistPage() {
   const [currentPage, setCurrentPage] = useState('dashboard');
@@ -20,7 +21,7 @@ export default function ReceptionistPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden transition-colors duration-200">
       <Sidebar 
         currentPage={currentPage} 
         onNavigate={setCurrentPage}
@@ -29,7 +30,13 @@ export default function ReceptionistPage() {
       />
       
       <div className="flex-1 flex flex-col overflow-hidden">
-        <MobileHeader onMenuClick={() => setMobileMenuOpen(true)} />
+        <div className="lg:hidden">
+          <MobileHeader onMenuClick={() => setMobileMenuOpen(true)} />
+        </div>
+        
+        <div className="hidden lg:block">
+          <TopBar onProfileClick={() => setCurrentPage('account')} />
+        </div>
         
         <main className={`flex-1 overflow-y-auto p-4 md:p-8 transition-all duration-300 ${mobileMenuOpen ? 'lg:brightness-100 brightness-50' : ''}`}>
           <div className="max-w-7xl mx-auto">

@@ -166,7 +166,7 @@ export function UserAccounts() {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4"
+            className="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-4"
           >
             <div
               className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center text-white`}
@@ -174,17 +174,17 @@ export function UserAccounts() {
               <stat.icon className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-sm text-gray-500">{stat.label}</p>
-              <p className="text-2xl font-bold text-gray-800">{stat.value}</p>
+              <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4">
+      <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             placeholder="Search by name, email, or username..."
             className="pl-10"

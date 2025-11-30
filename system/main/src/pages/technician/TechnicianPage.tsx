@@ -10,6 +10,7 @@ import ProfilePage from "../common/ProfilePage";
 import { TechnicianRatings } from "./components/TechnicianRatings";
 import AppointmentDetailsModal from "./components/AppointmentDetailsModal";
 import { MobileHeader } from "./components/MobileHeader";
+import TopBar from "../../components/TopBar";
 
 interface Appointment {
   id: string;
@@ -397,9 +398,9 @@ export default function TechnicianPage() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-200">
       {/* Mobile Header - Fixed at top */}
-      <div className="fixed top-0 left-0 right-0 z-40">
+      <div className="fixed top-0 left-0 right-0 z-40 lg:hidden">
         <MobileHeader onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       </div>
 
@@ -427,6 +428,9 @@ export default function TechnicianPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden pt-16 lg:pt-0">
+        <div className="hidden lg:block">
+          <TopBar onProfileClick={() => setActiveTab("profile")} />
+        </div>
         <main className="flex-1 overflow-auto p-4 lg:p-8">
           {renderContent()}
         </main>

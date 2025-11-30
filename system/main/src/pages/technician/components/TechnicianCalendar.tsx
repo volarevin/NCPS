@@ -59,7 +59,7 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
   const days = [];
   // Empty cells for previous month
   for (let i = 0; i < firstDay; i++) {
-    days.push(<div key={`empty-${i}`} className="min-h-[80px] md:min-h-[100px] bg-gray-50/50 border border-gray-100" />);
+    days.push(<div key={`empty-${i}`} className="min-h-[80px] md:min-h-[100px] bg-muted/20 border border-border" />);
   }
 
   // Days of current month
@@ -72,15 +72,15 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
     days.push(
       <div 
         key={day} 
-        className={`min-h-[80px] md:min-h-[100px] border border-gray-100 p-2 transition-all cursor-pointer hover:bg-blue-50/50 active:bg-blue-100
-            ${isToday ? 'bg-blue-50/30 ring-1 ring-inset ring-[#0B4F6C]/20' : ''}
+        className={`min-h-[80px] md:min-h-[100px] border border-border p-2 transition-all cursor-pointer hover:bg-primary/10 active:bg-primary/20
+            ${isToday ? 'bg-primary/5 ring-1 ring-inset ring-[#0B4F6C]/20 dark:ring-primary/20' : ''}
         `}
         onClick={() => handleDayClick(day)}
       >
         <div className="flex flex-col h-full justify-between">
-            <div className={`font-medium text-sm flex justify-between items-start ${isToday ? 'text-[#0B4F6C]' : 'text-gray-700'}`}>
+            <div className={`font-medium text-sm flex justify-between items-start ${isToday ? 'text-[#0B4F6C] dark:text-primary' : 'text-muted-foreground'}`}>
                 <span className={`
-                    ${isToday ? "bg-[#0B4F6C] text-white w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
+                    ${isToday ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
                 `}>
                     {day}
                 </span>
@@ -91,16 +91,16 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
                     <div className="hidden md:block space-y-1">
                         {dayAppointments.slice(0, 2).map((apt, idx) => (
                             <div key={idx} className={`text-[10px] px-1.5 py-0.5 rounded truncate border
-                                ${apt.status === 'Completed' ? 'bg-green-50 text-green-700 border-green-100' :
-                                  apt.status === 'In Progress' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                                  apt.status === 'Cancelled' ? 'bg-red-50 text-red-700 border-red-100' :
-                                  'bg-orange-50 text-orange-700 border-orange-100'}
+                                ${apt.status === 'Completed' ? 'bg-green-500/10 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' :
+                                  apt.status === 'In Progress' ? 'bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800' :
+                                  apt.status === 'Cancelled' ? 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' :
+                                  'bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-200 dark:border-orange-800'}
                             `}>
                                 {apt.time} - {apt.service}
                             </div>
                         ))}
                         {dayAppointments.length > 2 && (
-                            <div className="text-[10px] text-gray-500 pl-1">
+                            <div className="text-[10px] text-muted-foreground pl-1">
                                 +{dayAppointments.length - 2} more
                             </div>
                         )}
@@ -108,9 +108,9 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
                     {/* Mobile View: Dots */}
                     <div className="md:hidden flex gap-1 justify-center">
                         {dayAppointments.slice(0, 3).map((_, idx) => (
-                            <div key={idx} className="w-1.5 h-1.5 rounded-full bg-[#0B4F6C]" />
+                            <div key={idx} className="w-1.5 h-1.5 rounded-full bg-[#0B4F6C] dark:bg-primary" />
                         ))}
-                        {dayAppointments.length > 3 && <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />}
+                        {dayAppointments.length > 3 && <div className="w-1.5 h-1.5 rounded-full bg-muted" />}
                     </div>
                 </div>
             )}
@@ -123,28 +123,28 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
 
   return (
     <>
-    <Card className="shadow-md border-none bg-white">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-gray-100">
-        <CardTitle className="text-xl font-bold text-[#0B4F6C] flex items-center gap-2">
+    <Card className="shadow-md border-none bg-card">
+      <CardHeader className="flex flex-row items-center justify-between pb-4 border-b border-border">
+        <CardTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary flex items-center gap-2">
             <CalendarIcon className="w-5 h-5" />
             {monthNames[month]} {year}
         </CardTitle>
         <div className="flex gap-2">
-          <Button variant="outline" size="icon" onClick={handlePrevMonth} className="hover:bg-[#0B4F6C] hover:text-white transition-colors">
+          <Button variant="outline" size="icon" onClick={handlePrevMonth} className="hover:bg-[#0B4F6C] hover:text-white dark:hover:bg-primary dark:hover:text-primary-foreground transition-colors">
             <ChevronLeft className="w-4 h-4" />
           </Button>
           <Button variant="outline" size="icon" onClick={() => setCurrentDate(new Date())} className="text-xs px-3 w-auto">
             Today
           </Button>
-          <Button variant="outline" size="icon" onClick={handleNextMonth} className="hover:bg-[#0B4F6C] hover:text-white transition-colors">
+          <Button variant="outline" size="icon" onClick={handleNextMonth} className="hover:bg-[#0B4F6C] hover:text-white dark:hover:bg-primary dark:hover:text-primary-foreground transition-colors">
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+        <div className="grid grid-cols-7 bg-muted/50 border-b border-border">
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
-            <div key={d} className="text-center font-semibold text-gray-500 text-sm py-3">
+            <div key={d} className="text-center font-semibold text-muted-foreground text-sm py-3">
               {d}
             </div>
           ))}

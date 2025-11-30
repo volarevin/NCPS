@@ -310,16 +310,16 @@ export function Technicians() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             placeholder="Search technicians..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white border-gray-200 focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
+            className="pl-10 bg-background border-border focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] bg-white border-gray-200">
+          <SelectTrigger className="w-[180px] bg-background border-border">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -330,8 +330,8 @@ export function Technicians() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px] bg-white border-gray-200">
-            <ArrowUpDown className="w-4 h-4 mr-2 text-gray-400" />
+          <SelectTrigger className="w-[180px] bg-background border-border">
+            <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
           <SelectContent>
@@ -351,13 +351,13 @@ export function Technicians() {
             <div
               key={tech.id}
               onClick={() => handleViewDetails(tech.id)}
-              className="group bg-white rounded-xl border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative overflow-hidden"
+              className="group bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-1 h-full bg-[#0B4F6C] opacity-0 group-hover:opacity-100 transition-opacity" />
               
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full ${specialtyConfig.bg} flex items-center justify-center border border-gray-200 group-hover:border-[#0B4F6C]/30 transition-colors`}>
+                  <div className={`w-12 h-12 rounded-full ${specialtyConfig.bg} flex items-center justify-center border border-border group-hover:border-[#0B4F6C]/30 transition-colors`}>
                     <SpecialtyIcon className={`w-6 h-6 ${specialtyConfig.color}`} />
                   </div>
                   <div>

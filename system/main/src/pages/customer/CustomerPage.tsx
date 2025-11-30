@@ -6,6 +6,7 @@ import ProfilePage from '../common/ProfilePage';
 import { CustomerServices } from './components/CustomerServices';
 import { MobileHeader } from './components/MobileHeader';
 import { MobileSidebar } from './components/MobileSidebar';
+import TopBar from '../../components/TopBar';
 
 export type Page = 'dashboard' | 'appointments' | 'profile' | 'services';
 
@@ -18,7 +19,7 @@ export default function CustomerPage() {
   }, []);
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden font-sans">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-900 overflow-hidden font-sans transition-colors duration-200">
       {/* Desktop Sidebar - hidden on mobile */}
       <div className="hidden lg:block">
         <CustomerSidebar currentPage={currentPage} onNavigate={setCurrentPage} />
@@ -49,11 +50,16 @@ export default function CustomerPage() {
         </>
       )}
       
-      <main className="flex-1 overflow-y-auto pt-16 lg:pt-0">
-        {currentPage === 'dashboard' && <CustomerDashboard />}
-        {currentPage === 'services' && <CustomerServices />}
-        {currentPage === 'appointments' && <CustomerAppointments />}
-        {currentPage === 'profile' && <ProfilePage />}
+      <main className="flex-1 flex flex-col overflow-hidden pt-16 lg:pt-0">
+        <div className="hidden lg:block">
+          <TopBar onProfileClick={() => setCurrentPage('profile')} />
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          {currentPage === 'dashboard' && <CustomerDashboard />}
+          {currentPage === 'services' && <CustomerServices />}
+          {currentPage === 'appointments' && <CustomerAppointments />}
+          {currentPage === 'profile' && <ProfilePage />}
+        </div>
       </main>
     </div>
   );

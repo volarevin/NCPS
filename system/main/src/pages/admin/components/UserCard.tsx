@@ -40,7 +40,7 @@ export function UserCard({
   return (
     <div
       onClick={onClick}
-      className="group bg-white rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-[#0B4F6C] transform hover:-translate-y-1"
+      className="group bg-card rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-[#0B4F6C] transform hover:-translate-y-1"
     >
       {/* Header with Avatar and Role Badge */}
       <div className="flex items-center gap-3 mb-4">
@@ -48,15 +48,15 @@ export function UserCard({
           <img
             src={avatar}
             alt={fullName}
-            className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-gray-200 group-hover:border-[#0B4F6C] transition-colors"
+            className="w-12 h-12 md:w-14 md:h-14 rounded-full object-cover border-2 border-border group-hover:border-[#0B4F6C] transition-colors"
           />
         ) : (
-          <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gray-100 flex items-center justify-center border-2 border-gray-200 group-hover:border-[#0B4F6C] transition-colors">
-            <User className="w-6 h-6 md:w-7 md:h-7 text-gray-400 group-hover:text-[#0B4F6C]" />
+          <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-muted flex items-center justify-center border-2 border-border group-hover:border-[#0B4F6C] transition-colors">
+            <User className="w-6 h-6 md:w-7 md:h-7 text-muted-foreground group-hover:text-[#0B4F6C]" />
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-gray-800 truncate group-hover:text-[#0B4F6C] transition-colors">
+          <h3 className="font-bold text-foreground truncate group-hover:text-[#0B4F6C] transition-colors">
             {fullName}
           </h3>
           <div
