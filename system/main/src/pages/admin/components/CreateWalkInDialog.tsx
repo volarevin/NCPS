@@ -198,12 +198,14 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[98vw] w-full max-h-[90vh] overflow-y-auto flex flex-col p-0">
-        <div className="p-8">
-          <DialogHeader className="mb-6">
+      <DialogContent className="max-w-5xl w-full sm:max-w-5xl h-[85vh] p-0 flex flex-col overflow-hidden">
+        <div className="p-6 border-b">
+          <DialogHeader>
             <DialogTitle className="text-2xl">Book Walk-in / Phone Appointment</DialogTitle>
           </DialogHeader>
+        </div>
 
+        <div className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             {/* Left Column: Customer Selection - Takes more space */}
             <div className="lg:col-span-7 space-y-6 lg:border-r lg:pr-12">
