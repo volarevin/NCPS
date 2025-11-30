@@ -209,8 +209,7 @@ export function CustomerDashboard() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <PageHeader 
-            title={`Welcome, ${user?.firstName || 'Customer'}!`}
-            description="Here's an overview of your appointments."
+            title="Dashboard Overview"
         />
         <Button 
             onClick={() => setIsCreateDialogOpen(true)}

@@ -149,6 +149,7 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
               <Input
                 id="date"
                 type="date"
+                min={new Date().toLocaleDateString('en-CA')}
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 className="border-[#1A5560]/20 focus:border-[#3FA9BC] h-9"

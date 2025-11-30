@@ -9,22 +9,34 @@ import {
 import { Button } from "../../../components/ui/button";
 import { Label } from "../../../components/ui/label";
 import { Textarea } from "../../../components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { AlertCircle } from 'lucide-react';
 
 interface CancelAppointmentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   appointment: any;
-  onConfirm: (reason: string) => void;
+  onConfirm: (reason: string, category: string) => void;
 }
 
 export function CancelAppointmentDialog({ open, onOpenChange, appointment, onConfirm }: CancelAppointmentDialogProps) {
   const [reason, setReason] = useState('');
+  const [category, setCategory] = useState('');
 
   const handleCancel = () => {
-    onConfirm(reason);
+    onConfirm(reason, category);
     setReason('');
+    setCategory('');
   };
+
+  const cancellationCategories = [
+    "Change of plans",
+    "Found another provider",
+    "Service no longer needed",
+    "Scheduling conflict",
+    "Emergency",
+    "Other"
+  ];
 
   if (!appointment) return null;
 
@@ -52,14 +64,32 @@ export function CancelAppointmentDialog({ open, onOpenChange, appointment, onCon
           </div>
 
           <div className="space-y-2">
+            <Label htmlFor="category" className="text-[#1A5560]">
+              Cancellation Category *
+            </Label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="border-[#1A5560]/20 focus:border-[#3FA9BC]">
+                <SelectValue placeholder="Select a reason" />
+              </SelectTrigger>
+              <SelectContent>
+                {cancellationCategories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
             <Label htmlFor="reason" className="text-[#1A5560]">
-              Reason for Cancellation *
+              Additional Details *
             </Label>
             <Textarea
               id="reason"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Please provide a reason for cancelling this appointment..."
+              placeholder="Please provide more details..."
               className="border-[#1A5560]/20 focus:border-[#3FA9BC] min-h-[100px]"
               required
             />
@@ -71,6 +101,7 @@ export function CancelAppointmentDialog({ open, onOpenChange, appointment, onCon
               onClick={() => {
                 onOpenChange(false);
                 setReason('');
+                setCategory('');
               }}
               className="flex-1 border-[#1A5560] text-[#1A5560] hover:bg-[#1A5560]/10"
             >
@@ -78,7 +109,7 @@ export function CancelAppointmentDialog({ open, onOpenChange, appointment, onCon
             </Button>
             <Button
               onClick={handleCancel}
-              disabled={!reason.trim()}
+              disabled={!reason.trim() || !category}
               className="flex-1 bg-red-500 hover:bg-red-600 text-white transition-colors duration-200"
             >
               Cancel Appointment

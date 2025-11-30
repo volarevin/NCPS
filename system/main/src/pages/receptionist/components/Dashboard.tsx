@@ -240,7 +240,6 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
     <div className="space-y-6 animate-fade-in">
       <PageHeader 
         title="Dashboard" 
-        description="Welcome to NCPS Receptionist Portal"
       />
 
       {/* Quick Stats with Icons - Compact */}

@@ -2,6 +2,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { Sun, Moon, User as UserIcon } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { getProfilePictureUrl } from "@/lib/utils";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,7 +29,7 @@ export default function TopBar({ onProfileClick }: TopBarProps) {
 
   const user = getUser();
   const firstName = user?.first_name || user?.firstName || "User";
-  const profilePic = user?.profile_picture || "";
+  const profilePic = getProfilePictureUrl(user?.profile_picture);
 
   const handleProfileClick = () => {
     if (onProfileClick) {
@@ -41,27 +42,23 @@ export default function TopBar({ onProfileClick }: TopBarProps) {
   };
 
   return (
-    <header className="w-full h-16 px-4 md:px-6 border-b border-border bg-background flex items-center justify-between transition-colors duration-200">
+    <header className="w-full h-16 px-4 md:px-6 bg-[#0B4F6C] flex items-center justify-between transition-colors duration-200 shadow-md z-20">
       <div className="flex items-center gap-4">
-        {/* Left side content (breadcrumbs or title could go here) */}
-        <h2 className="text-lg font-semibold text-foreground hidden md:block">
-          {/* Optional: Dashboard Title or Breadcrumb */}
-        </h2>
+        {/* Left side content */}
+        <div className="flex flex-col">
+          <h2 className="text-xl md:text-2xl font-bold text-white tracking-tight">
+            Welcome back, {firstName}!
+          </h2>
+        </div>
       </div>
 
       <div className="flex items-center gap-3 md:gap-6">
-        <div className="hidden md:flex flex-col items-end">
-          <span className="text-sm font-medium text-muted-foreground">
-            Welcome back, {firstName}
-          </span>
-        </div>
-
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="rounded-full text-white/80 hover:bg-white/10 hover:text-white"
             aria-label="Toggle theme"
           >
             {theme === "dark" ? (
@@ -73,10 +70,10 @@ export default function TopBar({ onProfileClick }: TopBarProps) {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden border border-gray-200 dark:border-gray-700">
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 overflow-hidden border-2 border-white/20 hover:border-white/40 transition-colors">
                 <Avatar className="h-full w-full">
                   <AvatarImage src={profilePic} alt={firstName} className="object-cover" />
-                  <AvatarFallback className="bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary-foreground">
+                  <AvatarFallback className="bg-[#4DBDCC] text-[#0B4F6C] font-bold">
                     {firstName.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

@@ -27,8 +27,7 @@ export function TechnicianDashboardContent({
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
       <PageHeader 
-        title={`Welcome back, ${technicianProfile.name.split(' ')[0]}!`}
-        description="Here's your schedule overview for today."
+        title="Dashboard Overview"
       />
 
       {/* Stats Grid */}

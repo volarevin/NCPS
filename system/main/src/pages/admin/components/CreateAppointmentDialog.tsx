@@ -43,10 +43,8 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
   });
 
   useEffect(() => {
-    if (open) {
-      fetchData();
-    }
-  }, [open]);
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -177,6 +175,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
                 id="date" 
                 type="date" 
                 required
+                min={new Date().toLocaleDateString('en-CA')}
                 value={formData.appointment_date}
                 onChange={(e) => setFormData({...formData, appointment_date: e.target.value})}
                 className="bg-white dark:bg-background dark:border-input dark:text-foreground"

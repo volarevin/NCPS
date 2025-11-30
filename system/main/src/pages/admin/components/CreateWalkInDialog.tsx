@@ -76,8 +76,11 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
   };
 
   useEffect(() => {
+    fetchServices();
+  }, []);
+
+  useEffect(() => {
     if (open) {
-      fetchServices();
       // Reset states
       setSelectedUser(null);
       setSearchQuery("");
@@ -336,7 +339,7 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="dark:text-foreground">Date</Label>
-                    <Input type="date" className="bg-white dark:bg-background dark:border-input dark:text-foreground" value={appointment.date} onChange={e => setAppointment({...appointment, date: e.target.value})} />
+                    <Input type="date" min={new Date().toLocaleDateString('en-CA')} className="bg-white dark:bg-background dark:border-input dark:text-foreground" value={appointment.date} onChange={e => setAppointment({...appointment, date: e.target.value})} />
                   </div>
                   <div className="space-y-2">
                     <Label className="dark:text-foreground">Time</Label>

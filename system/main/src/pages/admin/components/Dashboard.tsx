@@ -151,7 +151,6 @@ export function Dashboard() {
     <div className="space-y-6 animate-fade-in">
       <PageHeader 
         title="Dashboard Overview" 
-        description="Welcome back, Admin. Here's what's happening with your operations today."
       />
 
       {/* Stats Grid */}

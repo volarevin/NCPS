@@ -92,7 +92,7 @@ export function CustomerAppointments() {
     fetchAppointments();
   }, []);
 
-  const handleCancelAppointment = async (reason: string) => {
+  const handleCancelAppointment = async (reason: string, category: string) => {
     if (!selectedAppointment) return;
 
     const promise = async () => {
@@ -102,7 +102,7 @@ export function CustomerAppointments() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${sessionStorage.getItem('token')}`
         },
-        body: JSON.stringify({ status: 'Cancelled', reason, category: 'Customer Request' })
+        body: JSON.stringify({ status: 'Cancelled', reason, category })
       });
 
       if (!response.ok) throw new Error('Failed to cancel appointment');

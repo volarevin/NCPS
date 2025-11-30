@@ -47,9 +47,24 @@ export function AddAppointmentDialog({
   const [technicians, setTechnicians] = useState<Technician[]>([]);
 
   useEffect(() => {
+    fetchServices();
+    fetchTechnicians();
+  }, []);
+
+  // Reset form when dialog opens
+  useEffect(() => {
     if (open) {
-      fetchServices();
-      fetchTechnicians();
+      setFormData({
+        clientName: '',
+        phone: '',
+        email: '',
+        address: '',
+        serviceId: '',
+        date: '',
+        time: '',
+        technicianId: '',
+        notes: '',
+      });
     }
   }, [open]);
 
@@ -249,6 +264,7 @@ export function AddAppointmentDialog({
                 <Input
                   id="date"
                   type="date"
+                  min={new Date().toLocaleDateString('en-CA')}
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                   className="mt-1"

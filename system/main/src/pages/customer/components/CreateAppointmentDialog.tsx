@@ -158,6 +158,8 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
     }
   };
 
+  const today = new Date().toLocaleDateString('en-CA');
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -195,6 +197,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, initialServiceId, 
               <Input
                 id="date"
                 type="date"
+                min={today}
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                 className="border-[#1A5560]/20 focus:border-[#3FA9BC]"
