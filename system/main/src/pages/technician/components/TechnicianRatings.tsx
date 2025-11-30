@@ -78,7 +78,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
 
       {/* Summary Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1 bg-gradient-to-br from-[#0B4F6C] to-[#145A75] text-white border-none shadow-lg">
+        <Card className="md:col-span-1 bg-gradient-to-br from-[#0B4F6C] to-[#145A75] dark:from-primary dark:to-primary/80 text-white dark:text-primary-foreground border-none shadow-lg">
           <CardContent className="flex flex-col items-center justify-center h-full py-8 space-y-2">
             <div className="text-6xl font-bold tracking-tighter">
               {stats.average.toFixed(1)}
@@ -87,17 +87,17 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star 
                   key={star} 
-                  className={`w-6 h-6 ${star <= Math.round(stats.average) ? "fill-yellow-400 text-yellow-400" : "fill-gray-400 text-gray-400"}`} 
+                  className={`w-6 h-6 ${star <= Math.round(stats.average) ? "fill-yellow-400 text-yellow-400" : "fill-gray-400 text-gray-400 dark:fill-muted dark:text-muted"}`} 
                 />
               ))}
             </div>
-            <p className="text-blue-100 font-medium mt-2">Based on {stats.total} reviews</p>
+            <p className="text-blue-100 dark:text-primary-foreground/80 font-medium mt-2">Based on {stats.total} reviews</p>
           </CardContent>
         </Card>
 
         <Card className="md:col-span-2 shadow-md">
           <CardHeader>
-            <CardTitle className="text-lg text-gray-700">Rating Distribution</CardTitle>
+            <CardTitle className="text-lg text-gray-700 dark:text-foreground">Rating Distribution</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             {stats.distribution.map((item) => (
@@ -108,7 +108,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
                 </div>
                 <div className="flex-1 h-3 bg-muted rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-[#0B4F6C] rounded-full transition-all duration-500 ease-out"
+                    className="h-full bg-[#0B4F6C] dark:bg-primary rounded-full transition-all duration-500 ease-out"
                     style={{ width: `${item.percentage}%` }}
                   />
                 </div>
@@ -131,7 +131,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
               variant={filterStar === "all" ? "default" : "outline"} 
               size="sm"
               onClick={() => setFilterStar("all")}
-              className={filterStar === "all" ? "bg-[#0B4F6C]" : ""}
+              className={filterStar === "all" ? "bg-[#0B4F6C] dark:bg-primary" : ""}
             >
               All
             </Button>
@@ -141,7 +141,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
                 variant={filterStar === star.toString() ? "default" : "outline"}
                 size="sm"
                 onClick={() => setFilterStar(star.toString())}
-                className={`gap-1 ${filterStar === star.toString() ? "bg-[#0B4F6C]" : ""}`}
+                className={`gap-1 ${filterStar === star.toString() ? "bg-[#0B4F6C] dark:bg-primary" : ""}`}
               >
                 {star} <Star className="w-3 h-3 fill-current" />
               </Button>
@@ -187,7 +187,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
                   </Badge>
                 </div>
 
-                <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-[#0B4F6C] transition-colors">
+                <h3 className="font-bold text-lg text-foreground mb-1 group-hover:text-[#0B4F6C] dark:group-hover:text-primary transition-colors">
                   {rating.service}
                 </h3>
                 
@@ -198,7 +198,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
 
                 <div className="relative bg-muted/50 p-4 rounded-xl mt-auto">
                   <Quote className="absolute top-2 left-2 w-4 h-4 text-muted -scale-x-100" />
-                  <p className="text-gray-600 text-sm italic line-clamp-3 pl-4">
+                  <p className="text-gray-600 dark:text-muted-foreground text-sm italic line-clamp-3 pl-4">
                     "{rating.feedback}"
                   </p>
                 </div>
@@ -206,8 +206,8 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
             </Card>
           ))
         ) : (
-          <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500 bg-white rounded-xl border border-dashed border-gray-200">
-            <MessageSquare className="w-12 h-12 mb-4 text-gray-300" />
+          <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-500 dark:text-muted-foreground bg-white dark:bg-card rounded-xl border border-dashed border-gray-200 dark:border-border">
+            <MessageSquare className="w-12 h-12 mb-4 text-gray-300 dark:text-muted" />
             <p className="text-lg font-medium">No ratings found</p>
             <p className="text-sm">Try adjusting your filters</p>
           </div>
@@ -218,7 +218,7 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
       <Dialog open={!!selectedRating} onOpenChange={(open) => !open && setSelectedRating(null)}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-[#0B4F6C] flex items-center gap-2 text-xl">
+            <DialogTitle className="text-[#0B4F6C] dark:text-primary flex items-center gap-2 text-xl">
               <ThumbsUp className="w-5 h-5" />
               Feedback Details
             </DialogTitle>
@@ -229,31 +229,31 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
           
           {selectedRating && (
             <div className="space-y-6 py-4">
-              <div className="flex flex-col items-center justify-center p-6 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex flex-col items-center justify-center p-6 bg-gray-50 dark:bg-muted/50 rounded-xl border border-gray-100 dark:border-border">
                 <div className="flex gap-1 mb-2">
                   {renderStars(selectedRating.rating)}
                 </div>
-                <span className="text-3xl font-bold text-gray-900">{selectedRating.rating.toFixed(1)}</span>
-                <span className="text-sm text-gray-500">out of 5.0</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-foreground">{selectedRating.rating.toFixed(1)}</span>
+                <span className="text-sm text-gray-500 dark:text-muted-foreground">out of 5.0</span>
               </div>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Service</label>
-                    <p className="font-medium text-gray-900">{selectedRating.service}</p>
+                    <label className="text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Service</label>
+                    <p className="font-medium text-gray-900 dark:text-foreground">{selectedRating.service}</p>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</label>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <Calendar className="w-4 h-4 text-gray-400" />
+                    <label className="text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Date</label>
+                    <div className="flex items-center gap-2 text-gray-900 dark:text-foreground">
+                      <Calendar className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                       <span className="font-medium">{selectedRating.date}</span>
                     </div>
                   </div>
                   <div className="col-span-2 space-y-1">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer</label>
-                    <div className="flex items-center gap-2 text-gray-900">
-                      <User className="w-4 h-4 text-gray-400" />
+                    <label className="text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Customer</label>
+                    <div className="flex items-center gap-2 text-gray-900 dark:text-foreground">
+                      <User className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                       <span className="font-medium">{selectedRating.customerName}</span>
                     </div>
                   </div>
@@ -262,9 +262,9 @@ export function TechnicianRatings({ ratings, renderStars }: TechnicianRatingsPro
                 <Separator />
 
                 <div className="space-y-2">
-                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Customer Feedback</label>
-                  <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-                    <p className="text-gray-700 italic leading-relaxed">"{selectedRating.feedback}"</p>
+                  <label className="text-xs font-semibold text-gray-500 dark:text-muted-foreground uppercase tracking-wider">Customer Feedback</label>
+                  <div className="bg-blue-50/50 dark:bg-primary/10 p-4 rounded-xl border border-blue-100 dark:border-primary/20">
+                    <p className="text-gray-700 dark:text-foreground italic leading-relaxed">"{selectedRating.feedback}"</p>
                   </div>
                 </div>
               </div>

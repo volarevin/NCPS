@@ -398,10 +398,10 @@ export default function ProfilePage() {
     <div className="p-6 max-w-5xl mx-auto space-y-8 animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#0B4F6C]">My Profile</h1>
-          <p className="text-gray-500 mt-1">Manage your personal information and account settings</p>
+          <h1 className="text-3xl font-bold text-foreground">My Profile</h1>
+          <p className="text-muted-foreground mt-1">Manage your personal information and account settings</p>
         </div>
-        <Badge variant="outline" className="px-4 py-1 text-sm border-[#3FA9BC] text-[#3FA9BC] bg-[#F0F9FA]">
+        <Badge variant="outline" className="px-4 py-1 text-sm border-primary text-primary bg-primary/10">
           {profile.role} Account
         </Badge>
       </div>
@@ -409,21 +409,21 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Personal Info */}
         <div className="lg:col-span-2 space-y-6">
-          <Card className="border-none shadow-md">
+          <Card className="border-border shadow-md bg-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xl text-[#0B4F6C] flex items-center gap-2">
+              <CardTitle className="text-xl text-foreground flex items-center gap-2">
                 <User className="w-5 h-5" /> Personal Information
               </CardTitle>
               {!isEditing ? (
-                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-[#3FA9BC]">
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)} className="text-primary hover:text-primary/80">
                   <Edit2 className="w-4 h-4 mr-2" /> Edit
                 </Button>
               ) : (
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-gray-500">
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)} className="text-muted-foreground">
                     <X className="w-4 h-4 mr-2" /> Cancel
                   </Button>
-                  <Button size="sm" onClick={handleUpdateProfile} className="bg-[#3FA9BC] hover:bg-[#2A6570]">
+                  <Button size="sm" onClick={handleUpdateProfile} className="bg-primary hover:bg-primary/90 text-primary-foreground">
                     <Save className="w-4 h-4 mr-2" /> Save
                   </Button>
                 </div>
@@ -433,9 +433,9 @@ export default function ProfilePage() {
               {/* Profile Picture Section */}
               <div className="flex items-center gap-6 mb-6">
                 <div className="relative group">
-                  <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
+                  <Avatar className="w-24 h-24 border-4 border-background shadow-lg">
                     <AvatarImage src={profile.profile_picture ? `http://localhost:5000${profile.profile_picture}` : undefined} />
-                    <AvatarFallback className="bg-[#0B4F6C] text-white text-2xl">
+                    <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                       {profile.first_name[0]}{profile.last_name[0]}
                     </AvatarFallback>
                   </Avatar>
@@ -454,11 +454,11 @@ export default function ProfilePage() {
                   />
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg">{profile.first_name} {profile.last_name}</h3>
-                  <p className="text-gray-500 text-sm">@{profile.username}</p>
+                  <h3 className="font-medium text-lg text-foreground">{profile.first_name} {profile.last_name}</h3>
+                  <p className="text-muted-foreground text-sm">@{profile.username}</p>
                   <Button 
                     variant="link" 
-                    className="p-0 h-auto text-[#3FA9BC] mt-1"
+                    className="p-0 h-auto text-primary mt-1"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     Change Profile Picture
@@ -470,61 +470,61 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
                 <div className="space-y-2">
-                  <Label className="text-gray-500">Username</Label>
+                  <Label className="text-muted-foreground">Username</Label>
                   {isEditing ? (
                     <Input 
                       value={editForm.username} 
                       onChange={(e) => setEditForm({...editForm, username: e.target.value})}
                     />
                   ) : (
-                    <div className="font-medium text-lg">{profile.username}</div>
+                    <div className="font-medium text-lg text-foreground">{profile.username}</div>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-500">First Name</Label>
+                  <Label className="text-muted-foreground">First Name</Label>
                   {isEditing ? (
                     <Input 
                       value={editForm.firstName} 
                       onChange={(e) => setEditForm({...editForm, firstName: e.target.value})}
                     />
                   ) : (
-                    <div className="font-medium text-lg">{profile.first_name}</div>
+                    <div className="font-medium text-lg text-foreground">{profile.first_name}</div>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-500">Last Name</Label>
+                  <Label className="text-muted-foreground">Last Name</Label>
                   {isEditing ? (
                     <Input 
                       value={editForm.lastName} 
                       onChange={(e) => setEditForm({...editForm, lastName: e.target.value})}
                     />
                   ) : (
-                    <div className="font-medium text-lg">{profile.last_name}</div>
+                    <div className="font-medium text-lg text-foreground">{profile.last_name}</div>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-500">Email Address</Label>
+                  <Label className="text-muted-foreground">Email Address</Label>
                   {isEditing ? (
                     <Input 
                       value={editForm.email} 
                       onChange={(e) => setEditForm({...editForm, email: e.target.value})}
                     />
                   ) : (
-                    <div className="flex items-center gap-2 font-medium">
-                      <Mail className="w-4 h-4 text-gray-400" /> {profile.email}
+                    <div className="flex items-center gap-2 font-medium text-foreground">
+                      <Mail className="w-4 h-4 text-muted-foreground" /> {profile.email}
                     </div>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-gray-500">Phone Number</Label>
+                  <Label className="text-muted-foreground">Phone Number</Label>
                   {isEditing ? (
                     <Input 
                       value={editForm.phone} 
                       onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
                     />
                   ) : (
-                    <div className="flex items-center gap-2 font-medium">
-                      <Phone className="w-4 h-4 text-gray-400" /> {profile.phone_number}
+                    <div className="flex items-center gap-2 font-medium text-foreground">
+                      <Phone className="w-4 h-4 text-muted-foreground" /> {profile.phone_number}
                     </div>
                   )}
                 </div>
@@ -532,9 +532,9 @@ export default function ProfilePage() {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-md">
+          <Card className="border-border shadow-md bg-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-xl text-[#0B4F6C] flex items-center gap-2">
+              <CardTitle className="text-xl text-foreground flex items-center gap-2">
                 <MapPin className="w-5 h-5" /> Address Book
               </CardTitle>
               <Button 
@@ -545,14 +545,14 @@ export default function ProfilePage() {
                   setIsEditingAddress(false);
                   setIsAddressDialogOpen(true);
                 }}
-                className="border-[#3FA9BC] text-[#3FA9BC] hover:bg-[#F0F9FA]"
+                className="border-primary text-primary hover:bg-primary/10"
               >
                 <Plus className="w-4 h-4 mr-2" /> Add Address
               </Button>
             </CardHeader>
             <CardContent className="space-y-4">
               {profile.addresses.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                <div className="text-center py-8 text-muted-foreground bg-muted/50 rounded-lg border border-dashed border-border">
                   No addresses found. Add one to get started.
                 </div>
               ) : (
@@ -561,16 +561,16 @@ export default function ProfilePage() {
                     key={addr.address_id} 
                     className={`p-4 rounded-lg border transition-all ${
                       addr.is_primary 
-                        ? 'bg-[#F0F9FA] border-[#3FA9BC] shadow-sm' 
-                        : 'bg-white border-gray-100 hover:border-gray-200'
+                        ? 'bg-primary/10 border-primary shadow-sm' 
+                        : 'bg-card border-border hover:border-primary/50'
                     }`}
                   >
                     <div className="flex justify-between items-start gap-4">
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{addr.address_line}</span>
+                          <span className="font-medium text-foreground">{addr.address_line}</span>
                           {addr.is_primary && (
-                            <Badge className="bg-[#3FA9BC] hover:bg-[#2A6570] text-[10px]">Primary</Badge>
+                            <Badge className="bg-primary hover:bg-primary/90 text-primary-foreground text-[10px]">Primary</Badge>
                           )}
                         </div>
                       </div>
@@ -581,7 +581,7 @@ export default function ProfilePage() {
                             size="icon" 
                             title="Set as Primary"
                             onClick={() => handleSetPrimaryAddress(addr.address_id)}
-                            className="text-gray-400 hover:text-[#3FA9BC]"
+                            className="text-muted-foreground hover:text-primary"
                           >
                             <Star className="w-4 h-4" />
                           </Button>
@@ -594,7 +594,7 @@ export default function ProfilePage() {
                             setIsEditingAddress(true);
                             setIsAddressDialogOpen(true);
                           }}
-                          className="text-gray-400 hover:text-blue-600"
+                          className="text-muted-foreground hover:text-blue-600"
                         >
                           <Edit2 className="w-4 h-4" />
                         </Button>
@@ -602,7 +602,7 @@ export default function ProfilePage() {
                           variant="ghost" 
                           size="icon" 
                           onClick={() => handleDeleteAddress(addr.address_id)}
-                          className="text-gray-400 hover:text-red-600"
+                          className="text-muted-foreground hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -617,17 +617,17 @@ export default function ProfilePage() {
 
         {/* Right Column: Security */}
         <div className="space-y-6">
-          <Card className="border-none shadow-md bg-white">
+          <Card className="border-border shadow-md bg-card">
             <CardHeader>
-              <CardTitle className="text-xl text-[#0B4F6C] flex items-center gap-2">
+              <CardTitle className="text-xl text-foreground flex items-center gap-2">
                 <Lock className="w-5 h-5" /> Security
               </CardTitle>
               <CardDescription>Manage your password and account security</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
-                <h3 className="font-medium text-gray-900 mb-1">Password</h3>
-                <p className="text-sm text-gray-500 mb-4">Last changed: Never</p>
+              <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                <h3 className="font-medium text-foreground mb-1">Password</h3>
+                <p className="text-sm text-muted-foreground mb-4">Last changed: Never</p>
                 <Button 
                   variant="outline" 
                   className="w-full"
@@ -665,24 +665,24 @@ export default function ProfilePage() {
       </Dialog>
 
       {/* Login History Section */}
-      <Card className="mt-6">
+      <Card className="mt-6 border-border bg-card">
         <CardHeader>
-          <CardTitle className="text-xl font-bold text-[#0B4F6C]">Login History</CardTitle>
+          <CardTitle className="text-xl font-bold text-foreground">Login History</CardTitle>
           <CardDescription>Recent login activity for your account</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {loginHistory.length === 0 ? (
-              <p className="text-sm text-gray-500">No login history found.</p>
+              <p className="text-sm text-muted-foreground">No login history found.</p>
             ) : (
               <div className="space-y-2">
                 {loginHistory.map((log) => (
-                  <div key={log.history_id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg text-sm">
+                  <div key={log.history_id} className="flex justify-between items-center p-3 bg-muted/50 rounded-lg text-sm">
                     <div>
-                      <div className="font-medium">{new Date(log.created_at).toLocaleString()}</div>
-                      <div className="text-xs text-gray-500">{log.ip_address || 'Unknown IP'} • {log.user_agent ? log.user_agent.substring(0, 30) + '...' : 'Unknown Device'}</div>
+                      <div className="font-medium text-foreground">{new Date(log.created_at).toLocaleString()}</div>
+                      <div className="text-xs text-muted-foreground">{log.ip_address || 'Unknown IP'} • {log.user_agent ? log.user_agent.substring(0, 30) + '...' : 'Unknown Device'}</div>
                     </div>
-                    <Badge variant={log.success ? "outline" : "destructive"} className={log.success ? "text-green-600 border-green-200 bg-green-50" : ""}>
+                    <Badge variant={log.success ? "outline" : "destructive"} className={log.success ? "text-green-600 border-green-200 bg-green-50 dark:bg-green-900/20 dark:border-green-800 dark:text-green-400" : ""}>
                       {log.success ? "Success" : "Failed"}
                     </Badge>
                   </div>

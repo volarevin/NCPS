@@ -431,13 +431,13 @@ export function Appointments() {
       />
 
       {/* Filters and Sorting */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-4">
+      <div className="bg-white dark:bg-card p-4 rounded-xl shadow-sm border border-gray-100 dark:border-border flex flex-col gap-4">
         <div className="flex flex-col md:flex-row gap-4 justify-between">
             <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-muted-foreground w-4 h-4" />
                 <Input
                     placeholder="Search client, service, or ID..."
-                    className="pl-10 border-gray-200 focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
+                    className="pl-10 border-gray-200 dark:border-border focus:border-[#0B4F6C] dark:focus:border-primary focus:ring-[#0B4F6C] dark:focus:ring-primary bg-white dark:bg-muted/50 text-foreground"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -445,7 +445,7 @@ export function Appointments() {
             
             <div className="flex items-center gap-2">
                  <select
-                    className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] outline-none transition-all hover:border-[#0B4F6C]"
+                    className="bg-white dark:bg-muted/50 border border-gray-300 dark:border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] dark:focus:ring-primary outline-none transition-all hover:border-[#0B4F6C] dark:hover:border-primary text-foreground"
                     value={categoryFilter}
                     onChange={(e) => setCategoryFilter(e.target.value)}
                  >
@@ -456,7 +456,7 @@ export function Appointments() {
                  </select>
 
                  <select 
-                    className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] outline-none transition-all hover:border-[#0B4F6C]"
+                    className="bg-white dark:bg-muted/50 border border-gray-300 dark:border-border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#0B4F6C] dark:focus:ring-primary outline-none transition-all hover:border-[#0B4F6C] dark:hover:border-primary text-foreground"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as any)}
                  >
@@ -466,7 +466,7 @@ export function Appointments() {
                      <option value="name">Client Name</option>
                  </select>
                  <button 
-                    className="bg-white border border-gray-300 px-3 py-2 rounded-lg hover:bg-gray-50 text-gray-600 transition-all hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
+                    className="bg-white dark:bg-muted/50 border border-gray-300 dark:border-border px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-muted text-gray-600 dark:text-muted-foreground transition-all hover:border-[#0B4F6C] dark:hover:border-primary hover:text-[#0B4F6C] dark:hover:text-primary"
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                  >
                      {sortOrder === 'asc' ? '↑' : '↓'}
@@ -475,7 +475,7 @@ export function Appointments() {
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-          <Filter className="w-4 h-4 text-gray-500 shrink-0" />
+          <Filter className="w-4 h-4 text-gray-500 dark:text-muted-foreground shrink-0" />
           {[
               { id: "all", label: "All" },
               { id: "pending", label: "Pending" },
@@ -490,8 +490,8 @@ export function Appointments() {
                 onClick={() => setStatusFilter(filter.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
                   statusFilter === filter.id
-                    ? "bg-[#0B4F6C] text-white border-[#0B4F6C] shadow-md"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
+                    ? "bg-[#0B4F6C] dark:bg-primary text-white border-[#0B4F6C] dark:border-primary shadow-md"
+                    : "bg-white dark:bg-muted/50 text-gray-700 dark:text-muted-foreground border-gray-300 dark:border-border hover:border-[#0B4F6C] dark:hover:border-primary hover:text-[#0B4F6C] dark:hover:text-primary"
                 }`}
               >
                 {filter.label}
@@ -499,14 +499,14 @@ export function Appointments() {
             )
           )}
           
-          <div className="h-6 w-px bg-gray-300 mx-2" />
+          <div className="h-6 w-px bg-gray-300 dark:bg-border mx-2" />
           
           <Button
             variant="outline"
             size="sm"
             onClick={handleBulkDelete}
             disabled={filteredAppointments.length === 0}
-            className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 whitespace-nowrap"
+            className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 dark:border-red-900/50 dark:hover:bg-red-900/20 whitespace-nowrap"
           >
             <Trash2 className="w-3.5 h-3.5 mr-2" />
             Move All {statusFilter === 'all' ? '' : statusFilter === 'upcoming' ? 'Confirmed' : statusFilter.replace('-', ' ')} to Bin
@@ -519,32 +519,32 @@ export function Appointments() {
         {filteredAppointments.map((appointment) => (
           <div
             key={appointment.id}
-            className="group bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 cursor-pointer relative overflow-hidden"
+            className="group bg-white dark:bg-card p-5 rounded-xl shadow-sm border border-gray-100 dark:border-border hover:shadow-lg transition-all duration-300 cursor-pointer relative overflow-hidden"
             onClick={() => handleViewDetails(appointment)}
           >
-            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#0B4F6C] opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#0B4F6C] dark:bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
             
             <div className="flex flex-col md:flex-row justify-between gap-6">
               <div className="flex items-start gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E6F0F4] to-[#F0F7FA] flex items-center justify-center text-[#0B4F6C] shrink-0 shadow-inner">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#E6F0F4] to-[#F0F7FA] dark:from-primary/20 dark:to-primary/10 flex items-center justify-center text-[#0B4F6C] dark:text-primary shrink-0 shadow-inner">
                   <User className="w-7 h-7" />
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-lg text-gray-800 group-hover:text-[#0B4F6C] transition-colors">
+                    <h3 className="font-bold text-lg text-gray-800 dark:text-foreground group-hover:text-[#0B4F6C] dark:group-hover:text-primary transition-colors">
                         {appointment.clientName}
                     </h3>
-                    <Badge variant="outline" className="text-xs font-normal text-gray-500 border-gray-200">
+                    <Badge variant="outline" className="text-xs font-normal text-gray-500 dark:text-muted-foreground border-gray-200 dark:border-border">
                         #{appointment.id}
                     </Badge>
                   </div>
-                  <p className="text-[#0B4F6C] font-medium flex items-center gap-2">
+                  <p className="text-[#0B4F6C] dark:text-primary font-medium flex items-center gap-2">
                     {appointment.service}
                   </p>
                   {appointment.status === 'completed' && appointment.rating && (
                     <div className="flex items-center gap-1 mt-1">
                       <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                      <span className="text-sm font-medium text-gray-700">{appointment.rating}/5</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-foreground">{appointment.rating}/5</span>
                     </div>
                   )}
                   {(appointment.status === 'cancelled' || appointment.status === 'rejected') && (appointment.cancellationCategory || appointment.rejectionReason) && (
@@ -552,18 +552,18 @@ export function Appointments() {
                       {appointment.status === 'cancelled' ? `Reason: ${appointment.cancellationCategory}` : `Reason: ${appointment.rejectionReason}`}
                     </p>
                   )}
-                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500">
-                    <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
-                      <Calendar className="w-3.5 h-3.5 text-gray-400" />
+                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-500 dark:text-muted-foreground">
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-muted/50 px-2 py-1 rounded-md">
+                      <Calendar className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
                       {appointment.date}
                     </div>
-                    <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
-                      <Clock className="w-3.5 h-3.5 text-gray-400" />
+                    <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-muted/50 px-2 py-1 rounded-md">
+                      <Clock className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
                       {appointment.time}
                     </div>
                     {appointment.phone !== 'N/A' && (
-                        <div className="flex items-center gap-1.5 bg-gray-50 px-2 py-1 rounded-md">
-                            <Phone className="w-3.5 h-3.5 text-gray-400" />
+                        <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-muted/50 px-2 py-1 rounded-md">
+                            <Phone className="w-3.5 h-3.5 text-gray-400 dark:text-muted-foreground" />
                             {appointment.phone}
                         </div>
                     )}
@@ -572,7 +572,7 @@ export function Appointments() {
               </div>
 
                 <div className="flex flex-col items-end justify-between gap-4 min-w-[140px]">
-                <div className="flex flex-col items-end text-xs text-gray-400">
+                <div className="flex flex-col items-end text-xs text-gray-400 dark:text-muted-foreground">
                     {appointment.createdAt && (
                         <span>Created: {appointment.createdAt.toLocaleDateString()}</span>
                     )}
@@ -593,8 +593,8 @@ export function Appointments() {
                 
                 {appointment.technician && (
                   <div className="text-right">
-                    <p className="text-xs text-gray-400 mb-0.5">Technician</p>
-                    <p className="text-sm font-medium text-gray-700">{appointment.technician}</p>
+                    <p className="text-xs text-gray-400 dark:text-muted-foreground mb-0.5">Technician</p>
+                    <p className="text-sm font-medium text-gray-700 dark:text-foreground">{appointment.technician}</p>
                   </div>
                 )}
 

@@ -110,7 +110,7 @@ export function CustomerServices() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
                 selectedCategory === category 
-                  ? 'bg-[#0B4F6C] text-white shadow-md' 
+                  ? 'bg-[#0B4F6C] dark:bg-primary text-white shadow-md' 
                   : 'bg-muted text-muted-foreground hover:bg-muted/80'
               }`}
             >
@@ -187,7 +187,7 @@ export function CustomerServices() {
                 >
                   <div className="p-5 flex-1">
                     <div className="flex justify-between items-start mb-3">
-                      <div className="bg-blue-500/10 p-2 rounded-lg text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] group-hover:text-white transition-colors">
+                      <div className="bg-blue-500/10 dark:bg-blue-900/20 p-2 rounded-lg text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] dark:group-hover:bg-primary group-hover:text-white transition-colors">
                         <IconComponent className="w-5 h-5" />
                       </div>
                       <div className="flex items-center gap-1 text-sm font-medium text-muted-foreground">
@@ -200,7 +200,7 @@ export function CustomerServices() {
                       <span className="text-[10px] font-bold text-[#4DBDCC] dark:text-cyan-400 uppercase tracking-wider">
                         {service.category_name}
                       </span>
-                      <h3 className="font-bold text-foreground group-hover:text-[#0B4F6C] transition-colors">
+                      <h3 className="font-bold text-foreground group-hover:text-[#0B4F6C] dark:group-hover:text-primary transition-colors">
                         {service.service_name}
                       </h3>
                     </div>
@@ -210,7 +210,7 @@ export function CustomerServices() {
                     </p>
                   </div>
                   
-                  <div className="px-5 py-4 border-t border-border bg-muted/30 rounded-b-xl flex items-center justify-between group-hover:bg-blue-500/10 transition-colors">
+                  <div className="px-5 py-4 border-t border-border bg-muted/30 rounded-b-xl flex items-center justify-between group-hover:bg-blue-500/10 dark:group-hover:bg-blue-900/20 transition-colors">
                     <span className="font-bold text-[#0B4F6C] dark:text-primary">₱{service.base_price}</span>
                     <div className="flex items-center text-sm font-medium text-[#4DBDCC] dark:text-cyan-400 group-hover:translate-x-1 transition-transform">
                       Book <ChevronRight className="w-4 h-4 ml-1" />

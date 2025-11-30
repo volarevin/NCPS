@@ -73,17 +73,17 @@ export function UserDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-hidden flex flex-col dark:bg-card dark:text-foreground dark:border-border">
         <DialogHeader>
           <div className="flex items-center justify-between pr-8">
-            <DialogTitle className="text-xl font-bold text-[#0B4F6C]">
+            <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
               User Profile
             </DialogTitle>
             <div className="flex gap-2">
               {!isEditing ? (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-[#0B4F6C] text-white rounded-lg hover:bg-[#093e54] transition-colors text-sm font-medium"
+                  className="px-4 py-2 bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground rounded-lg hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors text-sm font-medium"
                 >
                   Edit Profile
                 </button>
@@ -91,13 +91,13 @@ export function UserDetailsDialog({
                 <>
                   <button
                     onClick={() => setIsEditing(false)}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
+                    className="px-4 py-2 text-gray-600 dark:text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted/50 rounded-lg transition-colors text-sm font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                    className="px-4 py-2 bg-green-600 dark:bg-green-700 text-white rounded-lg hover:bg-green-700 dark:hover:bg-green-800 transition-colors text-sm font-medium"
                   >
                     Save Changes
                   </button>
@@ -111,7 +111,7 @@ export function UserDetailsDialog({
           {/* Left Column - Profile Info */}
           <div className="w-full md:w-1/3 space-y-6">
             <div className="text-center">
-              <div className="w-24 h-24 mx-auto rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg mb-4">
+              <div className="w-24 h-24 mx-auto rounded-full bg-gray-100 dark:bg-muted flex items-center justify-center border-4 border-white dark:border-card shadow-lg mb-4">
                 {user.avatar ? (
                   <img
                     src={user.avatar}
@@ -122,22 +122,22 @@ export function UserDetailsDialog({
                   <User className="w-10 h-10 text-muted-foreground" />
                 )}
               </div>
-              <h3 className="font-bold text-xl text-foreground">
+              <h3 className="font-bold text-xl text-foreground dark:text-foreground">
                 {user.fullName}
               </h3>
               <p className="text-muted-foreground text-sm">@{user.username}</p>
-              <Badge className="mt-2 bg-[#0B4F6C]">{user.role}</Badge>
+              <Badge className="mt-2 bg-[#0B4F6C] dark:bg-primary">{user.role}</Badge>
             </div>
 
             <div className="space-y-4 bg-muted/50 p-4 rounded-xl">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Joined</span>
-                <span className="font-medium">{user.joinedDate}</span>
+                <span className="font-medium dark:text-foreground">{user.joinedDate}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Status</span>
-                <span className="text-green-600 font-medium flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-green-600" />
+                <span className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
+                  <div className="w-2 h-2 rounded-full bg-green-600 dark:bg-green-400" />
                   Active
                 </span>
               </div>
@@ -152,14 +152,14 @@ export function UserDetailsDialog({
                 <div className="flex gap-2">
                   <button
                     onClick={() => onPromote(user.id)}
-                    className="flex-1 py-2 px-4 bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    className="flex-1 py-2 px-4 bg-blue-500/10 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/20 dark:hover:bg-blue-900/30 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
                   >
                     <ArrowUpCircle className="w-4 h-4" />
                     Promote
                   </button>
                   <button
                     onClick={() => onDemote(user.id)}
-                    className="flex-1 py-2 px-4 bg-red-500/10 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+                    className="flex-1 py-2 px-4 bg-red-500/10 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-500/20 dark:hover:bg-red-900/30 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
                   >
                     <ArrowDownCircle className="w-4 h-4" />
                     Demote
@@ -178,7 +178,7 @@ export function UserDetailsDialog({
                 {/* Contact Information */}
                 <div>
                   <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-[#0B4F6C]" />
+                    <Users className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                     Contact Information
                   </h4>
                   <div className="grid grid-cols-1 gap-4">
@@ -193,7 +193,7 @@ export function UserDetailsDialog({
                             fullName: e.target.value,
                           })
                         }
-                        className="bg-background"
+                        className="bg-background dark:bg-muted/50 dark:border-border"
                       />
                     </div>
                     <div className="space-y-2">
@@ -209,7 +209,7 @@ export function UserDetailsDialog({
                               email: e.target.value,
                             })
                           }
-                          className="pl-10 bg-background"
+                          className="pl-10 bg-background dark:bg-muted/50 dark:border-border"
                         />
                       </div>
                     </div>
@@ -226,7 +226,7 @@ export function UserDetailsDialog({
                               phone: e.target.value,
                             })
                           }
-                          className="pl-10 bg-background"
+                          className="pl-10 bg-background dark:bg-muted/50 dark:border-border"
                         />
                       </div>
                     </div>
@@ -238,7 +238,7 @@ export function UserDetailsDialog({
                 {/* Activity Log */}
                 <div>
                   <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                    <Activity className="w-4 h-4 text-[#0B4F6C]" />
+                    <Activity className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                     Recent Activity
                   </h4>
                   <div className="space-y-4">
@@ -249,7 +249,7 @@ export function UserDetailsDialog({
                           className="flex gap-4 p-3 rounded-lg bg-muted/50 border border-border"
                         >
                           <div className="mt-1">
-                            <div className="w-2 h-2 rounded-full bg-[#0B4F6C]" />
+                            <div className="w-2 h-2 rounded-full bg-[#0B4F6C] dark:bg-primary" />
                           </div>
                           <div>
                             <p className="font-medium text-foreground">

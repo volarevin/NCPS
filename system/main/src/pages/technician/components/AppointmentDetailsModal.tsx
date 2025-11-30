@@ -57,15 +57,15 @@ export default function AppointmentDetailsModal({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+        return "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
       case "In Progress":
-        return "bg-blue-100 text-blue-800 border-blue-300";
+        return "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800";
       case "Completed":
-        return "bg-green-100 text-green-800 border-green-300";
+        return "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
       case "Cancelled":
-        return "bg-red-100 text-red-800 border-red-300";
+        return "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-300";
+        return "bg-gray-100 text-gray-800 border-gray-300 dark:bg-muted dark:text-muted-foreground dark:border-border";
     }
   };
 
@@ -115,7 +115,7 @@ export default function AppointmentDetailsModal({
         <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center justify-between pr-8">
-              <DialogTitle className="text-xl font-bold text-[#0B4F6C]">
+              <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
                 Appointment Details
               </DialogTitle>
               <Badge className={`${getStatusColor(appointment.status)} text-xs lg:text-sm`}>
@@ -127,88 +127,88 @@ export default function AppointmentDetailsModal({
           <div className="grid gap-6 py-4">
             {/* Client Info Section */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                <User className="w-4 h-4 text-[#0B4F6C]" />
+              <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+                <User className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                 Client Information
               </h3>
               <div className="grid grid-cols-2 gap-4 pl-6">
                 <div>
-                  <p className="text-sm text-gray-500">Name</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Name</p>
                   <p className="font-medium">{appointment.customerName}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Phone</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Phone</p>
                   <div className="flex items-center gap-2">
-                    <Phone className="w-3 h-3 text-gray-400" />
+                    <Phone className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
                     <p className="font-medium">{appointment.phone}</p>
                     <Button
                         onClick={() => handleCall(appointment.phone)}
                         size="sm"
                         variant="ghost"
-                        className="h-6 w-6 p-0 text-green-600"
+                        className="h-6 w-6 p-0 text-green-600 dark:text-green-400"
                       >
                         <Phone className="w-3 h-3" />
                     </Button>
                   </div>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Email</p>
                   <div className="flex items-center gap-2">
-                    <Mail className="w-3 h-3 text-gray-400" />
+                    <Mail className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
                     <p className="font-medium">{appointment.email}</p>
                     <Button
                         onClick={() => handleEmail(appointment.email)}
                         size="sm"
                         variant="ghost"
-                        className="h-6 w-6 p-0 text-blue-600"
+                        className="h-6 w-6 p-0 text-blue-600 dark:text-blue-400"
                       >
                         <Mail className="w-3 h-3" />
                     </Button>
                   </div>
                 </div>
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-500">Address</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Address</p>
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-3 h-3 text-gray-400" />
+                    <MapPin className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
                     <p className="font-medium">{appointment.address}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="border-t border-gray-100" />
+            <div className="border-t border-gray-100 dark:border-border" />
 
             {/* Service Info Section */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-[#0B4F6C]" />
+              <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+                <Wrench className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                 Service Details
               </h3>
               <div className="grid grid-cols-2 gap-4 pl-6">
                 <div>
-                  <p className="text-sm text-gray-500">Service Type</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Service Type</p>
                   <p className="font-medium">{appointment.service}</p>
                 </div>
                 
                 <div>
-                  <p className="text-sm text-gray-500">Date</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Date</p>
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-3 h-3 text-gray-400" />
+                    <Calendar className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
                     <p className="font-medium">{appointment.date}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Time</p>
+                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Time</p>
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-gray-400" />
+                    <Clock className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
                     <p className="font-medium">{appointment.time}</p>
                   </div>
                 </div>
                 
                 {appointment.notes && (
                   <div className="col-span-2">
-                    <p className="text-sm text-gray-500">Notes</p>
-                    <p className="font-medium text-gray-700 bg-yellow-50 p-3 rounded-lg mt-1 border border-yellow-100">
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Notes</p>
+                    <p className="font-medium text-gray-700 dark:text-foreground bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg mt-1 border border-yellow-100 dark:border-yellow-900/30">
                       {appointment.notes}
                     </p>
                   </div>
@@ -219,16 +219,16 @@ export default function AppointmentDetailsModal({
             {/* Completed Appointment Details */}
             {appointment.status === 'Completed' && (appointment.rating || appointment.feedback) && (
               <>
-                <div className="border-t border-gray-100" />
+                <div className="border-t border-gray-100 dark:border-border" />
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#0B4F6C]" />
+                  <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+                    <Star className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                     Feedback & Rating
                   </h3>
                   <div className="pl-6 space-y-3">
                     {appointment.rating && (
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">Rating</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Rating</p>
                         <div className="flex gap-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <Star
@@ -236,7 +236,7 @@ export default function AppointmentDetailsModal({
                               className={`w-4 h-4 ${
                                 star <= appointment.rating!
                                   ? "fill-yellow-400 text-yellow-400"
-                                  : "text-gray-300"
+                                  : "text-gray-300 dark:text-muted"
                               }`}
                             />
                           ))}
@@ -245,10 +245,10 @@ export default function AppointmentDetailsModal({
                     )}
                     {appointment.feedback && (
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">Customer Feedback</p>
-                        <div className="flex gap-2 items-start bg-gray-50 p-3 rounded-lg">
-                          <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                          <p className="text-gray-700 italic text-sm">"{appointment.feedback}"</p>
+                        <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Customer Feedback</p>
+                        <div className="flex gap-2 items-start bg-gray-50 dark:bg-muted/50 p-3 rounded-lg">
+                          <MessageSquare className="w-4 h-4 text-gray-400 dark:text-muted-foreground mt-0.5 shrink-0" />
+                          <p className="text-gray-700 dark:text-foreground italic text-sm">"{appointment.feedback}"</p>
                         </div>
                       </div>
                     )}
@@ -260,33 +260,33 @@ export default function AppointmentDetailsModal({
             {/* Cancelled Details */}
             {appointment.status === 'Cancelled' && (
               <>
-                <div className="border-t border-gray-100" />
+                <div className="border-t border-gray-100 dark:border-border" />
                 <div className="space-y-4">
-                  <h3 className="font-semibold text-red-600 flex items-center gap-2">
+                  <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" />
                     Cancellation Details
                   </h3>
                   <div className="grid grid-cols-2 gap-4 pl-6">
                     <div className="col-span-2">
-                      <p className="text-sm text-gray-500">Category</p>
-                      <Badge variant="outline" className="mt-1 border-red-200 text-red-700 bg-red-50">
+                      <p className="text-sm text-gray-500 dark:text-muted-foreground">Category</p>
+                      <Badge variant="outline" className="mt-1 border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20">
                         {appointment.cancellationCategory || 'N/A'}
                       </Badge>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-sm text-gray-500">Reason</p>
-                      <p className="font-medium text-gray-700 bg-red-50 p-3 rounded-lg mt-1 border border-red-100">
+                      <p className="text-sm text-gray-500 dark:text-muted-foreground">Reason</p>
+                      <p className="font-medium text-gray-700 dark:text-foreground bg-red-50 dark:bg-red-900/20 p-3 rounded-lg mt-1 border border-red-100 dark:border-red-900/30">
                         {appointment.cancellationReason || 'No reason provided'}
                       </p>
                     </div>
                     <div className="col-span-2">
-                      <p className="text-sm text-gray-500">Cancelled By</p>
-                      <p className="font-medium text-gray-700">
+                      <p className="text-sm text-gray-500 dark:text-muted-foreground">Cancelled By</p>
+                      <p className="font-medium text-gray-700 dark:text-foreground">
                         {appointment.cancelledByRole ? (
                           <span className="capitalize">
                             {appointment.cancelledByRole} 
                             {(appointment.cancelledByRole === 'Admin' || appointment.cancelledByRole === 'Receptionist') && appointment.cancelledById && (
-                              <span className="text-gray-400 text-xs ml-2">(ID: {appointment.cancelledById})</span>
+                              <span className="text-gray-400 dark:text-muted-foreground text-xs ml-2">(ID: {appointment.cancelledById})</span>
                             )}
                           </span>
                         ) : 'N/A'}
@@ -298,7 +298,7 @@ export default function AppointmentDetailsModal({
             )}
 
             {/* Actions */}
-            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
+            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-border">
               {isTechnician && appointment.status !== "Completed" && appointment.status !== "Cancelled" && (
                 <>
                   {(appointment.status === "Pending" || appointment.status === "Confirmed") && isToday(appointment.date) && (
@@ -349,7 +349,7 @@ export default function AppointmentDetailsModal({
         <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-red-600">
+              <DialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
                 <XCircle className="w-5 h-5" />
                 Cancel Appointment
               </DialogTitle>
@@ -359,8 +359,8 @@ export default function AppointmentDetailsModal({
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div>
-                <label className="text-sm text-gray-700 font-medium mb-2 block">
-                  Cancellation Category <span className="text-red-500">*</span>
+                <label className="text-sm text-gray-700 dark:text-foreground font-medium mb-2 block">
+                  Cancellation Category <span className="text-red-500 dark:text-red-400">*</span>
                 </label>
                 <Select value={cancelCategory} onValueChange={setCancelCategory}>
                   <SelectTrigger>
@@ -374,7 +374,7 @@ export default function AppointmentDetailsModal({
                 </Select>
               </div>
               <div>
-                <label className="text-sm text-gray-700 font-medium mb-2 block">
+                <label className="text-sm text-gray-700 dark:text-foreground font-medium mb-2 block">
                   Cancellation Reason (Optional)
                 </label>
                 <Textarea

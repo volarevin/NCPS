@@ -24,7 +24,7 @@ export function NotificationCard({ notification, onClick }: NotificationCardProp
   return (
     <div 
       onClick={onClick}
-      className={`border-l-4 border-l-[#4DBDCC] bg-white p-4 rounded-r-lg shadow-sm hover:shadow-md transition-all cursor-pointer mb-3 border border-gray-100`}
+      className={`border-l-4 border-l-[#4DBDCC] bg-white dark:bg-card p-4 rounded-r-lg shadow-sm hover:shadow-md transition-all cursor-pointer mb-3 border border-gray-100 dark:border-border`}
     >
       <div className="flex gap-3">
         <div className="mt-1 flex-shrink-0">
@@ -32,20 +32,20 @@ export function NotificationCard({ notification, onClick }: NotificationCardProp
         </div>
         <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
-                <h4 className="font-semibold text-[#0B4F6C] text-sm md:text-base truncate pr-2">{notification.title}</h4>
-                <span className="text-[10px] text-gray-400 whitespace-nowrap flex-shrink-0">
+                <h4 className="font-semibold text-[#0B4F6C] dark:text-primary text-sm md:text-base truncate pr-2">{notification.title}</h4>
+                <span className="text-[10px] text-gray-400 dark:text-muted-foreground whitespace-nowrap flex-shrink-0">
                     {new Date(notification.created_at).toLocaleDateString()}
                 </span>
             </div>
             
             {notification.service_name && (
-                <p className="text-xs font-medium text-gray-700 mt-0.5 flex items-center gap-1">
-                    <Calendar className="w-3 h-3 text-gray-400" />
+                <p className="text-xs font-medium text-gray-700 dark:text-foreground mt-0.5 flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
                     {notification.service_name}
                 </p>
             )}
             
-            <p className="text-gray-600 text-xs md:text-sm mt-1 line-clamp-2">{notification.message}</p>
+            <p className="text-gray-600 dark:text-muted-foreground text-xs md:text-sm mt-1 line-clamp-2">{notification.message}</p>
         </div>
       </div>
     </div>

@@ -106,52 +106,52 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] dark:bg-card dark:text-foreground dark:border-border">
         <DialogHeader>
-          <DialogTitle>Add New Technician</DialogTitle>
+          <DialogTitle className="dark:text-foreground">Add New Technician</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Select User to Promote</Label>
+            <Label className="dark:text-foreground">Select User to Promote</Label>
             <div className="relative">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search users..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-8"
+                className="pl-8 dark:bg-muted/50 dark:border-border"
               />
             </div>
-            <ScrollArea className="h-[400px] border rounded-md p-2">
+            <ScrollArea className="h-[400px] border dark:border-border rounded-md p-2">
               {filteredUsers.length === 0 ? (
-                <div className="text-center text-sm text-gray-500 py-4">No eligible users found</div>
+                <div className="text-center text-sm text-gray-500 dark:text-muted-foreground py-4">No eligible users found</div>
               ) : (
                 <div className="space-y-1">
                   {filteredUsers.map((user) => (
                     <div
                       key={user.user_id}
                       className={`flex items-start justify-between p-3 rounded-md cursor-pointer transition-colors ${
-                        selectedUser === user.user_id ? 'bg-[#0B4F6C]/10 border-[#0B4F6C] border' : 'hover:bg-gray-100'
+                        selectedUser === user.user_id ? 'bg-[#0B4F6C]/10 dark:bg-primary/20 border-[#0B4F6C] dark:border-primary border' : 'hover:bg-gray-100 dark:hover:bg-muted/50'
                       }`}
                       onClick={() => setSelectedUser(user.user_id)}
                     >
                       <div className="flex-1">
-                        <p className="font-medium">{user.first_name} {user.last_name}</p>
+                        <p className="font-medium dark:text-foreground">{user.first_name} {user.last_name}</p>
                         <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-1">
-                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground flex items-center gap-1">
                             <span className="font-semibold">Email:</span> {user.email}
                           </p>
-                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground flex items-center gap-1">
                             <span className="font-semibold">Phone:</span> {user.phone_number || 'N/A'}
                           </p>
-                          <p className="text-xs text-gray-500 col-span-2 flex items-center gap-1">
+                          <p className="text-xs text-gray-500 dark:text-muted-foreground col-span-2 flex items-center gap-1">
                             <span className="font-semibold">Address:</span> {user.address || 'N/A'}
                           </p>
                         </div>
                       </div>
                       {selectedUser === user.user_id && (
-                        <div className="h-2 w-2 rounded-full bg-[#0B4F6C] mt-2" />
+                        <div className="h-2 w-2 rounded-full bg-[#0B4F6C] dark:bg-primary mt-2" />
                       )}
                     </div>
                   ))}
@@ -161,9 +161,9 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
           </div>
 
           <div className="space-y-2">
-            <Label>Assign Specialty</Label>
+            <Label className="dark:text-foreground">Assign Specialty</Label>
             <Select value={selectedSpecialty} onValueChange={setSelectedSpecialty}>
-              <SelectTrigger>
+              <SelectTrigger className="dark:bg-muted/50 dark:border-border">
                 <SelectValue placeholder="Select specialty" />
               </SelectTrigger>
               <SelectContent>
@@ -181,11 +181,11 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">Cancel</Button>
           <Button 
             onClick={handlePromote} 
             disabled={!selectedUser || !selectedSpecialty || loading}
-            className="bg-[#0B4F6C] hover:bg-[#093d54]"
+            className="bg-[#0B4F6C] hover:bg-[#093d54] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
           >
             {loading ? "Promoting..." : "Promote to Technician"}
           </Button>

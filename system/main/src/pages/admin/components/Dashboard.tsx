@@ -114,35 +114,35 @@ export function Dashboard() {
       icon: Calendar,
       value: formatNumber(statsData?.today_appointments),
       label: "Today's Appointments",
-      bgColor: "#B8D4FF",
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
       iconBg: "#5B8FFF",
     },
     {
       icon: Wrench,
       value: formatNumber(statsData?.pending_requests),
       label: "Pending Requests",
-      bgColor: "#FFD9B8",
+      bgColor: "bg-orange-100 dark:bg-orange-900/20",
       iconBg: "#FFB366",
     },
     {
       icon: Activity,
       value: formatNumber(statsData?.in_progress_count),
       label: "In Progress",
-      bgColor: "#BFDBFE",
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
       iconBg: "#3B82F6",
     },
     {
       icon: TrendingUp,
       value: formatCurrency(statsData?.monthly_revenue),
       label: "Monthly Revenue",
-      bgColor: "#C1EAC5",
+      bgColor: "bg-green-100 dark:bg-green-900/20",
       iconBg: "#5DD37C",
     },
     {
       icon: Users,
       value: formatNumber(statsData?.available_techs),
       label: "Available Technicians",
-      bgColor: "#E0E0E0",
+      bgColor: "bg-gray-100 dark:bg-gray-800",
       iconBg: "#757575",
     },
   ];
@@ -159,11 +159,10 @@ export function Dashboard() {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white p-6 rounded-2xl shadow-sm border-2 border-gray-100 flex items-center space-x-4"
+            className="bg-card p-6 rounded-2xl shadow-sm border border-border flex items-center space-x-4"
           >
             <div
-              className="p-3 rounded-xl"
-              style={{ backgroundColor: stat.bgColor }}
+              className={`p-3 rounded-xl ${stat.bgColor}`}
             >
               <stat.icon
                 className="w-6 h-6"
@@ -171,8 +170,8 @@ export function Dashboard() {
               />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-800">{stat.value}</h3>
-              <p className="text-sm text-gray-500">{stat.label}</p>
+              <h3 className="text-2xl font-bold text-foreground">{stat.value}</h3>
+              <p className="text-sm text-muted-foreground">{stat.label}</p>
             </div>
           </div>
         ))}
@@ -180,30 +179,50 @@ export function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Monthly Appointments & Revenue Chart */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border-2 border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="lg:col-span-2 bg-card p-6 rounded-2xl shadow-sm border border-border">
+          <h3 className="text-lg font-semibold text-foreground mb-4">
             Monthly Performance
           </h3>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <ComposedChart data={monthlyStats}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} />
-                <YAxis yAxisId="left" axisLine={false} tickLine={false} />
-                <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tickFormatter={(value) => `₱${value/1000}k`} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis 
+                  dataKey="month" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis 
+                  yAxisId="left" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                />
+                <YAxis 
+                  yAxisId="right" 
+                  orientation="right" 
+                  axisLine={false} 
+                  tickLine={false} 
+                  tickFormatter={(value) => `₱${value/1000}k`} 
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#fff",
+                    backgroundColor: "hsl(var(--popover))",
                     borderRadius: "8px",
-                    border: "none",
+                    border: "1px solid hsl(var(--border))",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                    color: "hsl(var(--popover-foreground))"
                   }}
+                  itemStyle={{ color: "hsl(var(--popover-foreground))" }}
+                  labelStyle={{ color: "hsl(var(--popover-foreground))" }}
                   formatter={(value: any, name: string) => [
                     name === "Revenue" ? `₱${Number(value).toLocaleString()}` : value,
                     name
                   ]}
                 />
-                <Legend />
+                <Legend wrapperStyle={{ color: 'hsl(var(--foreground))' }} />
                 <Bar
                   yAxisId="left"
                   dataKey="appointments"
@@ -227,8 +246,8 @@ export function Dashboard() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+          <h3 className="text-lg font-semibold text-foreground mb-4">
             Recent Activity
           </h3>
           <div className="space-y-4">
@@ -244,11 +263,11 @@ export function Dashboard() {
                   />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-800">
+                  <p className="text-sm font-medium text-foreground">
                     {activity.user}
                   </p>
-                  <p className="text-xs text-gray-500">{activity.action}</p>
-                  <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+                  <p className="text-xs text-muted-foreground">{activity.action}</p>
+                  <p className="text-xs text-muted-foreground/70 mt-1">{activity.time}</p>
                 </div>
               </div>
             ))}
@@ -257,8 +276,8 @@ export function Dashboard() {
       </div>
 
       {/* Service Distribution */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border-2 border-gray-100">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+      <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
+        <h3 className="text-lg font-semibold text-foreground mb-4">
           Service Distribution
         </h3>
         <div className="h-[300px]">
@@ -277,8 +296,16 @@ export function Dashboard() {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: "hsl(var(--popover))",
+                  borderRadius: "8px",
+                  border: "1px solid hsl(var(--border))",
+                  color: "hsl(var(--popover-foreground))"
+                }}
+                itemStyle={{ color: "hsl(var(--popover-foreground))" }}
+              />
+              <Legend wrapperStyle={{ color: 'hsl(var(--foreground))' }} />
             </PieChart>
           </ResponsiveContainer>
         </div>

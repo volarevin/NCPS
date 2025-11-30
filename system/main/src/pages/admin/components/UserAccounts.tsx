@@ -154,7 +154,7 @@ export function UserAccounts() {
         title="User Accounts" 
         description="Manage system users, roles, and permissions."
         action={
-          <button className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] transition-colors">
+          <button className="bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors">
             <UserPlus className="w-4 h-4" />
             Add New User
           </button>
@@ -166,7 +166,7 @@ export function UserAccounts() {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-card p-4 rounded-xl shadow-sm border border-border flex items-center gap-4"
+            className="bg-card dark:bg-card p-4 rounded-xl shadow-sm border border-border dark:border-border flex items-center gap-4"
           >
             <div
               className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center text-white`}
@@ -174,20 +174,20 @@ export function UserAccounts() {
               <stat.icon className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
-              <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+              <p className="text-sm text-muted-foreground dark:text-muted-foreground">{stat.label}</p>
+              <p className="text-2xl font-bold text-foreground dark:text-foreground">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="bg-card p-4 rounded-xl shadow-sm border border-border flex flex-col md:flex-row gap-4">
+      <div className="bg-card dark:bg-card p-4 rounded-xl shadow-sm border border-border dark:border-border flex flex-col md:flex-row gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
             placeholder="Search by name, email, or username..."
-            className="pl-10"
+            className="pl-10 dark:bg-muted/50 dark:border-border"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -199,8 +199,8 @@ export function UserAccounts() {
               onClick={() => setRoleFilter(role)}
               className={`px-3 py-1.5 rounded-full text-sm capitalize transition-colors ${
                 roleFilter === role
-                  ? "bg-[#0B4F6C] text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground"
+                  : "bg-gray-100 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
               }`}
             >
               {role}

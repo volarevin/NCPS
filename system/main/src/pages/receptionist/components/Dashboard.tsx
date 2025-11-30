@@ -274,30 +274,30 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
       {/* Widgets Row - More Compact */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4 mb-4">
         {/* Today's Appointments */}
-        <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC]">
+        <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC] dark:hover:border-cyan-400">
           <CardHeader className="p-3 sm:p-4">
-            <CardTitle className="text-sm sm:text-base text-[#0B4F6C] flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-[#4DBDCC]" />
+            <CardTitle className="text-sm sm:text-base text-[#0B4F6C] dark:text-primary flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-[#4DBDCC] dark:text-cyan-400" />
               Today's Appointments
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs dark:text-muted-foreground">
               {today}
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 pt-0">
             {todayAppointments.length === 0 ? (
-              <p className="text-gray-500 text-center py-3 text-xs sm:text-sm">No appointments scheduled for today</p>
+              <p className="text-gray-500 dark:text-muted-foreground text-center py-3 text-xs sm:text-sm">No appointments scheduled for today</p>
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto overflow-x-hidden">
                 {todayAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
                     onClick={() => onAppointmentClick(appointment)}
-                    className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-[#E5F4F5] to-white rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer group"
+                    className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-[#E5F4F5] to-white dark:from-blue-900/20 dark:to-card rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer group"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-[#0B4F6C] group-hover:text-[#4DBDCC] transition-colors truncate">{appointment.clientName}</p>
-                      <p className="text-xs text-gray-600 truncate">{appointment.service}</p>
+                      <p className="text-xs sm:text-sm text-[#0B4F6C] dark:text-primary group-hover:text-[#4DBDCC] dark:group-hover:text-cyan-400 transition-colors truncate">{appointment.clientName}</p>
+                      <p className="text-xs text-gray-600 dark:text-muted-foreground truncate">{appointment.service}</p>
                       {appointment.status === 'completed' && appointment.rating && (
                         <div className="flex items-center gap-1 mt-1">
                           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
@@ -335,31 +335,31 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
         </Card>
 
         {/* Pending Appointments */}
-        <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC]">
+        <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC] dark:hover:border-cyan-400">
           <CardHeader className="p-3 sm:p-4">
-            <CardTitle className="text-sm sm:text-base text-[#0B4F6C] flex items-center gap-2">
+            <CardTitle className="text-sm sm:text-base text-[#0B4F6C] dark:text-primary flex items-center gap-2">
               <Clock className="h-4 w-4 text-[#F97316]" />
               Pending Appointments
             </CardTitle>
-            <CardDescription className="text-xs">
+            <CardDescription className="text-xs dark:text-muted-foreground">
               Waiting for approval
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 pt-0">
             {pendingAppointments.length === 0 ? (
-              <p className="text-gray-500 text-center py-3 text-xs sm:text-sm">No pending appointments</p>
+              <p className="text-gray-500 dark:text-muted-foreground text-center py-3 text-xs sm:text-sm">No pending appointments</p>
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto overflow-x-hidden">
                 {pendingAppointments.map((appointment) => (
                   <div
                     key={appointment.id}
                     onClick={() => onAppointmentClick(appointment)}
-                    className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-[#FFF7ED] to-white rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer group border border-orange-100"
+                    className="flex items-center justify-between p-2 sm:p-3 bg-gradient-to-r from-[#FFF7ED] to-white dark:from-orange-900/20 dark:to-card rounded-lg hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer group border border-orange-100 dark:border-orange-900/30"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-[#0B4F6C] font-medium truncate">{appointment.clientName}</p>
-                      <p className="text-xs text-gray-600 truncate">{appointment.service}</p>
-                      <p className="text-xs text-gray-500">{appointment.date} • {appointment.time}</p>
+                      <p className="text-xs sm:text-sm text-[#0B4F6C] dark:text-primary font-medium truncate">{appointment.clientName}</p>
+                      <p className="text-xs text-gray-600 dark:text-muted-foreground truncate">{appointment.service}</p>
+                      <p className="text-xs text-gray-500 dark:text-muted-foreground">{appointment.date} • {appointment.time}</p>
                     </div>
                     <div className="flex items-center gap-1 ml-2">
                       <Button
@@ -390,10 +390,10 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
       </div>
 
       {/* Service Summary - More Compact */}
-      <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC]">
+      <Card className="hover:shadow-xl transition-all duration-300 border-2 hover:border-[#4DBDCC] dark:hover:border-cyan-400">
         <CardHeader className="p-3 sm:p-4">
-          <CardTitle className="text-sm sm:text-base text-[#0B4F6C]">Service Summary by Category</CardTitle>
-          <CardDescription className="text-xs">Breakdown of services requested</CardDescription>
+          <CardTitle className="text-sm sm:text-base text-[#0B4F6C] dark:text-primary">Service Summary by Category</CardTitle>
+          <CardDescription className="text-xs dark:text-muted-foreground">Breakdown of services requested</CardDescription>
         </CardHeader>
         <CardContent className="p-3 sm:p-4 pt-0">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
@@ -409,7 +409,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                 <div 
                   key={category.name} 
                   onClick={() => setSelectedCategory(category)}
-                  className="bg-white rounded-lg p-3 sm:p-4 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-[#4DBDCC]"
+                  className="bg-white dark:bg-card rounded-lg p-3 sm:p-4 text-center hover:shadow-lg hover:scale-105 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-[#4DBDCC] dark:hover:border-cyan-400"
                   style={{ backgroundColor: `${category.color}15` }} // 10% opacity background
                 >
                   <div 
@@ -421,7 +421,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
                   <div className="text-xl sm:text-2xl font-bold mb-1" style={{ color: category.color }}>
                     {category.count}
                   </div>
-                  <div className="text-xs text-gray-600 font-medium line-clamp-2">{category.name}</div>
+                  <div className="text-xs text-gray-600 dark:text-muted-foreground font-medium line-clamp-2">{category.name}</div>
                 </div>
               );
             })}
@@ -519,7 +519,7 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
       <Dialog open={!!selectedCategory} onOpenChange={(open) => !open && setSelectedCategory(null)}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-[#0B4F6C]">
+            <DialogTitle className="flex items-center gap-2 text-[#0B4F6C] dark:text-primary">
               {selectedCategory && (() => {
                 const Icon = iconMap[selectedCategory.icon] || Box;
                 return <Icon className="w-5 h-5" style={{ color: selectedCategory.color }} />;
@@ -532,10 +532,10 @@ export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: Dashbo
               {selectedCategory?.services.map((service, index) => (
                 <div 
                   key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100"
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-muted rounded-lg border border-gray-100 dark:border-border"
                 >
-                  <span className="font-medium text-gray-700">{service.name}</span>
-                  <Badge variant="secondary" className="bg-white border border-gray-200 text-gray-600">
+                  <span className="font-medium text-gray-700 dark:text-foreground">{service.name}</span>
+                  <Badge variant="secondary" className="bg-white dark:bg-card border border-gray-200 dark:border-border text-gray-600 dark:text-muted-foreground">
                     {service.count} request{service.count !== 1 ? 's' : ''}
                   </Badge>
                 </div>

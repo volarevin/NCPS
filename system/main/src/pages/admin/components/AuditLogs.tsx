@@ -108,11 +108,11 @@ export function AuditLogs() {
 
   const getActionColor = (action: string) => {
     switch (action.toUpperCase()) {
-      case 'CREATE': return 'bg-green-100 text-green-800 border-green-200';
-      case 'UPDATE': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'DELETE': return 'bg-red-100 text-red-800 border-red-200';
-      case 'LOGIN': return 'bg-purple-100 text-purple-800 border-purple-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'CREATE': return 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-900';
+      case 'UPDATE': return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-900';
+      case 'DELETE': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-900';
+      case 'LOGIN': return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-900';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-muted dark:text-muted-foreground dark:border-border';
     }
   };
 
@@ -127,7 +127,7 @@ export function AuditLogs() {
     // Handle simple meta/note structure (from migration)
     if (parsed.meta && parsed.note) {
       return (
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-gray-600 dark:text-muted-foreground">
           <p>{parsed.note}</p>
           {parsed.meta !== parsed.note && <p className="text-xs mt-1 opacity-75">{parsed.meta}</p>}
         </div>
@@ -137,26 +137,26 @@ export function AuditLogs() {
     return (
       <div className="grid grid-cols-2 gap-4">
         {parsed.old && (
-          <div className="border rounded-md p-3 bg-red-50/50">
-            <h4 className="text-xs font-semibold text-red-600 mb-2 uppercase tracking-wider">Previous State</h4>
+          <div className="border rounded-md p-3 bg-red-50/50 dark:bg-red-900/10 dark:border-red-900/30">
+            <h4 className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 uppercase tracking-wider">Previous State</h4>
             <div className="space-y-1">
               {Object.entries(parsed.old).map(([key, value]) => (
                 <div key={key} className="text-xs grid grid-cols-3 gap-2">
-                  <span className="font-medium text-gray-600">{key}:</span>
-                  <span className="col-span-2 text-gray-800 break-all">{String(value)}</span>
+                  <span className="font-medium text-gray-600 dark:text-muted-foreground">{key}:</span>
+                  <span className="col-span-2 text-gray-800 dark:text-foreground break-all">{String(value)}</span>
                 </div>
               ))}
             </div>
           </div>
         )}
         {parsed.new && (
-          <div className="border rounded-md p-3 bg-green-50/50">
-            <h4 className="text-xs font-semibold text-green-600 mb-2 uppercase tracking-wider">New State</h4>
+          <div className="border rounded-md p-3 bg-green-50/50 dark:bg-green-900/10 dark:border-green-900/30">
+            <h4 className="text-xs font-semibold text-green-600 dark:text-green-400 mb-2 uppercase tracking-wider">New State</h4>
             <div className="space-y-1">
               {Object.entries(parsed.new).map(([key, value]) => (
                 <div key={key} className="text-xs grid grid-cols-3 gap-2">
-                  <span className="font-medium text-gray-600">{key}:</span>
-                  <span className="col-span-2 text-gray-800 break-all">{String(value)}</span>
+                  <span className="font-medium text-gray-600 dark:text-muted-foreground">{key}:</span>
+                  <span className="col-span-2 text-gray-800 dark:text-foreground break-all">{String(value)}</span>
                 </div>
               ))}
             </div>
@@ -205,18 +205,18 @@ export function AuditLogs() {
                 </SelectContent>
               </Select>
               
-              <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-background">
+              <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-background dark:bg-muted/50 dark:border-border">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <input 
                   type="date" 
-                  className="bg-transparent text-sm outline-none w-32"
+                  className="bg-transparent text-sm outline-none w-32 dark:text-foreground"
                   value={dateRange.start}
                   onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
                 />
                 <span className="text-muted-foreground">-</span>
                 <input 
                   type="date" 
-                  className="bg-transparent text-sm outline-none w-32"
+                  className="bg-transparent text-sm outline-none w-32 dark:text-foreground"
                   value={dateRange.end}
                   onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
                 />
@@ -316,7 +316,7 @@ export function AuditLogs() {
       </Card>
 
       <Dialog open={!!selectedLog} onOpenChange={(open) => !open && setSelectedLog(null)}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden flex flex-col dark:bg-card dark:text-foreground dark:border-border">
           <DialogHeader>
             <DialogTitle>Audit Log Details</DialogTitle>
             <DialogDescription>

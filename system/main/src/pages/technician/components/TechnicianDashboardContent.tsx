@@ -71,12 +71,12 @@ export function TechnicianDashboardContent({
               {todayAppointments.map((apt) => (
                 <Card 
                   key={apt.id}
-                  className="hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 border-l-[#0B4F6C] group bg-card"
+                  className="hover:shadow-md transition-all duration-200 cursor-pointer border-l-4 border-l-[#0B4F6C] dark:border-l-primary group bg-card"
                   onClick={() => setSelectedAppointment(apt)}
                 >
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="bg-[#E8F5F4] dark:bg-primary/10 p-3 rounded-full text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] group-hover:text-white transition-colors">
+                      <div className="bg-[#E8F5F4] dark:bg-primary/10 p-3 rounded-full text-[#0B4F6C] dark:text-primary group-hover:bg-[#0B4F6C] dark:group-hover:bg-primary group-hover:text-white transition-colors">
                         <Clock className="w-5 h-5" />
                       </div>
                       <div>

@@ -65,7 +65,7 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
   const days = [];
   // Empty cells for previous month
   for (let i = 0; i < firstDay; i++) {
-    days.push(<div key={`empty-${i}`} className="min-h-[80px] md:min-h-[100px] bg-gray-50/50 border border-gray-100" />);
+    days.push(<div key={`empty-${i}`} className="min-h-[80px] md:min-h-[100px] bg-gray-50/50 dark:bg-muted/20 border border-gray-100 dark:border-border" />);
   }
 
   // Days of current month
@@ -78,15 +78,15 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
     days.push(
       <div 
         key={day} 
-        className={`min-h-[80px] md:min-h-[100px] border border-gray-100 p-2 transition-all cursor-pointer hover:bg-blue-50/50 active:bg-blue-100
-            ${isToday ? 'bg-blue-50/30 ring-1 ring-inset ring-[#0B4F6C]/20' : ''}
+        className={`min-h-[80px] md:min-h-[100px] border border-gray-100 dark:border-border p-2 transition-all cursor-pointer hover:bg-blue-50/50 dark:hover:bg-blue-900/20 active:bg-blue-100 dark:active:bg-blue-900/40
+            ${isToday ? 'bg-blue-50/30 dark:bg-blue-900/10 ring-1 ring-inset ring-[#0B4F6C]/20 dark:ring-primary/20' : ''}
         `}
         onClick={() => handleDayClick(day)}
       >
         <div className="flex flex-col h-full justify-between">
-            <div className={`font-medium text-sm flex justify-between items-start ${isToday ? 'text-[#0B4F6C]' : 'text-gray-700'}`}>
+            <div className={`font-medium text-sm flex justify-between items-start ${isToday ? 'text-[#0B4F6C] dark:text-primary' : 'text-gray-700 dark:text-foreground'}`}>
                 <span className={`
-                    ${isToday ? "bg-[#0B4F6C] text-white w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
+                    ${isToday ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground w-7 h-7 flex items-center justify-center rounded-full shadow-sm" : "w-7 h-7 flex items-center justify-center"}
                 `}>
                     {day}
                 </span>

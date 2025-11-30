@@ -174,27 +174,27 @@ export function Reports() {
         description="View detailed reports and analytics for your business."
         action={
           <div className="flex gap-2 items-center">
-            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-2 py-1">
-                <span className="text-sm text-gray-500">From:</span>
+            <div className="flex items-center gap-2 bg-white dark:bg-muted/50 border border-gray-300 dark:border-border rounded-lg px-2 py-1">
+                <span className="text-sm text-gray-500 dark:text-muted-foreground">From:</span>
                 <input 
                     type="date" 
-                    className="text-sm focus:outline-none"
+                    className="text-sm focus:outline-none bg-transparent dark:text-foreground"
                     value={dateRange.start}
                     onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
                 />
             </div>
-            <div className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-2 py-1">
-                <span className="text-sm text-gray-500">To:</span>
+            <div className="flex items-center gap-2 bg-white dark:bg-muted/50 border border-gray-300 dark:border-border rounded-lg px-2 py-1">
+                <span className="text-sm text-gray-500 dark:text-muted-foreground">To:</span>
                 <input 
                     type="date" 
-                    className="text-sm focus:outline-none"
+                    className="text-sm focus:outline-none bg-transparent dark:text-foreground"
                     value={dateRange.end}
                     onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
                 />
             </div>
             <button 
                 onClick={handleExport}
-                className="bg-[#0B4F6C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] transition-colors"
+                className="bg-[#0B4F6C] dark:bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors"
             >
               Export Report
             </button>
@@ -203,28 +203,28 @@ export function Reports() {
       />
 
       <Tabs defaultValue="appointments" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-white p-1 rounded-xl border border-gray-200 mb-6">
+        <TabsList className="grid w-full grid-cols-4 lg:w-[600px] bg-white dark:bg-muted/50 p-1 rounded-xl border border-gray-200 dark:border-border mb-6">
           <TabsTrigger
             value="appointments"
-            className="data-[state=active]:bg-[#0B4F6C] data-[state=active]:text-white rounded-lg"
+            className="data-[state=active]:bg-[#0B4F6C] dark:data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
           >
             Appointments
           </TabsTrigger>
           <TabsTrigger
             value="services"
-            className="data-[state=active]:bg-[#0B4F6C] data-[state=active]:text-white rounded-lg"
+            className="data-[state=active]:bg-[#0B4F6C] dark:data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
           >
             Services
           </TabsTrigger>
           <TabsTrigger
             value="revenue"
-            className="data-[state=active]:bg-[#0B4F6C] data-[state=active]:text-white rounded-lg"
+            className="data-[state=active]:bg-[#0B4F6C] dark:data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
           >
             Revenue
           </TabsTrigger>
           <TabsTrigger
             value="trends"
-            className="data-[state=active]:bg-[#0B4F6C] data-[state=active]:text-white rounded-lg"
+            className="data-[state=active]:bg-[#0B4F6C] dark:data-[state=active]:bg-primary data-[state=active]:text-white rounded-lg"
           >
             Trends
           </TabsTrigger>
@@ -260,9 +260,9 @@ export function Reports() {
           </div>
 
           {/* Monthly Appointments Chart */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-            <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-              <Activity className="w-5 h-5 text-[#0B4F6C]" />
+          <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+            <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
               Monthly Appointment Trends
             </h3>
             <ResponsiveContainer width="100%" height={350}>
@@ -302,9 +302,9 @@ export function Reports() {
         <TabsContent value="services" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Service Popularity */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-              <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-                <Wrench className="w-5 h-5 text-[#0B4F6C]" />
+            <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+              <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+                <Wrench className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                 Service Popularity
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -323,9 +323,9 @@ export function Reports() {
             </div>
 
             {/* Service Ratings */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-              <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-                <Award className="w-5 h-5 text-[#0B4F6C]" />
+            <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+              <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                 Service Ratings
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -345,9 +345,9 @@ export function Reports() {
           </div>
 
           {/* Staff Performance */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-            <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-              <Users className="w-5 h-5 text-[#0B4F6C]" />
+          <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+            <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+              <Users className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
               Staff Performance Overview
             </h3>
             <ResponsiveContainer width="100%" height={350}>
@@ -368,7 +368,7 @@ export function Reports() {
             {staffPerformanceData.map((staff, index) => (
               <div
                 key={index}
-                className="bg-white rounded-2xl p-6 border-2 border-gray-300"
+                className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -376,10 +376,10 @@ export function Reports() {
                       <UserCheck className="w-6 h-6" />
                     </div>
                     <div>
-                      <h4 className="text-gray-800">{staff.name}</h4>
+                      <h4 className="text-gray-800 dark:text-foreground">{staff.name}</h4>
                       <div className="flex items-center gap-1">
                         <span className="text-yellow-500">★</span>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-600 dark:text-muted-foreground">
                           {staff.rating.toFixed(1)}
                         </span>
                       </div>
@@ -388,14 +388,14 @@ export function Reports() {
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-2xl text-[#0B4F6C]">
+                    <p className="text-2xl text-[#0B4F6C] dark:text-primary">
                       {staff.totalHandled}
                     </p>
-                    <p className="text-xs text-gray-600">Total Handled</p>
+                    <p className="text-xs text-gray-600 dark:text-muted-foreground">Total Handled</p>
                   </div>
                   <div>
                     <p className="text-2xl text-[#5DD37C]">{staff.confirmed}</p>
-                    <p className="text-xs text-gray-600">Confirmed</p>
+                    <p className="text-xs text-gray-600 dark:text-muted-foreground">Confirmed</p>
                   </div>
                 </div>
               </div>
@@ -427,9 +427,9 @@ export function Reports() {
           </div>
 
           {/* Monthly Revenue Chart */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-            <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-[#0B4F6C]" />
+          <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+            <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
               Monthly Revenue Trend
             </h3>
             <ResponsiveContainer width="100%" height={350}>
@@ -448,9 +448,9 @@ export function Reports() {
         {/* Appointment Trends Tab */}
         <TabsContent value="trends" className="space-y-6">
           {/* Peak Hours */}
-          <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-            <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-[#0B4F6C]" />
+          <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+            <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+              <Clock className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
               Peak Booking Hours
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -466,9 +466,9 @@ export function Reports() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Peak Days */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-              <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-[#0B4F6C]" />
+            <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+              <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                 Peak Booking Days
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -483,9 +483,9 @@ export function Reports() {
             </div>
 
             {/* Cancellation Reasons */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-gray-300">
-              <h3 className="text-xl text-gray-800 mb-4 flex items-center gap-2">
-                <XCircle className="w-5 h-5 text-[#0B4F6C]" />
+            <div className="bg-white dark:bg-card rounded-2xl p-6 border-2 border-gray-300 dark:border-border">
+              <h3 className="text-xl text-gray-800 dark:text-foreground mb-4 flex items-center gap-2">
+                <XCircle className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                 Cancellation Reasons
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -526,7 +526,7 @@ interface StatCardProps {
 
 function StatCard({ icon, label, value, color }: StatCardProps) {
   return (
-    <div className="bg-white rounded-xl p-6 border-2 border-gray-300">
+    <div className="bg-white dark:bg-card rounded-xl p-6 border-2 border-gray-300 dark:border-border">
       <div className="flex items-center gap-3 mb-2">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center"
@@ -535,8 +535,8 @@ function StatCard({ icon, label, value, color }: StatCardProps) {
           <div className="text-white">{icon}</div>
         </div>
         <div>
-          <p className="text-gray-600 text-sm">{label}</p>
-          <p className="text-2xl text-gray-800">{value}</p>
+          <p className="text-gray-600 dark:text-muted-foreground text-sm">{label}</p>
+          <p className="text-2xl text-gray-800 dark:text-foreground">{value}</p>
         </div>
       </div>
     </div>

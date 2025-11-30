@@ -284,10 +284,10 @@ export function CustomerDashboard() {
         />
 
         {/* Notifications */}
-        <div className="bg-white rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-shadow duration-200 border border-gray-100">
+        <div className="bg-white dark:bg-card rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-shadow duration-200 border border-gray-100 dark:border-border">
           <div className="flex items-center gap-2 mb-3 md:mb-6">
             <Bell className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
-            <h2 className="text-[#0B4F6C] font-semibold text-sm md:text-lg">Notifications</h2>
+            <h2 className="text-[#0B4F6C] dark:text-primary font-semibold text-sm md:text-lg">Notifications</h2>
           </div>
           <div className="space-y-3 md:space-y-4 max-h-[400px] overflow-y-auto pr-2">
             {notifications.length > 0 ? (

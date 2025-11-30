@@ -100,13 +100,13 @@ export function TechnicianAppointments({
       />
 
       {/* Filters & Search */}
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 space-y-4">
+      <div className="bg-white dark:bg-card p-4 rounded-xl shadow-sm border border-gray-100 dark:border-border space-y-4">
         <div className="flex flex-col md:flex-row gap-4 justify-between">
             <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-muted-foreground w-4 h-4" />
                 <Input
                     placeholder="Search client, service, or ID..."
-                    className="pl-10 border-gray-200 focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
+                    className="pl-10 border-gray-200 dark:border-input dark:bg-background dark:text-foreground focus:border-[#0B4F6C] dark:focus:border-primary focus:ring-[#0B4F6C] dark:focus:ring-primary"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -140,7 +140,7 @@ export function TechnicianAppointments({
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
-          <Filter className="w-4 h-4 text-gray-500 shrink-0" />
+          <Filter className="w-4 h-4 text-gray-500 dark:text-muted-foreground shrink-0" />
           {[
               { id: "all", label: "All" },
               { id: "Confirmed", label: "Confirmed" },
@@ -153,8 +153,8 @@ export function TechnicianAppointments({
                 onClick={() => setStatusFilter(filter.id)}
                 className={`px-3 py-1.5 rounded-lg text-sm whitespace-nowrap capitalize transition-all font-medium border-2 ${
                   statusFilter === filter.id
-                    ? "bg-[#0B4F6C] text-white border-[#0B4F6C] shadow-md"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-[#0B4F6C] hover:text-[#0B4F6C]"
+                    ? "bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground border-[#0B4F6C] dark:border-primary shadow-md"
+                    : "bg-white dark:bg-card text-gray-700 dark:text-foreground border-gray-300 dark:border-input hover:border-[#0B4F6C] dark:hover:border-primary hover:text-[#0B4F6C] dark:hover:text-primary"
                 }`}
               >
                 {filter.label}
@@ -186,10 +186,10 @@ export function TechnicianAppointments({
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-[#0B4F6C] transition-colors">{apt.service}</h3>
+                        <h3 className="font-bold text-lg text-gray-900 dark:text-foreground group-hover:text-[#0B4F6C] dark:group-hover:text-primary transition-colors">{apt.service}</h3>
                         {getStatusBadge(apt.status)}
                       </div>
-                      <div className="flex items-center gap-2 text-gray-600">
+                      <div className="flex items-center gap-2 text-gray-600 dark:text-muted-foreground">
                         {apt.customerAvatar ? (
                           <img src={getProfilePictureUrl(apt.customerAvatar)} alt={apt.customerName} className="w-5 h-5 rounded-full object-cover" />
                         ) : (
@@ -197,7 +197,7 @@ export function TechnicianAppointments({
                         )}
                         <span>{apt.customerName}</span>
                       </div>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-muted-foreground">
                         <div className="flex items-center gap-1.5">
                           <Calendar className="w-4 h-4" />
                           {apt.date}
@@ -207,7 +207,7 @@ export function TechnicianAppointments({
                           {apt.time}
                         </div>
                       </div>
-                      <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-muted-foreground">
                         <MapPin className="w-4 h-4 shrink-0" />
                         <span className="truncate">{apt.address}</span>
                       </div>
@@ -216,7 +216,7 @@ export function TechnicianAppointments({
                       <Button 
                         size="sm" 
                         variant="outline"
-                        className="flex-1 sm:w-full hover:bg-gray-50"
+                        className="flex-1 sm:w-full hover:bg-gray-50 dark:hover:bg-muted"
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedAppointment(apt);
@@ -255,8 +255,8 @@ export function TechnicianAppointments({
             </Card>
           ))
           ) : (
-            <div className="text-center py-12 bg-white rounded-xl border border-dashed border-gray-300">
-                <p className="text-gray-500">No appointments found matching your criteria.</p>
+            <div className="text-center py-12 bg-white dark:bg-card rounded-xl border border-dashed border-gray-300 dark:border-border">
+                <p className="text-gray-500 dark:text-muted-foreground">No appointments found matching your criteria.</p>
             </div>
           )}
           </div>
@@ -270,22 +270,22 @@ export function TechnicianAppointments({
 
         {/* Quick Stats / Summary */}
         <div className="space-y-6">
-          <Card className="bg-[#0B4F6C] text-white border-none shadow-lg">
+          <Card className="bg-[#0B4F6C] dark:bg-primary text-white dark:text-primary-foreground border-none shadow-lg">
             <CardContent className="p-6">
               <h3 className="font-bold text-lg mb-4">Weekly Summary</h3>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-white/80">Completed Jobs</span>
+                  <span className="text-white/80 dark:text-primary-foreground/80">Completed Jobs</span>
                   <span className="font-bold text-2xl">{completedCount}</span>
                 </div>
-                <Separator className="bg-white/20" />
+                <Separator className="bg-white/20 dark:bg-primary-foreground/20" />
                 <div className="flex justify-between items-center">
-                  <span className="text-white/80">Total Assigned</span>
+                  <span className="text-white/80 dark:text-primary-foreground/80">Total Assigned</span>
                   <span className="font-bold text-2xl">{appointments.length}</span>
                 </div>
-                <Separator className="bg-white/20" />
+                <Separator className="bg-white/20 dark:bg-primary-foreground/20" />
                 <div className="flex justify-between items-center">
-                  <span className="text-white/80">Customer Rating</span>
+                  <span className="text-white/80 dark:text-primary-foreground/80">Customer Rating</span>
                   <div className="flex items-center gap-1">
                     <span className="font-bold text-2xl">{averageRating.toFixed(1)}</span>
                     <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
@@ -297,7 +297,7 @@ export function TechnicianAppointments({
 
           <Card className="shadow-md">
             <CardHeader>
-              <CardTitle className="text-lg text-[#0B4F6C] flex items-center gap-2">
+              <CardTitle className="text-lg text-[#0B4F6C] dark:text-primary flex items-center gap-2">
                 <History className="w-5 h-5" />
                 Recent Activity
               </CardTitle>
@@ -305,24 +305,24 @@ export function TechnicianAppointments({
             <CardContent className="space-y-4">
               {recentActivity.length > 0 ? (
                 recentActivity.map((apt, idx) => (
-                  <div key={idx} className="flex gap-3 items-start pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+                  <div key={idx} className="flex gap-3 items-start pb-3 border-b border-gray-100 dark:border-border last:border-0 last:pb-0">
                     <div className={`mt-1 w-2 h-2 rounded-full shrink-0 ${
                       apt.status === 'Completed' ? 'bg-green-500' :
                       apt.status === 'In Progress' ? 'bg-blue-500' :
                       apt.status === 'Cancelled' ? 'bg-red-500' : 'bg-orange-500'
                     }`} />
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-gray-900">
-                        {apt.service} - <span className="text-gray-600">{apt.status}</span>
+                      <p className="text-sm font-medium text-gray-900 dark:text-foreground">
+                        {apt.service} - <span className="text-gray-600 dark:text-muted-foreground">{apt.status}</span>
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-muted-foreground">
                         {apt.customerName} • {apt.updatedAt ? new Date(apt.updatedAt).toLocaleDateString() : apt.date}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground text-center py-4">No recent activity</p>
               )}
             </CardContent>
           </Card>

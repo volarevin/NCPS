@@ -149,7 +149,7 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
             </div>
           ))}
         </div>
-        <div className="grid grid-cols-7 bg-white">
+        <div className="grid grid-cols-7 bg-white dark:bg-card">
           {days}
         </div>
       </CardContent>
@@ -171,47 +171,47 @@ export function TechnicianCalendar({ appointments, setSelectedAppointment }: Tec
                     selectedDayAppointments.map((apt) => (
                         <div 
                             key={apt.id}
-                            className="p-3 rounded-lg border border-gray-200 hover:border-[#0B4F6C] hover:shadow-sm transition-all cursor-pointer bg-white"
+                            className="p-3 rounded-lg border border-gray-200 dark:border-border hover:border-[#0B4F6C] dark:hover:border-primary hover:shadow-sm transition-all cursor-pointer bg-white dark:bg-card"
                             onClick={() => {
                                 setSelectedAppointment(apt);
                                 setIsDialogOpen(false);
                             }}
                         >
                             <div className="flex justify-between items-start mb-2">
-                                <h4 className="font-semibold text-gray-900">{apt.service}</h4>
+                                <h4 className="font-semibold text-gray-900 dark:text-foreground">{apt.service}</h4>
                                 <Badge variant={
-                                    apt.status === 'Completed' ? 'default' : // default is usually black/dark, might want custom
+                                    apt.status === 'Completed' ? 'default' : 
                                     apt.status === 'In Progress' ? 'secondary' :
                                     apt.status === 'Cancelled' ? 'destructive' : 'outline'
                                 } className={`
-                                    ${apt.status === 'Completed' ? 'bg-green-100 text-green-800 hover:bg-green-200' :
-                                      apt.status === 'In Progress' ? 'bg-blue-100 text-blue-800 hover:bg-blue-200' :
-                                      apt.status === 'Cancelled' ? 'bg-red-100 text-red-800 hover:bg-red-200' :
-                                      'bg-orange-100 text-orange-800 hover:bg-orange-200'} border-none
+                                    ${apt.status === 'Completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50' :
+                                      apt.status === 'In Progress' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-900/50' :
+                                      apt.status === 'Cancelled' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50' :
+                                      'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50'} border-none
                                 `}>
                                     {apt.status}
                                 </Badge>
                             </div>
                             
-                            <div className="space-y-1.5 text-sm text-gray-600">
+                            <div className="space-y-1.5 text-sm text-gray-600 dark:text-muted-foreground">
                                 <div className="flex items-center gap-2">
-                                    <Clock className="w-4 h-4 text-gray-400" />
+                                    <Clock className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                                     <span>{apt.time}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <User className="w-4 h-4 text-gray-400" />
+                                    <User className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                                     <span>{apt.customerName}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <MapPin className="w-4 h-4 text-gray-400" />
+                                    <MapPin className="w-4 h-4 text-gray-400 dark:text-muted-foreground" />
                                     <span className="truncate">{apt.address || "No address provided"}</span>
                                 </div>
                             </div>
                         </div>
                     ))
                 ) : (
-                    <div className="text-center py-8 text-gray-500">
-                        <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <div className="text-center py-8 text-gray-500 dark:text-muted-foreground">
+                        <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-muted" />
                         <p>No appointments scheduled for this day.</p>
                     </div>
                 )}

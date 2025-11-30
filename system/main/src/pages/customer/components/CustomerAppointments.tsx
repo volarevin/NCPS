@@ -174,16 +174,16 @@ export function CustomerAppointments() {
       />
 
       {/* Filters and Search */}
-      <div className="bg-white rounded-xl shadow-sm p-3 md:p-4 mb-4 md:mb-6 border border-gray-100">
+      <div className="bg-white dark:bg-card rounded-xl shadow-sm p-3 md:p-4 mb-4 md:mb-6 border border-gray-100 dark:border-border">
         <div className="flex flex-col gap-4">
           {/* Search Bar at Top */}
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-muted-foreground" />
             <Input
               placeholder="Search appointments..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 border-gray-200 focus:border-[#3FA9BC] focus:ring-[#3FA9BC] h-9 md:h-10 text-sm w-full"
+              className="pl-9 border-gray-200 dark:border-border focus:border-[#3FA9BC] dark:focus:border-primary focus:ring-[#3FA9BC] dark:focus:ring-primary h-9 md:h-10 text-sm w-full bg-white dark:bg-background"
             />
           </div>
 
@@ -195,8 +195,8 @@ export function CustomerAppointments() {
                   onClick={() => setActiveTab(tab.id as AppointmentStatus)}
                   className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-xs md:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     activeTab === tab.id
-                      ? 'bg-[#1A5560] text-white shadow-md'
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-200'
+                      ? 'bg-[#1A5560] dark:bg-primary text-white shadow-md'
+                      : 'bg-gray-50 dark:bg-muted text-gray-600 dark:text-muted-foreground hover:bg-gray-100 dark:hover:bg-muted/80 border border-transparent hover:border-gray-200 dark:hover:border-border'
                   }`}
                 >
                   {tab.label}
@@ -206,7 +206,7 @@ export function CustomerAppointments() {
             
             <div className="flex gap-2 items-center w-full lg:w-auto justify-end">
               <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-                  <SelectTrigger className="w-[140px] h-9 md:h-10 bg-white">
+                  <SelectTrigger className="w-[140px] h-9 md:h-10 bg-white dark:bg-background border-input">
                       <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -219,20 +219,20 @@ export function CustomerAppointments() {
               <Button
                   variant="outline"
                   size="icon"
-                  className="h-9 w-9 md:h-10 md:w-10 bg-white"
+                  className="h-9 w-9 md:h-10 md:w-10 bg-white dark:bg-background"
                   onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                   title={sortOrder === 'asc' ? "Ascending" : "Descending"}
               >
                   <ArrowUpDown className="h-4 w-4" />
               </Button>
 
-              <div className="flex bg-gray-100 p-1 rounded-lg border border-gray-200">
+              <div className="flex bg-gray-100 dark:bg-muted p-1 rounded-lg border border-gray-200 dark:border-border">
                 <button
                   onClick={() => setViewMode('list')}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
                     viewMode === 'list' 
-                      ? 'bg-white shadow-sm text-[#1A5560]' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                      ? 'bg-white dark:bg-card shadow-sm text-[#1A5560] dark:text-primary' 
+                      : 'text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground hover:bg-gray-200/50 dark:hover:bg-muted/80'
                   }`}
                 >
                   <List className="w-4 h-4" />
@@ -242,8 +242,8 @@ export function CustomerAppointments() {
                   onClick={() => setViewMode('calendar')}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-md transition-all text-sm font-medium ${
                     viewMode === 'calendar' 
-                      ? 'bg-white shadow-sm text-[#1A5560]' 
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200/50'
+                      ? 'bg-white dark:bg-card shadow-sm text-[#1A5560] dark:text-primary' 
+                      : 'text-gray-500 dark:text-muted-foreground hover:text-gray-700 dark:hover:text-foreground hover:bg-gray-200/50 dark:hover:bg-muted/80'
                   }`}
                 >
                   <Calendar className="w-4 h-4" />
@@ -305,19 +305,19 @@ export function CustomerAppointments() {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-gray-200">
-            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="w-8 h-8 text-gray-400" />
+          <div className="text-center py-16 bg-card rounded-xl border border-dashed border-border">
+            <div className="w-16 h-16 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-[#1A5560] font-medium mb-1 text-lg">No appointments found</h3>
-            <p className="text-gray-500 text-sm mb-6">
+            <h3 className="text-foreground font-medium mb-1 text-lg">No appointments found</h3>
+            <p className="text-muted-foreground text-sm mb-6">
               {searchQuery ? 'Try adjusting your search terms' : 'You haven\'t booked any appointments yet'}
             </p>
             {!searchQuery && (
               <Button 
                 onClick={() => setIsCreateDialogOpen(true)}
                 variant="outline"
-                className="border-[#3FA9BC] text-[#3FA9BC] hover:bg-[#3FA9BC]/10"
+                className="border-primary text-primary hover:bg-primary/10"
               >
                 Book Your First Appointment
               </Button>

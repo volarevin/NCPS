@@ -62,11 +62,11 @@ export function TechnicianProfile({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Profile Card */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="overflow-hidden border-none shadow-lg bg-gradient-to-b from-white to-gray-50">
-            <div className="h-32 bg-[#0B4F6C] relative">
+          <Card className="overflow-hidden border-none shadow-lg bg-gradient-to-b from-white to-gray-50 dark:from-card dark:to-card/95">
+            <div className="h-32 bg-[#0B4F6C] dark:bg-primary relative">
               <div className="absolute -bottom-16 left-1/2 -translate-x-1/2">
-                <Avatar className="w-32 h-32 border-4 border-white shadow-md">
-                  <AvatarFallback className="text-4xl bg-[#E5F4F5] text-[#0B4F6C] font-bold">
+                <Avatar className="w-32 h-32 border-4 border-white dark:border-card shadow-md">
+                  <AvatarFallback className="text-4xl bg-[#E5F4F5] dark:bg-primary/20 text-[#0B4F6C] dark:text-primary font-bold">
                     {technicianProfile.name.split(' ').map((n: string) => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
@@ -74,8 +74,8 @@ export function TechnicianProfile({
             </div>
             <CardContent className="pt-20 pb-8 text-center space-y-4">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{technicianProfile.name}</h2>
-                <Badge variant="secondary" className="mt-2 bg-[#E5F4F5] text-[#0B4F6C] hover:bg-[#d0eff2]">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-foreground">{technicianProfile.name}</h2>
+                <Badge variant="secondary" className="mt-2 bg-[#E5F4F5] dark:bg-primary/20 text-[#0B4F6C] dark:text-primary hover:bg-[#d0eff2] dark:hover:bg-primary/30">
                   {technicianProfile.specialization}
                 </Badge>
               </div>
@@ -84,53 +84,53 @@ export function TechnicianProfile({
                 <div className="flex gap-0.5">
                   {renderStars(technicianProfile.rating)}
                 </div>
-                <span className="text-sm font-medium text-gray-600">
+                <span className="text-sm font-medium text-gray-600 dark:text-muted-foreground">
                   ({technicianProfile.rating.toFixed(1)})
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-100 py-4">
+              <div className="grid grid-cols-2 gap-4 border-t border-b border-gray-100 dark:border-border py-4">
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-[#0B4F6C]">{technicianProfile.totalJobs}</p>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Jobs Done</p>
+                  <p className="text-2xl font-bold text-[#0B4F6C] dark:text-primary">{technicianProfile.totalJobs}</p>
+                  <p className="text-xs text-gray-500 dark:text-muted-foreground uppercase tracking-wide">Jobs Done</p>
                 </div>
-                <div className="text-center border-l border-gray-100">
-                  <p className="text-2xl font-bold text-[#0B4F6C]">
+                <div className="text-center border-l border-gray-100 dark:border-border">
+                  <p className="text-2xl font-bold text-[#0B4F6C] dark:text-primary">
                     {new Date().getFullYear() - new Date(technicianProfile.created_at || Date.now()).getFullYear() + 1}
                   </p>
-                  <p className="text-xs text-gray-500 uppercase tracking-wide">Years Exp.</p>
+                  <p className="text-xs text-gray-500 dark:text-muted-foreground uppercase tracking-wide">Years Exp.</p>
                 </div>
               </div>
 
               <div className="space-y-3 text-left px-2">
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Mail className="w-4 h-4 text-[#0B4F6C]" />
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-muted-foreground">
+                  <Mail className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                   <span className="truncate">{technicianProfile.email}</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Phone className="w-4 h-4 text-[#0B4F6C]" />
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-muted-foreground">
+                  <Phone className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                   <span>{technicianProfile.phone}</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <MapPin className="w-4 h-4 text-[#0B4F6C]" />
+                <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-muted-foreground">
+                  <MapPin className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                   <span className="truncate">{technicianProfile.address || "No address provided"}</span>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-red-100 shadow-sm">
+          <Card className="border-red-100 dark:border-red-900/30 shadow-sm">
             <CardHeader className="pb-3">
-              <CardTitle className="text-red-600 flex items-center gap-2 text-base">
+              <CardTitle className="text-red-600 dark:text-red-400 flex items-center gap-2 text-base">
                 <Shield className="w-4 h-4" />
                 Danger Zone
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 dark:text-muted-foreground mb-4">
                 Permanently delete your account and all associated data. This action cannot be undone.
               </p>
-              <Button variant="destructive" onClick={handleDeleteAccount} className="w-full bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 shadow-none">
+              <Button variant="destructive" onClick={handleDeleteAccount} className="w-full bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 shadow-none">
                 <Trash2 className="w-4 h-4 mr-2" />
                 Delete Account
               </Button>
@@ -141,16 +141,16 @@ export function TechnicianProfile({
         {/* Right Column: Edit Form */}
         <div className="lg:col-span-8 space-y-6">
           <Card className="shadow-md border-none">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-gray-50 pb-6">
+            <CardHeader className="flex flex-row items-center justify-between border-b border-gray-50 dark:border-border pb-6">
               <div>
-                <CardTitle className="text-xl text-[#0B4F6C]">Profile Settings</CardTitle>
+                <CardTitle className="text-xl text-[#0B4F6C] dark:text-primary">Profile Settings</CardTitle>
                 <CardDescription>Update your personal details and public profile.</CardDescription>
               </div>
               {!editingProfile ? (
                 <Button onClick={() => {
                   setFormData(technicianProfile);
                   setEditingProfile(true);
-                }} className="bg-[#0B4F6C] hover:bg-[#145A75]">
+                }} className="bg-[#0B4F6C] dark:bg-primary hover:bg-[#145A75] dark:hover:bg-primary/90">
                   <Edit className="w-4 h-4 mr-2" />
                   Edit Profile
                 </Button>
@@ -160,7 +160,7 @@ export function TechnicianProfile({
                     <X className="w-4 h-4 mr-2" />
                     Cancel
                   </Button>
-                  <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+                  <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800">
                     <Save className="w-4 h-4 mr-2" />
                     Save Changes
                   </Button>
@@ -171,7 +171,7 @@ export function TechnicianProfile({
               {/* Personal Info Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-                  <User className="w-5 h-5 text-[#0B4F6C]" />
+                  <User className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                   Personal Information
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -226,7 +226,7 @@ export function TechnicianProfile({
               {/* Professional Info Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-                  <Briefcase className="w-5 h-5 text-[#0B4F6C]" />
+                  <Briefcase className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                   Professional Details
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -260,7 +260,7 @@ export function TechnicianProfile({
               {/* Bio Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground">
-                  <FileText className="w-5 h-5 text-[#0B4F6C]" />
+                  <FileText className="w-5 h-5 text-[#0B4F6C] dark:text-primary" />
                   Professional Bio
                 </h3>
                 <div className="space-y-2">

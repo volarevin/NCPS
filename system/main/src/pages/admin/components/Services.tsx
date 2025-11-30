@@ -216,14 +216,14 @@ export function Services() {
             <div className="flex gap-2">
                 <button
                     onClick={() => setSettingsOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white dark:bg-card border border-gray-200 dark:border-border text-gray-700 dark:text-foreground hover:bg-gray-50 dark:hover:bg-muted/50 transition-colors"
                 >
                     <Settings className="w-4 h-4" />
                     <span>Settings</span>
                 </button>
                 <button
                     onClick={handleAddService}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0B4F6C] text-white hover:bg-[#093e54] transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0B4F6C] dark:bg-primary text-white hover:bg-[#093e54] dark:hover:bg-primary/90 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
                     <span>Add Service</span>
@@ -265,16 +265,16 @@ export function Services() {
       </div>
 
       {/* Filter Buttons */}
-      <div className="bg-white rounded-xl p-3 md:p-4 mb-6 shadow-sm border-2 border-gray-200">
+      <div className="bg-white dark:bg-card rounded-xl p-3 md:p-4 mb-6 shadow-sm border-2 border-gray-200 dark:border-border">
         <div className="flex flex-col md:flex-row md:items-center gap-3">
-          <span className="text-sm text-gray-600">Filter by:</span>
+          <span className="text-sm text-gray-600 dark:text-muted-foreground">Filter by:</span>
           <div className="flex items-center gap-2 flex-wrap flex-1">
             <button
                 onClick={() => setSelectedCategory("All")}
                 className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg transition-all text-xs md:text-sm shadow-sm ${
                   selectedCategory === "All"
-                    ? "bg-[#0B4F6C] text-white shadow-md scale-105"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-[#0B4F6C] dark:bg-primary text-white shadow-md scale-105"
+                    : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
                 }`}
             >
                 <Menu className="w-4 h-4" />
@@ -286,8 +286,8 @@ export function Services() {
                 onClick={() => setSelectedCategory(category.name)}
                 className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-5 py-2 md:py-2.5 rounded-lg transition-all text-xs md:text-sm shadow-sm ${
                   selectedCategory === category.name
-                    ? "bg-[#0B4F6C] text-white shadow-md scale-105"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-[#0B4F6C] dark:bg-primary text-white shadow-md scale-105"
+                    : "bg-gray-100 dark:bg-muted text-gray-700 dark:text-muted-foreground hover:bg-gray-200 dark:hover:bg-muted/80"
                 }`}
               >
                 <span className="w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
@@ -306,7 +306,7 @@ export function Services() {
           <div
             key={service.id}
             onClick={() => handleServiceClick(service)}
-            className="group bg-white rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-[#0B4F6C] transform hover:-translate-y-1"
+            className="group bg-white dark:bg-card rounded-2xl p-5 md:p-6 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border-2 border-transparent dark:border-border hover:border-[#0B4F6C] dark:hover:border-primary transform hover:-translate-y-1"
           >
             {/* Service Icon */}
             <div 
@@ -319,7 +319,7 @@ export function Services() {
             </div>
 
             {/* Service Name */}
-            <h3 className="text-base md:text-lg text-gray-800 mb-2 group-hover:text-[#0B4F6C] transition-colors">
+            <h3 className="text-base md:text-lg text-gray-800 dark:text-foreground mb-2 group-hover:text-[#0B4F6C] dark:group-hover:text-primary transition-colors">
               {service.name}
             </h3>
 
@@ -334,16 +334,16 @@ export function Services() {
             </div>
 
             {/* Description */}
-            <p className="text-xs md:text-sm text-gray-600 mb-4 line-clamp-2">
+            <p className="text-xs md:text-sm text-gray-600 dark:text-muted-foreground mb-4 line-clamp-2">
               {service.description}
             </p>
 
             {/* Price */}
-            <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-              <span className="text-lg md:text-xl text-[#0B4F6C]">
+            <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-border">
+              <span className="text-lg md:text-xl text-[#0B4F6C] dark:text-primary">
                 {service.price}
               </span>
-              <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-xs text-gray-500 dark:text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
                 Click to edit →
               </span>
             </div>
@@ -352,12 +352,12 @@ export function Services() {
       </div>
 
       {filteredServices.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Menu className="w-10 h-10 text-gray-400" />
+        <div className="text-center py-16 bg-white dark:bg-card rounded-2xl shadow-sm">
+          <div className="w-20 h-20 bg-gray-100 dark:bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+            <Menu className="w-10 h-10 text-gray-400 dark:text-muted-foreground" />
           </div>
-          <p className="text-gray-500 text-lg mb-2">No services found</p>
-          <p className="text-gray-400 text-sm">Try selecting a different category or add a new service</p>
+          <p className="text-gray-500 dark:text-muted-foreground text-lg mb-2">No services found</p>
+          <p className="text-gray-400 dark:text-muted-foreground/70 text-sm">Try selecting a different category or add a new service</p>
         </div>
       )}
 

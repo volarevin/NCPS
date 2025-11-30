@@ -315,11 +315,11 @@ export function Technicians() {
             placeholder="Search technicians..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-background border-border focus:border-[#0B4F6C] focus:ring-[#0B4F6C]"
+            className="pl-10 bg-background border-border focus:border-[#0B4F6C] dark:focus:border-primary focus:ring-[#0B4F6C] dark:focus:ring-primary dark:bg-muted/50"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] bg-background border-border">
+          <SelectTrigger className="w-[180px] bg-background border-border dark:bg-muted/50">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
@@ -330,7 +330,7 @@ export function Technicians() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[180px] bg-background border-border">
+          <SelectTrigger className="w-[180px] bg-background border-border dark:bg-muted/50">
             <ArrowUpDown className="w-4 h-4 mr-2 text-muted-foreground" />
             <SelectValue placeholder="Sort by" />
           </SelectTrigger>
@@ -351,27 +351,27 @@ export function Technicians() {
             <div
               key={tech.id}
               onClick={() => handleViewDetails(tech.id)}
-              className="group bg-card rounded-xl border border-border p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative overflow-hidden"
+              className="group bg-card dark:bg-card rounded-xl border border-border dark:border-border p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer relative overflow-hidden"
             >
-              <div className="absolute top-0 left-0 w-1 h-full bg-[#0B4F6C] opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute top-0 left-0 w-1 h-full bg-[#0B4F6C] dark:bg-primary opacity-0 group-hover:opacity-100 transition-opacity" />
               
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-full ${specialtyConfig.bg} flex items-center justify-center border border-border group-hover:border-[#0B4F6C]/30 transition-colors`}>
-                    <SpecialtyIcon className={`w-6 h-6 ${specialtyConfig.color}`} />
+                  <div className={`w-12 h-12 rounded-full ${specialtyConfig.bg} dark:bg-muted/20 flex items-center justify-center border border-border dark:border-border group-hover:border-[#0B4F6C]/30 dark:group-hover:border-primary/30 transition-colors`}>
+                    <SpecialtyIcon className={`w-6 h-6 ${specialtyConfig.color} dark:text-primary`} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900 group-hover:text-[#0B4F6C] transition-colors">{tech.name}</h3>
-                    <p className="text-sm text-gray-500">{tech.specialty}</p>
+                    <h3 className="font-semibold text-gray-900 dark:text-foreground group-hover:text-[#0B4F6C] dark:group-hover:text-primary transition-colors">{tech.name}</h3>
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">{tech.specialty}</p>
                   </div>
                 </div>
                 <Badge
                   className={`${
                     tech.status === "available"
-                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:bg-green-200 dark:hover:bg-green-900/50"
                       : tech.status === "busy"
-                      ? "bg-orange-100 text-orange-700 hover:bg-orange-200"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 hover:bg-orange-200 dark:hover:bg-orange-900/50"
+                      : "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700"
                   } border-0`}
                 >
                   {tech.status.charAt(0).toUpperCase() + tech.status.slice(1)}
@@ -379,40 +379,40 @@ export function Technicians() {
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Phone className="w-4 h-4 mr-2 text-gray-400" />
+                <div className="flex items-center text-sm text-gray-600 dark:text-muted-foreground">
+                  <Phone className="w-4 h-4 mr-2 text-gray-400 dark:text-muted-foreground" />
                   {tech.phone}
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Mail className="w-4 h-4 mr-2 text-gray-400" />
+                <div className="flex items-center text-sm text-gray-600 dark:text-muted-foreground">
+                  <Mail className="w-4 h-4 mr-2 text-gray-400 dark:text-muted-foreground" />
                   <span className="truncate">{tech.email}</span>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <MapPin className="w-4 h-4 mr-2 text-gray-400" />
+                <div className="flex items-center text-sm text-gray-600 dark:text-muted-foreground">
+                  <MapPin className="w-4 h-4 mr-2 text-gray-400 dark:text-muted-foreground" />
                   <span className="truncate">{tech.location}</span>
                 </div>
               </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
+              <div className="mt-6 pt-4 border-t border-gray-50 dark:border-border flex items-center justify-between">
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                  <span className="font-semibold text-gray-900">{tech.rating.toFixed(1)}</span>
-                  <span className="text-xs text-gray-500">Rating</span>
+                  <span className="font-semibold text-gray-900 dark:text-foreground">{tech.rating.toFixed(1)}</span>
+                  <span className="text-xs text-gray-500 dark:text-muted-foreground">Rating</span>
                 </div>
-                <div className="text-sm text-gray-500">
-                  <span className="font-semibold text-gray-900">{tech.completedJobs}</span> Jobs
+                <div className="text-sm text-gray-500 dark:text-muted-foreground">
+                  <span className="font-semibold text-gray-900 dark:text-foreground">{tech.completedJobs}</span> Jobs
                 </div>
               </div>
 
-              <div className="bg-gray-50 px-6 py-3 flex justify-between items-center border-t border-gray-100 -mx-6 -mb-6 mt-4">
+              <div className="bg-gray-50 dark:bg-muted/30 px-6 py-3 flex justify-between items-center border-t border-gray-100 dark:border-border -mx-6 -mb-6 mt-4">
                 <button 
-                  className="text-sm text-gray-600 hover:text-[#0B4F6C] font-medium"
+                  className="text-sm text-gray-600 dark:text-muted-foreground hover:text-[#0B4F6C] dark:hover:text-primary font-medium"
                   onClick={(e) => { e.stopPropagation(); handleViewDetails(tech.id); }}
                 >
                   View Profile
                 </button>
                 <button 
-                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-[#0B4F6C] hover:bg-white rounded-full transition-colors border border-transparent hover:border-gray-200 shadow-sm"
+                  className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-muted-foreground hover:text-[#0B4F6C] dark:hover:text-primary hover:bg-white dark:hover:bg-card rounded-full transition-colors border border-transparent hover:border-gray-200 dark:hover:border-border shadow-sm"
                   onClick={(e) => openEditDialog(e, tech)}
                 >
                   <Edit className="w-3.5 h-3.5" />

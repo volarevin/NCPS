@@ -148,15 +148,15 @@ export function AppointmentDetailsDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto dark:bg-card dark:text-foreground dark:border-border">
         <DialogHeader>
           <div className="flex items-center justify-between pr-8">
-            <DialogTitle className="text-xl font-bold text-[#0B4F6C]">
+            <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
               Appointment Details
             </DialogTitle>
             <div className="flex items-center gap-2">
               {(appointment.status === 'confirmed' || appointment.status === 'upcoming') && !isEditing && (
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
                   <Edit2 className="w-4 h-4 mr-2" />
                   Edit Details
                 </Button>
@@ -171,62 +171,62 @@ export function AppointmentDetailsDialog({
         <div className="grid gap-6 py-4">
           {/* Client Info Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <User className="w-4 h-4 text-[#0B4F6C]" />
+            <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+              <User className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
               Client Information
             </h3>
             <div className="grid grid-cols-2 gap-4 pl-6">
               <div>
-                <p className="text-sm text-gray-500">Name</p>
-                <p className="font-medium">{appointment.clientName}</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Name</p>
+                <p className="font-medium dark:text-foreground">{appointment.clientName}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Phone</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Phone</p>
                 <div className="flex items-center gap-2">
-                  <Phone className="w-3 h-3 text-gray-400" />
-                  <p className="font-medium">{appointment.phone}</p>
+                  <Phone className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+                  <p className="font-medium dark:text-foreground">{appointment.phone}</p>
                 </div>
               </div>
               <div className="col-span-2">
-                <p className="text-sm text-gray-500">Email</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Email</p>
                 <div className="flex items-center gap-2">
-                  <Mail className="w-3 h-3 text-gray-400" />
-                  <p className="font-medium">{appointment.email}</p>
+                  <Mail className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+                  <p className="font-medium dark:text-foreground">{appointment.email}</p>
                 </div>
               </div>
               <div className="col-span-2">
-                <p className="text-sm text-gray-500">Address</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Address</p>
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-3 h-3 text-gray-400" />
-                  <p className="font-medium">{appointment.address}</p>
+                  <MapPin className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+                  <p className="font-medium dark:text-foreground">{appointment.address}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-100" />
+          <div className="border-t border-gray-100 dark:border-border" />
 
           {/* Service Info Section */}
           <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-[#0B4F6C]" />
+            <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+              <Wrench className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
               Service Details
             </h3>
             <div className="grid grid-cols-2 gap-4 pl-6">
               <div>
-                <p className="text-sm text-gray-500">Service Type</p>
-                <p className="font-medium">{appointment.service}</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Service Type</p>
+                <p className="font-medium dark:text-foreground">{appointment.service}</p>
               </div>
               
               {/* Technician Selection Logic */}
               <div>
-                <p className="text-sm text-gray-500">Technician</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Technician</p>
                 {isEditing || appointment.status === 'pending' ? (
                   <Select 
                     value={selectedTechnician} 
                     onValueChange={setSelectedTechnician}
                   >
-                    <SelectTrigger className="h-8 mt-1">
+                    <SelectTrigger className="h-8 mt-1 dark:bg-muted/50 dark:border-border">
                       <SelectValue placeholder="Assign Technician" />
                     </SelectTrigger>
                     <SelectContent>
@@ -238,7 +238,7 @@ export function AppointmentDetailsDialog({
                     </SelectContent>
                   </Select>
                 ) : (
-                  <p className="font-medium text-[#0B4F6C]">
+                  <p className="font-medium text-[#0B4F6C] dark:text-primary">
                     {appointment.technician || "Not Assigned"}
                   </p>
                 )}
@@ -246,41 +246,41 @@ export function AppointmentDetailsDialog({
 
               {/* Date & Time Logic */}
               <div>
-                <p className="text-sm text-gray-500">Date</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Date</p>
                 {isEditing ? (
                   <Input 
                     type="date" 
                     value={editDate} 
                     onChange={(e) => setEditDate(e.target.value)}
-                    className="h-8 mt-1"
+                    className="h-8 mt-1 dark:bg-muted/50 dark:border-border"
                   />
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-3 h-3 text-gray-400" />
-                    <p className="font-medium">{appointment.date}</p>
+                    <Calendar className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+                    <p className="font-medium dark:text-foreground">{appointment.date}</p>
                   </div>
                 )}
               </div>
               <div>
-                <p className="text-sm text-gray-500">Time</p>
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Time</p>
                 {isEditing ? (
                   <Input 
                     type="time" 
                     value={editTime} 
                     onChange={(e) => setEditTime(e.target.value)}
-                    className="h-8 mt-1"
+                    className="h-8 mt-1 dark:bg-muted/50 dark:border-border"
                   />
                 ) : (
                   <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-gray-400" />
-                    <p className="font-medium">{appointment.time}</p>
+                    <Clock className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
+                    <p className="font-medium dark:text-foreground">{appointment.time}</p>
                   </div>
                 )}
               </div>
               
               <div className="col-span-2">
-                <p className="text-sm text-gray-500">Notes</p>
-                <p className="font-medium text-gray-700 bg-gray-50 p-3 rounded-lg mt-1">
+                <p className="text-sm text-gray-500 dark:text-muted-foreground">Notes</p>
+                <p className="font-medium text-gray-700 dark:text-foreground bg-gray-50 dark:bg-muted/50 p-3 rounded-lg mt-1">
                   {appointment.notes}
                 </p>
               </div>
@@ -290,16 +290,16 @@ export function AppointmentDetailsDialog({
           {/* Completed Appointment Details */}
           {appointment.status === 'completed' && (appointment.rating || appointment.feedback) && (
             <>
-              <div className="border-t border-gray-100" />
+              <div className="border-t border-gray-100 dark:border-border" />
               <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <Star className="w-4 h-4 text-[#0B4F6C]" />
+                <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
+                  <Star className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
                   Feedback & Rating
                 </h3>
                 <div className="pl-6 space-y-3">
                   {appointment.rating && (
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Rating</p>
+                      <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Rating</p>
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((star) => (
                           <Star
@@ -307,7 +307,7 @@ export function AppointmentDetailsDialog({
                             className={`w-4 h-4 ${
                               star <= appointment.rating!
                                 ? "fill-yellow-400 text-yellow-400"
-                                : "text-gray-300"
+                                : "text-gray-300 dark:text-muted"
                             }`}
                           />
                         ))}
@@ -316,10 +316,10 @@ export function AppointmentDetailsDialog({
                   )}
                   {appointment.feedback && (
                     <div>
-                      <p className="text-sm text-gray-500 mb-1">Customer Feedback</p>
-                      <div className="flex gap-2 items-start bg-gray-50 p-3 rounded-lg">
-                        <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 shrink-0" />
-                        <p className="text-gray-700 italic text-sm">"{appointment.feedback}"</p>
+                      <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Customer Feedback</p>
+                      <div className="flex gap-2 items-start bg-gray-50 dark:bg-muted/50 p-3 rounded-lg">
+                        <MessageSquare className="w-4 h-4 text-gray-400 dark:text-muted-foreground mt-0.5 shrink-0" />
+                        <p className="text-gray-700 dark:text-foreground italic text-sm">"{appointment.feedback}"</p>
                       </div>
                     </div>
                   )}
@@ -331,35 +331,35 @@ export function AppointmentDetailsDialog({
           {/* Cancelled/Rejected Details */}
           {(appointment.status === 'cancelled' || appointment.status === 'rejected') && (
             <>
-              <div className="border-t border-gray-100" />
+              <div className="border-t border-gray-100 dark:border-border" />
               <div className="space-y-4">
-                <h3 className="font-semibold text-red-600 flex items-center gap-2">
+                <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   {appointment.status === 'cancelled' ? 'Cancellation' : 'Rejection'} Details
                 </h3>
                 <div className="grid grid-cols-2 gap-4 pl-6">
                   <div className="col-span-2">
-                    <p className="text-sm text-gray-500">Category</p>
-                    <Badge variant="outline" className="mt-1 border-red-200 text-red-700 bg-red-50">
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Category</p>
+                    <Badge variant="outline" className="mt-1 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20">
                       {appointment.cancellationCategory || 'N/A'}
                     </Badge>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-sm text-gray-500">Reason</p>
-                    <p className="font-medium text-gray-700 bg-red-50 p-3 rounded-lg mt-1 border border-red-100">
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Reason</p>
+                    <p className="font-medium text-gray-700 dark:text-foreground bg-red-50 dark:bg-red-900/10 p-3 rounded-lg mt-1 border border-red-100 dark:border-red-900/30">
                       {appointment.status === 'cancelled' ? appointment.cancellationReason : appointment.rejectionReason || 'No reason provided'}
                     </p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-muted-foreground">
                       {appointment.status === 'cancelled' ? 'Cancelled By' : 'Rejected By'}
                     </p>
-                    <p className="font-medium text-gray-700">
+                    <p className="font-medium text-gray-700 dark:text-foreground">
                       {appointment.cancelledByRole ? (
                         <span className="capitalize">
                           {appointment.cancelledByRole} 
                           {(appointment.cancelledByRole === 'Admin' || appointment.cancelledByRole === 'Receptionist') && appointment.cancelledById && (
-                            <span className="text-gray-400 text-xs ml-2">(ID: {appointment.cancelledById})</span>
+                            <span className="text-gray-400 dark:text-muted-foreground text-xs ml-2">(ID: {appointment.cancelledById})</span>
                           )}
                         </span>
                       ) : 'N/A'}
@@ -371,14 +371,14 @@ export function AppointmentDetailsDialog({
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100">
+          <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-border">
             {isEditing ? (
               <>
-                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                <Button variant="outline" onClick={() => setIsEditing(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
                   Cancel Edit
                 </Button>
                 <Button 
-                  className="bg-[#0B4F6C] hover:bg-[#012A4A]"
+                  className="bg-[#0B4F6C] hover:bg-[#012A4A] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
                   onClick={handleSaveChanges}
                 >
                   Save Changes
@@ -395,7 +395,7 @@ export function AppointmentDetailsDialog({
                       Reject
                     </Button>
                     <Button 
-                      className="bg-[#0B4F6C] hover:bg-[#012A4A]"
+                      className="bg-[#0B4F6C] hover:bg-[#012A4A] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
                       onClick={handleApproveClick}
                       disabled={!selectedTechnician}
                     >
@@ -415,6 +415,7 @@ export function AppointmentDetailsDialog({
                     <Button 
                       variant="outline"
                       onClick={() => setIsEditing(true)}
+                      className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80"
                     >
                       Edit Details
                     </Button>
@@ -423,7 +424,7 @@ export function AppointmentDetailsDialog({
 
                 {appointment.status === 'in-progress' && (
                   <Button 
-                    className="bg-green-600 hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 dark:text-white"
                     onClick={() => onUpdateStatus?.(appointment.id, 'completed')}
                   >
                     Mark as Completed
@@ -431,7 +432,7 @@ export function AppointmentDetailsDialog({
                 )}
                 
                 {(appointment.status === 'completed' || appointment.status === 'cancelled' || appointment.status === 'rejected') && (
-                  <Button variant="outline" onClick={() => onOpenChange(false)}>
+                  <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
                     Close
                   </Button>
                 )}
