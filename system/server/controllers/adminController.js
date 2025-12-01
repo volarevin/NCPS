@@ -293,7 +293,7 @@ exports.getReportsData = (req, res) => {
     `,
     cancellationReasons: `
       SELECT 
-        cancellation_category as reason, 
+        cancellation_category as category, 
         COUNT(*) as count 
       FROM appointments a
       WHERE status = 'Cancelled' AND cancellation_category IS NOT NULL 

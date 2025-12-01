@@ -373,6 +373,7 @@ export function Reports() {
                       outerRadius={80}
                       fill="#8884d8"
                       dataKey="count"
+                      nameKey="category"
                     >
                       {cancellationReasonsData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
