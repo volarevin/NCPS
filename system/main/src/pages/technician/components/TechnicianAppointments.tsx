@@ -9,11 +9,12 @@ import { Input } from "../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { TechnicianCalendar } from "./TechnicianCalendar";
 import { getProfilePictureUrl } from "@/lib/utils";
+import { CompleteJobDialog } from "./CompleteJobDialog";
 
 interface TechnicianAppointmentsProps {
   appointments: any[];
   setSelectedAppointment: (apt: any) => void;
-  updateAppointmentStatus: (id: string, status: any) => void;
+  updateAppointmentStatus: (id: string, status: any, reason?: string, category?: string, totalCost?: number, costNotes?: string) => void;
   getStatusBadge: (status: string) => JSX.Element;
 }
 
@@ -28,6 +29,8 @@ export function TechnicianAppointments({
   const [sortBy, setSortBy] = useState<"date" | "created" | "updated" | "name">("created");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
+  const [selectedJobForCompletion, setSelectedJobForCompletion] = useState<any>(null);
 
   const filteredAppointments = appointments
     .filter((apt) => {
@@ -242,7 +245,8 @@ export function TechnicianAppointments({
                           className="flex-1 sm:w-full bg-green-500 hover:bg-green-600 shadow-sm"
                           onClick={(e) => {
                             e.stopPropagation();
-                            updateAppointmentStatus(apt.id, "Completed");
+                            setSelectedJobForCompletion(apt);
+                            setCompleteDialogOpen(true);
                           }}
                         >
                           Complete
@@ -328,6 +332,17 @@ export function TechnicianAppointments({
           </Card>
         </div>
       </div>
+
+      <CompleteJobDialog 
+        isOpen={completeDialogOpen}
+        onClose={() => setCompleteDialogOpen(false)}
+        onConfirm={(cost, notes) => {
+          if (selectedJobForCompletion) {
+            updateAppointmentStatus(selectedJobForCompletion.id, "Completed", undefined, undefined, cost, notes);
+          }
+        }}
+        serviceName={selectedJobForCompletion?.service}
+      />
     </div>
   );
 }

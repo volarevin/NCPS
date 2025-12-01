@@ -40,7 +40,7 @@ exports.createAppointment = (req, res) => {
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status, reason, category, technicianId, overrideConflict } = req.body;
+  const { status, reason, category, technicianId, overrideConflict, totalCost, costNotes } = req.body;
   const validStatuses = ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled', 'Rejected'];
 
   if (!validStatuses.includes(status)) {
@@ -54,6 +54,11 @@ exports.updateAppointmentStatus = (req, res) => {
     if (technicianId) {
       query += ', technician_id = ?';
       params.push(technicianId);
+    }
+
+    if (status === 'Completed' && totalCost !== undefined) {
+      query += ', total_cost = ?, cost_notes = ?';
+      params.push(totalCost, costNotes || null);
     }
 
     if (status === 'Cancelled' || status === 'Rejected') {
@@ -81,8 +86,16 @@ exports.updateAppointmentStatus = (req, res) => {
         return res.status(500).json({ message: 'Database error updating appointment.' });
       }
 
-      // If status is Completed, notify the technician (confirmation)
+      // If status is Completed, handle payment record and notification
       if (status === 'Completed') {
+          // Create payment record if cost is provided
+          if (totalCost) {
+            const paymentQuery = 'INSERT INTO payments (appointment_id, amount, status) VALUES (?, ?, ?)';
+            (req.db || db).query(paymentQuery, [id, totalCost, 'Pending'], (payErr) => {
+                if (payErr) console.error('Error creating payment record:', payErr);
+            });
+          }
+
           // We need to fetch appointment details to get technician_id and service name
           const detailsQuery = `
               SELECT a.technician_id, s.name as service_name, u.first_name, u.last_name 
@@ -96,7 +109,7 @@ exports.updateAppointmentStatus = (req, res) => {
                   const appt = detResults[0];
                   if (appt.technician_id) {
                       const notifQuery = 'INSERT INTO notifications (user_id, title, message, related_appointment_id) VALUES (?, ?, ?, ?)';
-                      const message = `You marked "${appt.service_name}" for ${appt.first_name} ${appt.last_name} as completed.`;
+                      const message = `You marked "${appt.service_name}" for ${appt.first_name} ${appt.last_name} as completed. Total Cost: ${totalCost || 'N/A'}`;
                       (req.db || db).query(notifQuery, [appt.technician_id, 'Job Completed', message, id], (notifErr) => {
                           if (notifErr) console.error('Error creating completion notification:', notifErr);
                       });

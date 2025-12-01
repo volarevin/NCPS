@@ -221,11 +221,20 @@ export default function TechnicianPage() {
     }))
     .sort((a, b) => new Date(b.rawDate).getTime() - new Date(a.rawDate).getTime());
 
-  const updateAppointmentStatus = async (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => {
+  const updateAppointmentStatus = async (
+    appointmentId: string, 
+    newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", 
+    reason?: string, 
+    category?: string,
+    totalCost?: number,
+    costNotes?: string
+  ) => {
     const promise = async () => {
       const body: any = { status: newStatus };
       if (reason) body.reason = reason;
       if (category) body.category = category;
+      if (totalCost !== undefined) body.totalCost = totalCost;
+      if (costNotes) body.costNotes = costNotes;
 
       const response = await fetch(`http://localhost:5000/api/appointments/${appointmentId}/status`, {
         method: 'PUT',

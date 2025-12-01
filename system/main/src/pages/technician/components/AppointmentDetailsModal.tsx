@@ -9,19 +9,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { 
-  Calendar, Clock, User, Phone, Mail, MapPin, Wrench, Star, 
+  Calendar, Clock, User, Phone, Mail, MapPin, Star, 
   AlertCircle, MessageSquare, PlayCircle, CheckCircle, XCircle, 
-  Copy, ExternalLink, Navigation
+  Copy, Navigation
 } from "lucide-react";
 import { useState } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
-import { useFeedback } from "@/context/FeedbackContext";
+import { CompleteJobDialog } from "./CompleteJobDialog";
 
 interface Appointment {
   id: string;
@@ -33,7 +32,7 @@ interface Appointment {
   phone: string;
   email: string;
   address: string;
-  status: "Pending" | "Confirmed" | "In Progress" | "Completed" | "Cancelled";
+  status: "Pending" | "Confirmed" | "In Progress" | "Completed" | "Cancelled" | "Rejected";
   notes: string;
   rating?: number;
   feedback?: string;
@@ -49,7 +48,7 @@ interface Appointment {
 interface AppointmentDetailsModalProps {
   appointment: Appointment;
   onClose: () => void;
-  onUpdateStatus: (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => void;
+  onUpdateStatus: (appointmentId: string, newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string, totalCost?: number, costNotes?: string) => void;
   isTechnician?: boolean;
 }
 
@@ -57,10 +56,9 @@ export default function AppointmentDetailsModal({
   appointment, 
   onClose, 
   onUpdateStatus,
-  isTechnician = false 
 }: AppointmentDetailsModalProps) {
-  const { showPromise } = useFeedback();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showCompleteDialog, setShowCompleteDialog] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelCategory, setCancelCategory] = useState("");
 
@@ -352,7 +350,7 @@ export default function AppointmentDetailsModal({
                 {appointment.status === 'In Progress' && (
                   <Button 
                     className="w-full bg-green-600 hover:bg-green-700 text-white h-12 text-lg"
-                    onClick={() => onUpdateStatus(appointment.id, "Completed")}
+                    onClick={() => setShowCompleteDialog(true)}
                   >
                     <CheckCircle className="w-5 h-5 mr-2" /> Complete Job
                   </Button>
@@ -430,6 +428,16 @@ export default function AppointmentDetailsModal({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <CompleteJobDialog 
+        isOpen={showCompleteDialog}
+        onClose={() => setShowCompleteDialog(false)}
+        onConfirm={(cost, notes) => {
+          onUpdateStatus(appointment.id, "Completed", undefined, undefined, cost, notes);
+          onClose();
+        }}
+        serviceName={appointment.service}
+      />
     </>
   );
 }

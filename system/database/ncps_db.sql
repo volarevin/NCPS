@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 30, 2025 at 03:59 PM
+-- Generation Time: Dec 01, 2025 at 04:24 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -402,7 +402,8 @@ INSERT INTO `activity_logs` (`log_id`, `user_id`, `action_type`, `description`, 
 (323, 1, 'Appointment Confirmed', 'Appointment #158 was confirmed', '2025-11-28 12:17:15'),
 (324, 1, 'Appointment Confirmed', 'Appointment #158 was confirmed', '2025-11-28 12:17:18'),
 (325, 1, 'Appointment Confirmed', 'Appointment #162 was confirmed', '2025-11-28 13:28:06'),
-(326, 1, 'Appointment Confirmed', 'Appointment #163 was confirmed', '2025-11-28 14:25:33');
+(326, 1, 'Appointment Confirmed', 'Appointment #163 was confirmed', '2025-11-28 14:25:33'),
+(327, 1, 'Appointment Confirmed', 'Appointment #169 was confirmed', '2025-12-01 02:33:46');
 
 -- --------------------------------------------------------
 
@@ -412,7 +413,7 @@ INSERT INTO `activity_logs` (`log_id`, `user_id`, `action_type`, `description`, 
 
 CREATE TABLE `appointments` (
   `appointment_id` int(11) NOT NULL,
-  `customer_id` int(11) NOT NULL,
+  `customer_id` int(11) DEFAULT NULL,
   `technician_id` int(11) DEFAULT NULL,
   `service_id` int(11) NOT NULL,
   `service_address` text DEFAULT NULL,
@@ -430,176 +431,184 @@ CREATE TABLE `appointments` (
   `cancelled_by` int(11) DEFAULT NULL,
   `marked_for_deletion` tinyint(1) DEFAULT 0,
   `deletion_marked_at` datetime DEFAULT NULL,
-  `deletion_marked_by` int(11) DEFAULT NULL
+  `deletion_marked_by` int(11) DEFAULT NULL,
+  `walkin_name` varchar(100) DEFAULT NULL,
+  `walkin_phone` varchar(20) DEFAULT NULL,
+  `walkin_email` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `appointments`
 --
 
-INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `service_id`, `service_address`, `appointment_date`, `status`, `total_cost`, `customer_notes`, `cancellation_reason`, `rejection_reason`, `cancellation_category`, `is_walk_in`, `created_at`, `updated_at`, `payment_status`, `cancelled_by`, `marked_for_deletion`, `deletion_marked_at`, `deletion_marked_by`) VALUES
-(1, 32, 8, 3, NULL, '2025-06-14 22:03:00', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(2, 28, 12, 5, NULL, '2025-06-23 09:30:31', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(3, 24, 4, 1, NULL, '2025-10-11 18:01:45', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(4, 18, 9, 1, NULL, '2025-07-03 04:34:04', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(5, 18, 4, 5, NULL, '2025-12-06 13:15:47', 'Cancelled', 1000.00, NULL, NULL, NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-28 16:22:45', 'Unpaid', 4, 0, NULL, NULL),
-(6, 29, NULL, 1, NULL, '2025-11-25 10:05:29', 'Rejected', 1500.00, NULL, NULL, 'Service not avaialable at the moment', NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:26', 'Unpaid', NULL, 0, NULL, NULL),
-(7, 25, 4, 8, NULL, '2025-12-10 03:35:40', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 12:56:53', 'Unpaid', NULL, 0, NULL, NULL),
-(8, 14, 4, 6, NULL, '2025-06-24 22:21:38', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(9, 23, 12, 5, NULL, '2025-05-30 22:15:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(10, 26, 10, 6, NULL, '2025-10-06 05:03:44', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(11, 32, 12, 6, NULL, '2025-10-21 02:05:23', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(12, 31, 11, 5, NULL, '2025-08-05 19:45:08', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(13, 23, 10, 8, NULL, '2025-09-22 19:02:32', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(14, 28, 4, 3, NULL, '2025-06-29 00:37:45', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(15, 24, 4, 1, NULL, '2025-07-30 16:22:14', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(16, 20, 11, 7, NULL, '2025-12-23 08:45:10', 'Cancelled', 500.00, NULL, 'mukha kang burat', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-24 13:08:05', 'Unpaid', 1, 0, NULL, NULL),
-(17, 31, 9, 3, NULL, '2025-06-26 23:08:59', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(18, 27, 9, 6, NULL, '2025-12-08 20:29:24', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(19, 30, NULL, 4, NULL, '2025-12-06 15:28:36', 'Pending', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(20, 19, 12, 4, NULL, '2025-12-17 07:24:04', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(21, 15, NULL, 7, NULL, '2025-11-28 05:26:44', 'Rejected', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:24', 'Unpaid', NULL, 0, NULL, NULL),
-(22, 2, 4, 1, 'Nasugbu, Batangas', '2025-06-05 21:59:33', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(23, 31, 9, 5, NULL, '2025-12-10 21:46:54', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(24, 30, NULL, 2, NULL, '2025-11-26 01:57:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:43:13', 'Unpaid', NULL, 0, NULL, NULL),
-(25, 32, NULL, 5, NULL, '2025-12-19 19:36:10', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:29', 'Unpaid', 1, 0, NULL, NULL),
-(26, 17, 12, 2, NULL, '2025-09-04 09:13:37', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(27, 18, 8, 6, NULL, '2025-10-14 08:52:40', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(28, 21, 8, 8, NULL, '2025-09-18 01:22:51', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(29, 21, 4, 3, NULL, '2025-09-29 08:14:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(30, 32, 4, 5, NULL, '2025-06-29 00:57:25', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(31, 18, 12, 1, NULL, '2025-08-06 20:25:52', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(32, 13, NULL, 8, NULL, '2025-11-13 16:41:11', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(33, 22, NULL, 2, NULL, '0000-00-00 00:00:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 09:10:25', 'Unpaid', NULL, 0, NULL, NULL),
-(34, 20, 12, 5, NULL, '2025-12-19 23:35:13', 'Cancelled', 1000.00, NULL, 'FAHHHHHH', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:37:25', 'Unpaid', 1, 0, NULL, NULL),
-(35, 27, 8, 6, NULL, '2025-07-26 08:05:31', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(36, 29, 10, 6, NULL, '2025-06-02 08:51:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(37, 30, 12, 5, NULL, '2025-11-30 13:19:52', 'Cancelled', 1000.00, NULL, 'technician is gay, sorry', NULL, 'No available technician', 0, '2025-11-24 09:18:17', '2025-11-26 08:07:19', 'Unpaid', 3, 0, NULL, NULL),
-(38, 24, NULL, 3, NULL, '2025-11-30 09:34:42', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(39, 30, NULL, 1, NULL, '2025-12-01 02:08:09', 'Pending', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(40, 27, NULL, 5, NULL, '2025-12-18 18:48:14', 'Rejected', 1000.00, NULL, NULL, 'KAMAGONG', NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:25', 'Unpaid', NULL, 0, NULL, NULL),
-(41, 20, 4, 4, NULL, '2025-10-29 14:03:24', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(42, 21, NULL, 8, NULL, '2025-12-19 21:52:34', 'Cancelled', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:26', 'Unpaid', 1, 0, NULL, NULL),
-(43, 13, 9, 2, NULL, '2025-08-30 08:29:20', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(44, 19, NULL, 6, NULL, '2025-05-25 05:10:30', 'Cancelled', 2000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(45, 29, NULL, 3, NULL, '2025-07-24 09:30:24', 'Cancelled', 800.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(46, 31, 8, 3, NULL, '2025-12-12 22:58:54', 'Confirmed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(47, 23, 10, 6, NULL, '2025-10-19 02:59:56', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(48, 18, NULL, 3, NULL, '2025-12-06 08:58:44', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(49, 14, 10, 4, NULL, '2025-12-16 23:36:22', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(50, 30, NULL, 5, NULL, '2025-12-24 06:09:42', 'Rejected', 1000.00, NULL, NULL, 'bcos you\'re gay', 'Other', 0, '2025-11-24 09:18:17', '2025-11-26 10:29:53', 'Unpaid', NULL, 1, '2025-11-26 18:29:53', 1),
-(51, 25, 4, 2, NULL, '2025-12-09 12:34:19', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 13:39:13', 'Unpaid', NULL, 0, NULL, NULL),
-(52, 27, 9, 6, NULL, '2025-09-15 23:29:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(53, 31, 9, 5, NULL, '2025-05-24 14:24:02', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(54, 26, 4, 7, NULL, '2025-11-01 23:36:42', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(55, 23, 10, 2, NULL, '2025-10-03 19:13:00', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(56, 21, 9, 1, NULL, '2025-10-10 16:09:08', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(57, 21, 12, 1, NULL, '2025-10-10 16:36:12', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(58, 27, 12, 4, NULL, '2025-12-16 20:14:30', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(59, 26, 10, 6, NULL, '2025-07-19 13:20:51', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(60, 2, 4, 3, 'Nasugbu, Batangas', '2025-07-29 19:22:37', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(61, 30, NULL, 8, NULL, '2025-12-21 08:44:20', 'Cancelled', 0.00, NULL, 'ayoko hahaha', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:36:46', 'Unpaid', 1, 0, NULL, NULL),
-(62, 14, NULL, 8, NULL, '2025-05-29 03:19:54', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(63, 25, NULL, 4, NULL, '2025-10-19 23:01:52', 'Cancelled', 1200.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(64, 15, NULL, 2, NULL, '2025-08-28 12:08:27', 'Cancelled', 3000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(65, 30, NULL, 8, NULL, '2025-07-20 06:54:30', 'Cancelled', 0.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(66, 2, 4, 5, 'Nasugbu, Batangas', '2025-09-15 16:12:16', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(67, 29, 12, 1, NULL, '2025-08-25 22:05:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(68, 19, 9, 1, NULL, '2025-10-10 21:32:10', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(69, 20, 4, 3, NULL, '2025-06-28 18:40:23', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(70, 13, 9, 2, NULL, '2025-09-05 05:26:27', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(71, 16, 10, 8, NULL, '2025-08-31 22:56:16', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(72, 13, 9, 5, NULL, '2025-11-01 12:58:42', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(73, 31, 4, 8, NULL, '2025-06-27 19:24:34', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(74, 2, 4, 7, 'Nasugbu, Batangas', '2025-08-02 06:33:36', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(75, 24, NULL, 3, NULL, '2025-09-01 13:20:42', 'Cancelled', 800.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(76, 21, 4, 5, NULL, '2025-12-18 19:35:00', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:42:51', 'Unpaid', NULL, 0, NULL, NULL),
-(77, 28, 12, 6, NULL, '2025-10-02 09:25:25', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(78, 2, 10, 2, 'Nasugbu, Batangas', '2025-12-11 17:48:42', 'Cancelled', 3000.00, NULL, 'ayaw ko na', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', 2, 0, NULL, NULL),
-(79, 26, NULL, 7, NULL, '2025-12-24 05:08:34', 'Cancelled', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:47', 'Unpaid', 1, 0, NULL, NULL),
-(81, 32, 11, 6, NULL, '2025-11-11 11:46:59', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(82, 19, 11, 4, NULL, '2025-10-07 16:16:19', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(83, 17, 8, 8, NULL, '2025-07-12 12:08:04', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(84, 18, NULL, 8, NULL, '2025-06-25 18:30:31', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(85, 30, 9, 1, NULL, '2025-09-19 12:46:23', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(86, 16, 10, 5, NULL, '2025-11-15 05:08:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(87, 32, 4, 7, NULL, '2025-07-16 02:58:25', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(88, 15, 4, 5, NULL, '2025-11-26 23:39:00', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 14:31:13', 'Unpaid', NULL, 0, NULL, NULL),
-(89, 26, 9, 1, NULL, '2025-06-14 09:16:56', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(90, 2, 11, 6, 'Nasugbu, Batangas', '2025-07-14 05:47:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(91, 25, 9, 7, NULL, '2025-12-22 09:24:29', 'Cancelled', 500.00, NULL, 'YOU\'RE GAY', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 12:57:34', 'Unpaid', NULL, 0, NULL, NULL),
-(92, 16, 4, 3, NULL, '2025-09-23 10:37:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(93, 2, 4, 4, 'Nasugbu, Batangas', '2025-11-24 18:59:12', 'Cancelled', 1200.00, NULL, 'Conflict in sched', NULL, 'Scheduling conflict', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', 3, 0, NULL, NULL),
-(94, 19, 4, 7, NULL, '2025-12-12 07:23:51', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(95, 27, 9, 2, NULL, '2025-08-11 23:57:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(96, 29, NULL, 3, NULL, '2025-08-22 13:05:17', 'Cancelled', 800.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(97, 18, 11, 6, NULL, '2025-11-30 02:12:08', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(98, 32, 12, 5, NULL, '2025-09-20 11:39:56', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(99, 25, 12, 3, NULL, '2025-08-23 05:11:29', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(100, 29, 9, 2, NULL, '2025-09-22 21:09:58', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(101, 2, 11, 4, 'Nasugbu, Batangas', '2025-09-05 14:05:12', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(102, 22, 10, 2, NULL, '2025-11-02 10:26:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(103, 13, 8, 6, NULL, '2025-10-02 14:51:18', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(104, 29, 4, 8, NULL, '2025-12-18 02:42:48', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(105, 28, NULL, 5, NULL, '2025-11-22 18:32:42', 'Cancelled', 1000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(106, 2, NULL, 1, 'Nasugbu, Batangas', '2025-06-09 02:54:47', 'Cancelled', 1500.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
-(107, 19, 11, 3, NULL, '2025-06-28 06:06:49', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(108, 16, NULL, 1, NULL, '2025-09-03 03:17:03', 'Cancelled', 1500.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(109, 31, 11, 1, NULL, '2025-12-09 03:22:46', 'Confirmed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(110, 16, 9, 7, NULL, '2025-07-01 16:54:30', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(111, 14, 8, 7, NULL, '2025-12-06 10:35:25', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(112, 32, 8, 8, NULL, '2025-10-06 12:25:52', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(113, 26, 9, 1, NULL, '2025-06-01 11:11:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(114, 28, 8, 7, NULL, '2025-08-16 04:27:59', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(115, 19, 11, 5, NULL, '2025-09-06 12:58:07', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(116, 19, 10, 5, NULL, '2025-08-26 01:26:48', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(117, 14, 10, 6, NULL, '2025-11-09 18:26:50', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(118, 28, 10, 6, NULL, '2025-06-23 23:00:02', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(119, 19, NULL, 3, NULL, '2025-09-28 04:48:25', 'Cancelled', 800.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(120, 29, 4, 6, NULL, '2025-11-13 04:34:28', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(121, 28, NULL, 5, NULL, '2025-12-21 14:05:05', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:59', 'Unpaid', 1, 0, NULL, NULL),
-(122, 25, 4, 5, NULL, '2025-09-04 09:09:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(123, 32, 12, 8, NULL, '2025-06-26 02:34:03', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(124, 2, 10, 2, 'Nasugbu, Batangas', '2025-08-03 02:04:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(125, 28, NULL, 4, NULL, '2025-10-04 07:24:31', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(126, 27, 8, 8, NULL, '2025-09-23 01:58:20', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(127, 21, NULL, 4, NULL, '2025-08-27 06:25:56', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(128, 28, 12, 4, NULL, '2025-11-01 04:00:07', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(129, 26, 8, 6, NULL, '2025-07-15 14:52:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(130, 2, 4, 3, 'Nasugbu, Batangas', '2025-08-29 18:04:43', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(131, 30, NULL, 2, NULL, '2025-06-19 19:19:59', 'Cancelled', 3000.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(132, 24, 4, 4, NULL, '2025-07-27 04:55:06', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(133, 22, 8, 6, NULL, '2025-06-23 14:18:19', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(134, 31, 10, 1, NULL, '2025-07-12 03:37:02', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(135, 2, NULL, 2, 'Nasugbu, Batangas', '2025-12-07 08:42:36', 'Pending', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
-(136, 27, 12, 4, NULL, '2025-12-12 10:22:41', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(137, 25, 12, 4, NULL, '2025-06-09 21:15:50', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(138, 2, 9, 5, 'Nasugbu, Batangas', '2025-05-31 16:54:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL),
-(139, 26, 12, 2, NULL, '2025-08-08 00:38:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(140, 31, NULL, 8, NULL, '2025-07-26 04:23:33', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(141, 31, 8, 8, NULL, '2025-09-04 01:54:41', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(142, 14, 11, 5, NULL, '2025-08-24 13:34:32', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(143, 20, NULL, 6, NULL, '2025-11-28 10:35:46', 'Pending', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(144, 19, 9, 7, NULL, '2025-08-31 15:57:03', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(145, 26, NULL, 2, NULL, '2025-08-04 03:04:56', 'Cancelled', 3000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL),
-(146, 27, 8, 7, NULL, '2025-11-04 12:39:08', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-27 01:52:42', 'Paid', NULL, 1, '2025-11-27 09:52:42', 3),
-(147, 15, 12, 2, NULL, '2025-08-19 15:58:09', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(148, 16, 4, 6, NULL, '2025-06-20 08:33:42', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(149, 31, 9, 1, NULL, '2025-10-14 22:56:30', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(150, 30, 11, 8, NULL, '2025-10-17 08:42:38', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL),
-(151, 13, NULL, 1, NULL, '2025-11-26 22:22:00', 'Cancelled', NULL, 'poide pakabit cctv lods', 'Duplicate ka boss', NULL, 'Duplicate booking', 0, '2025-11-26 08:36:29', '2025-11-26 11:36:18', 'Unpaid', 1, 0, NULL, NULL),
-(152, 33, 4, 6, '123 Main St, Nasugbu, Batangas', '2025-11-26 21:41:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 09:41:18', '2025-11-28 13:52:30', 'Unpaid', NULL, 1, '2025-11-26 17:41:54', 1),
-(153, 14, 4, 3, NULL, '2025-11-28 02:39:00', 'Cancelled', NULL, '', NULL, NULL, 'Scheduling conflict', 0, '2025-11-26 13:39:37', '2025-11-28 15:41:09', 'Unpaid', 4, 0, NULL, NULL),
-(154, 2, 4, 2, 'Nasugbu, Batangas', '2025-11-26 00:45:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:45:59', '2025-11-28 14:31:11', 'Unpaid', NULL, 0, NULL, NULL),
-(155, 2, 4, 6, 'Nasugbu, Batangas', '2025-11-27 21:02:00', 'Confirmed', NULL, 'pakabit ng CCTV \n\nAddress: 123 Main St, Nasugbu, Batangas', NULL, NULL, NULL, 0, '2025-11-28 12:02:46', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
-(156, 2, 4, 3, 'Nasugbu, Batangas', '2025-11-27 22:06:00', 'Confirmed', NULL, 'pagawa cam \n\nAddress: Manila', NULL, NULL, NULL, 0, '2025-11-28 12:06:47', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
-(157, 2, NULL, 3, 'Nasugbu, Batangas', '2025-11-28 21:13:00', 'Confirmed', NULL, ' \n\nAddress: Manila', NULL, NULL, NULL, 0, '2025-11-28 12:13:59', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
-(158, 2, 4, 7, 'Nasugbu, Batangas', '2025-11-28 21:17:00', 'Completed', NULL, ' \n\nAddress: Manilaz', NULL, NULL, NULL, 0, '2025-11-28 12:17:07', '2025-11-28 14:20:09', 'Unpaid', NULL, 0, NULL, NULL),
-(161, 2, 4, 6, 'Nasugbu, Batangas', '2025-11-28 22:12:00', 'Cancelled', NULL, 'KAMAGONG \n\nAddress: 123 Main St, Nasugbu, Batangas', NULL, NULL, NULL, 0, '2025-11-28 13:12:45', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL),
-(162, 2, 4, 4, 'Nasugbu, Batangas', '2025-11-28 23:26:00', 'Cancelled', NULL, ' \n\nAddress: Manila', 'Walang tao', NULL, 'No available technician', 0, '2025-11-28 13:26:38', '2025-11-28 13:52:30', 'Unpaid', 4, 0, NULL, NULL),
-(163, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-11-28 23:24:00', 'Completed', NULL, 'pagawa po ng cam', NULL, NULL, NULL, 0, '2025-11-28 14:25:03', '2025-11-28 15:41:40', 'Unpaid', NULL, 0, NULL, NULL),
-(164, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-11-28 23:59:00', 'Cancelled', NULL, '', NULL, NULL, NULL, 0, '2025-11-28 15:40:01', '2025-11-28 15:40:55', 'Unpaid', NULL, 0, NULL, NULL),
-(165, 2, 4, 8, 'Nasugbu, Batangas', '2025-11-29 02:23:00', 'In Progress', NULL, '', NULL, NULL, NULL, 0, '2025-11-28 16:23:19', '2025-11-28 16:23:53', 'Unpaid', NULL, 0, NULL, NULL);
+INSERT INTO `appointments` (`appointment_id`, `customer_id`, `technician_id`, `service_id`, `service_address`, `appointment_date`, `status`, `total_cost`, `customer_notes`, `cancellation_reason`, `rejection_reason`, `cancellation_category`, `is_walk_in`, `created_at`, `updated_at`, `payment_status`, `cancelled_by`, `marked_for_deletion`, `deletion_marked_at`, `deletion_marked_by`, `walkin_name`, `walkin_phone`, `walkin_email`) VALUES
+(1, 32, 8, 3, NULL, '2025-06-14 22:03:00', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(2, 28, 12, 5, NULL, '2025-06-23 09:30:31', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(3, 24, 4, 1, NULL, '2025-10-11 18:01:45', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(4, 18, 9, 1, NULL, '2025-07-03 04:34:04', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(5, 18, 4, 5, NULL, '2025-12-06 13:15:47', 'Cancelled', 1000.00, NULL, NULL, NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-28 16:22:45', 'Unpaid', 4, 0, NULL, NULL, NULL, NULL, NULL),
+(6, 29, NULL, 1, NULL, '2025-11-25 10:05:29', 'Rejected', 1500.00, NULL, NULL, 'Service not avaialable at the moment', NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:26', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(7, 25, 4, 8, NULL, '2025-12-10 03:35:40', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 12:56:53', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(8, 14, 4, 6, NULL, '2025-06-24 22:21:38', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(9, 23, 12, 5, NULL, '2025-05-30 22:15:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(10, 26, 10, 6, NULL, '2025-10-06 05:03:44', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(11, 32, 12, 6, NULL, '2025-10-21 02:05:23', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(12, 31, 11, 5, NULL, '2025-08-05 19:45:08', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(13, 23, 10, 8, NULL, '2025-09-22 19:02:32', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(14, 28, 4, 3, NULL, '2025-06-29 00:37:45', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(15, 24, 4, 1, NULL, '2025-07-30 16:22:14', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(16, 20, 11, 7, NULL, '2025-12-23 08:45:10', 'Cancelled', 500.00, NULL, 'mukha kang burat', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-24 13:08:05', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(17, 31, 9, 3, NULL, '2025-06-26 23:08:59', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(18, 27, 9, 6, NULL, '2025-12-08 20:29:24', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(19, 30, NULL, 4, NULL, '2025-12-06 15:28:36', 'Pending', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(20, 19, 12, 4, NULL, '2025-12-17 07:24:04', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(21, 15, NULL, 7, NULL, '2025-11-28 05:26:44', 'Rejected', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:24', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(22, 2, 4, 1, 'Nasugbu, Batangas', '2025-06-05 21:59:33', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(23, 31, 9, 5, NULL, '2025-12-10 21:46:54', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(24, 30, NULL, 2, NULL, '2025-11-26 01:57:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:43:13', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(25, 32, NULL, 5, NULL, '2025-12-19 19:36:10', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:29', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(26, 17, 12, 2, NULL, '2025-09-04 09:13:37', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(27, 18, 8, 6, NULL, '2025-10-14 08:52:40', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(28, 21, 8, 8, NULL, '2025-09-18 01:22:51', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(29, 21, 4, 3, NULL, '2025-09-29 08:14:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(30, 32, 4, 5, NULL, '2025-06-29 00:57:25', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(31, 18, 12, 1, NULL, '2025-08-06 20:25:52', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(32, 13, NULL, 8, NULL, '2025-11-13 16:41:11', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(33, 22, NULL, 2, NULL, '0000-00-00 00:00:00', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 09:10:25', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(34, 20, 12, 5, NULL, '2025-12-19 23:35:13', 'Cancelled', 1000.00, NULL, 'FAHHHHHH', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:37:25', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(35, 27, 8, 6, NULL, '2025-07-26 08:05:31', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(36, 29, 10, 6, NULL, '2025-06-02 08:51:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(37, 30, 12, 5, NULL, '2025-11-30 13:19:52', 'Cancelled', 1000.00, NULL, 'technician is gay, sorry', NULL, 'No available technician', 0, '2025-11-24 09:18:17', '2025-11-26 08:07:19', 'Unpaid', 3, 0, NULL, NULL, NULL, NULL, NULL),
+(38, 24, 4, 3, NULL, '2025-11-30 09:34:42', 'Confirmed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-30 15:57:08', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(39, 30, 9, 1, NULL, '2025-12-01 02:08:09', 'Confirmed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-12-01 00:34:57', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(40, 27, NULL, 5, NULL, '2025-12-18 18:48:14', 'Rejected', 1000.00, NULL, NULL, 'KAMAGONG', NULL, 0, '2025-11-24 09:18:17', '2025-11-28 15:06:25', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(41, 20, 4, 4, NULL, '2025-10-29 14:03:24', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(42, 21, NULL, 8, NULL, '2025-12-19 21:52:34', 'Cancelled', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:25:26', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(43, 13, 9, 2, NULL, '2025-08-30 08:29:20', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(44, 19, NULL, 6, NULL, '2025-05-25 05:10:30', 'Cancelled', 2000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(45, 29, NULL, 3, NULL, '2025-07-24 09:30:24', 'Cancelled', 800.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(46, 31, 8, 3, NULL, '2025-12-12 22:58:54', 'Confirmed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(47, 23, 10, 6, NULL, '2025-10-19 02:59:56', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(48, 18, NULL, 3, NULL, '2025-12-06 08:58:44', 'Pending', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(49, 14, 10, 4, NULL, '2025-12-16 23:36:22', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(50, 30, NULL, 5, NULL, '2025-12-24 06:09:42', 'Rejected', 1000.00, NULL, NULL, 'bcos you\'re gay', 'Other', 0, '2025-11-24 09:18:17', '2025-11-26 10:29:53', 'Unpaid', NULL, 1, '2025-11-26 18:29:53', 1, NULL, NULL, NULL),
+(51, 25, 4, 2, NULL, '2025-12-09 12:34:19', 'Confirmed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 13:39:13', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(52, 27, 9, 6, NULL, '2025-09-15 23:29:43', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(53, 31, 9, 5, NULL, '2025-05-24 14:24:02', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(54, 26, 4, 7, NULL, '2025-11-01 23:36:42', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(55, 23, 10, 2, NULL, '2025-10-03 19:13:00', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(56, 21, 9, 1, NULL, '2025-10-10 16:09:08', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(57, 21, 12, 1, NULL, '2025-10-10 16:36:12', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(58, 27, 12, 4, NULL, '2025-12-16 20:14:30', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(59, 26, 10, 6, NULL, '2025-07-19 13:20:51', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(60, 2, 4, 3, 'Nasugbu, Batangas', '2025-07-29 19:22:37', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(61, 30, NULL, 8, NULL, '2025-12-21 08:44:20', 'Cancelled', 0.00, NULL, 'ayoko hahaha', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-26 11:36:46', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(62, 14, NULL, 8, NULL, '2025-05-29 03:19:54', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(63, 25, NULL, 4, NULL, '2025-10-19 23:01:52', 'Cancelled', 1200.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(64, 15, NULL, 2, NULL, '2025-08-28 12:08:27', 'Cancelled', 3000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(65, 30, NULL, 8, NULL, '2025-07-20 06:54:30', 'Cancelled', 0.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(66, 2, 4, 5, 'Nasugbu, Batangas', '2025-09-15 16:12:16', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(67, 29, 12, 1, NULL, '2025-08-25 22:05:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(68, 19, 9, 1, NULL, '2025-10-10 21:32:10', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(69, 20, 4, 3, NULL, '2025-06-28 18:40:23', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(70, 13, 9, 2, NULL, '2025-09-05 05:26:27', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(71, 16, 10, 8, NULL, '2025-08-31 22:56:16', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(72, 13, 9, 5, NULL, '2025-11-01 12:58:42', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(73, 31, 4, 8, NULL, '2025-06-27 19:24:34', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(74, 2, 4, 7, 'Nasugbu, Batangas', '2025-08-02 06:33:36', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(75, 24, NULL, 3, NULL, '2025-09-01 13:20:42', 'Cancelled', 800.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(76, 21, 4, 5, NULL, '2025-12-18 19:35:00', 'Confirmed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 14:42:51', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(77, 28, 12, 6, NULL, '2025-10-02 09:25:25', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(78, 2, 10, 2, 'Nasugbu, Batangas', '2025-12-11 17:48:42', 'Cancelled', 3000.00, NULL, 'ayaw ko na', NULL, 'Customer request', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', 2, 0, NULL, NULL, NULL, NULL, NULL),
+(79, 26, NULL, 7, NULL, '2025-12-24 05:08:34', 'Cancelled', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:47', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(81, 32, 11, 6, NULL, '2025-11-11 11:46:59', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(82, 19, 11, 4, NULL, '2025-10-07 16:16:19', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(83, 17, 8, 8, NULL, '2025-07-12 12:08:04', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(84, 18, NULL, 8, NULL, '2025-06-25 18:30:31', 'Cancelled', 0.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(85, 30, 9, 1, NULL, '2025-09-19 12:46:23', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(86, 16, 10, 5, NULL, '2025-11-15 05:08:39', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(87, 32, 4, 7, NULL, '2025-07-16 02:58:25', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(88, 15, 4, 5, NULL, '2025-11-26 23:39:00', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 14:31:13', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(89, 26, 9, 1, NULL, '2025-06-14 09:16:56', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(90, 2, 11, 6, 'Nasugbu, Batangas', '2025-07-14 05:47:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(91, 25, 9, 7, NULL, '2025-12-22 09:24:29', 'Cancelled', 500.00, NULL, 'YOU\'RE GAY', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 12:57:34', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(92, 16, 4, 3, NULL, '2025-09-23 10:37:52', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(93, 2, 4, 4, 'Nasugbu, Batangas', '2025-11-24 18:59:12', 'Cancelled', 1200.00, NULL, 'Conflict in sched', NULL, 'Scheduling conflict', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', 3, 0, NULL, NULL, NULL, NULL, NULL),
+(94, 19, 4, 7, NULL, '2025-12-12 07:23:51', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(95, 27, 9, 2, NULL, '2025-08-11 23:57:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(96, 29, NULL, 3, NULL, '2025-08-22 13:05:17', 'Cancelled', 800.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(97, 18, 11, 6, NULL, '2025-11-30 02:12:08', 'Confirmed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(98, 32, 12, 5, NULL, '2025-09-20 11:39:56', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(99, 25, 12, 3, NULL, '2025-08-23 05:11:29', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(100, 29, 9, 2, NULL, '2025-09-22 21:09:58', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(101, 2, 11, 4, 'Nasugbu, Batangas', '2025-09-05 14:05:12', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(102, 22, 10, 2, NULL, '2025-11-02 10:26:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(103, 13, 8, 6, NULL, '2025-10-02 14:51:18', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(104, 29, 4, 8, NULL, '2025-12-18 02:42:48', 'Confirmed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(105, 28, NULL, 5, NULL, '2025-11-22 18:32:42', 'Cancelled', 1000.00, NULL, 'Customer reason: Other', NULL, 'Other', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(106, 2, NULL, 1, 'Nasugbu, Batangas', '2025-06-09 02:54:47', 'Cancelled', 1500.00, NULL, 'Customer reason: Emergency', NULL, 'Emergency', 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(107, 19, 11, 3, NULL, '2025-06-28 06:06:49', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(108, 16, NULL, 1, NULL, '2025-09-03 03:17:03', 'Cancelled', 1500.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(109, 31, 11, 1, NULL, '2025-12-09 03:22:46', 'Confirmed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(110, 16, 9, 7, NULL, '2025-07-01 16:54:30', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(111, 14, 8, 7, NULL, '2025-12-06 10:35:25', 'Confirmed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(112, 32, 8, 8, NULL, '2025-10-06 12:25:52', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(113, 26, 9, 1, NULL, '2025-06-01 11:11:19', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(114, 28, 8, 7, NULL, '2025-08-16 04:27:59', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(115, 19, 11, 5, NULL, '2025-09-06 12:58:07', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(116, 19, 10, 5, NULL, '2025-08-26 01:26:48', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(117, 14, 10, 6, NULL, '2025-11-09 18:26:50', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(118, 28, 10, 6, NULL, '2025-06-23 23:00:02', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(119, 19, NULL, 3, NULL, '2025-09-28 04:48:25', 'Cancelled', 800.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(120, 29, 4, 6, NULL, '2025-11-13 04:34:28', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(121, 28, NULL, 5, NULL, '2025-12-21 14:05:05', 'Cancelled', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-26 10:24:59', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(122, 25, 4, 5, NULL, '2025-09-04 09:09:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(123, 32, 12, 8, NULL, '2025-06-26 02:34:03', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(124, 2, 10, 2, 'Nasugbu, Batangas', '2025-08-03 02:04:41', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(125, 28, NULL, 4, NULL, '2025-10-04 07:24:31', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(126, 27, 8, 8, NULL, '2025-09-23 01:58:20', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(127, 21, NULL, 4, NULL, '2025-08-27 06:25:56', 'Cancelled', 1200.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(128, 28, 12, 4, NULL, '2025-11-01 04:00:07', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(129, 26, 8, 6, NULL, '2025-07-15 14:52:39', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(130, 2, 4, 3, 'Nasugbu, Batangas', '2025-08-29 18:04:43', 'Completed', 800.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(131, 30, NULL, 2, NULL, '2025-06-19 19:19:59', 'Cancelled', 3000.00, NULL, 'Customer reason: Found Cheaper', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(132, 24, 4, 4, NULL, '2025-07-27 04:55:06', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(133, 22, 8, 6, NULL, '2025-06-23 14:18:19', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(134, 31, 10, 1, NULL, '2025-07-12 03:37:02', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(135, 2, NULL, 2, 'Nasugbu, Batangas', '2025-12-07 08:42:36', 'Pending', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(136, 27, 12, 4, NULL, '2025-12-12 10:22:41', 'Confirmed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(137, 25, 12, 4, NULL, '2025-06-09 21:15:50', 'Completed', 1200.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(138, 2, 9, 5, 'Nasugbu, Batangas', '2025-05-31 16:54:18', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-28 13:52:30', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(139, 26, 12, 2, NULL, '2025-08-08 00:38:33', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(140, 31, NULL, 8, NULL, '2025-07-26 04:23:33', 'Cancelled', 0.00, NULL, 'Customer reason: Changed Mind', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(141, 31, 8, 8, NULL, '2025-09-04 01:54:41', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(142, 14, 11, 5, NULL, '2025-08-24 13:34:32', 'Completed', 1000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(143, 20, NULL, 6, NULL, '2025-11-28 10:35:46', 'Pending', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(144, 19, 9, 7, NULL, '2025-08-31 15:57:03', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(145, 26, NULL, 2, NULL, '2025-08-04 03:04:56', 'Cancelled', 3000.00, NULL, 'Customer reason: Tech Unavailable', NULL, '', 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(146, 27, 8, 7, NULL, '2025-11-04 12:39:08', 'Completed', 500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-27 01:52:42', 'Paid', NULL, 1, '2025-11-27 09:52:42', 3, NULL, NULL, NULL),
+(147, 15, 12, 2, NULL, '2025-08-19 15:58:09', 'Completed', 3000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(148, 16, 4, 6, NULL, '2025-06-20 08:33:42', 'Completed', 2000.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(149, 31, 9, 1, NULL, '2025-10-14 22:56:30', 'Completed', 1500.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(150, 30, 11, 8, NULL, '2025-10-17 08:42:38', 'Completed', 0.00, NULL, NULL, NULL, NULL, 0, '2025-11-24 09:18:17', '2025-11-24 09:18:17', 'Paid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(151, 13, NULL, 1, NULL, '2025-11-26 22:22:00', 'Cancelled', NULL, 'poide pakabit cctv lods', 'Duplicate ka boss', NULL, 'Duplicate booking', 0, '2025-11-26 08:36:29', '2025-11-26 11:36:18', 'Unpaid', 1, 0, NULL, NULL, NULL, NULL, NULL),
+(152, 33, 4, 6, '123 Main St, Nasugbu, Batangas', '2025-11-26 21:41:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 09:41:18', '2025-11-28 13:52:30', 'Unpaid', NULL, 1, '2025-11-26 17:41:54', 1, NULL, NULL, NULL),
+(153, 14, 4, 3, NULL, '2025-11-28 02:39:00', 'Cancelled', NULL, '', NULL, NULL, 'Scheduling conflict', 0, '2025-11-26 13:39:37', '2025-11-28 15:41:09', 'Unpaid', 4, 0, NULL, NULL, NULL, NULL, NULL),
+(154, 2, 4, 2, 'Nasugbu, Batangas', '2025-11-26 00:45:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-26 13:45:59', '2025-11-28 14:31:11', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(155, 2, 4, 6, 'Nasugbu, Batangas', '2025-11-27 21:02:00', 'Confirmed', NULL, 'pakabit ng CCTV \n\nAddress: 123 Main St, Nasugbu, Batangas', NULL, NULL, NULL, 0, '2025-11-28 12:02:46', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(156, 2, 4, 3, 'Nasugbu, Batangas', '2025-11-27 22:06:00', 'Confirmed', NULL, 'pagawa cam \n\nAddress: Manila', NULL, NULL, NULL, 0, '2025-11-28 12:06:47', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(157, 2, NULL, 3, 'Nasugbu, Batangas', '2025-11-28 21:13:00', 'Confirmed', NULL, ' \n\nAddress: Manila', NULL, NULL, NULL, 0, '2025-11-28 12:13:59', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(158, 2, 4, 7, 'Nasugbu, Batangas', '2025-11-28 21:17:00', 'Completed', NULL, ' \n\nAddress: Manilaz', NULL, NULL, NULL, 0, '2025-11-28 12:17:07', '2025-11-28 14:20:09', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(161, 2, 4, 6, 'Nasugbu, Batangas', '2025-11-28 22:12:00', 'Cancelled', NULL, 'KAMAGONG \n\nAddress: 123 Main St, Nasugbu, Batangas', NULL, NULL, NULL, 0, '2025-11-28 13:12:45', '2025-11-28 13:52:30', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(162, 2, 4, 4, 'Nasugbu, Batangas', '2025-11-28 23:26:00', 'Cancelled', NULL, ' \n\nAddress: Manila', 'Walang tao', NULL, 'No available technician', 0, '2025-11-28 13:26:38', '2025-11-28 13:52:30', 'Unpaid', 4, 0, NULL, NULL, NULL, NULL, NULL),
+(163, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-11-28 23:24:00', 'Completed', NULL, 'pagawa po ng cam', NULL, NULL, NULL, 0, '2025-11-28 14:25:03', '2025-11-28 15:41:40', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(164, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-11-28 23:59:00', 'Cancelled', NULL, '', NULL, NULL, NULL, 0, '2025-11-28 15:40:01', '2025-11-28 15:40:55', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(165, 2, 4, 8, 'Nasugbu, Batangas', '2025-11-29 02:23:00', 'Completed', NULL, '', NULL, NULL, NULL, 0, '2025-11-28 16:23:19', '2025-11-30 16:00:32', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(166, 2, 4, 3, 'Tumalim, Nasugbu, Batangas', '2025-12-01 12:55:00', 'Confirmed', NULL, '', NULL, NULL, NULL, 0, '2025-11-30 15:56:11', '2025-11-30 15:58:57', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(167, NULL, NULL, 7, 'Centro Tumalim', '2025-12-10 09:08:00', 'Pending', NULL, '', NULL, NULL, NULL, 1, '2025-12-01 00:09:10', '2025-12-01 00:09:10', 'Unpaid', NULL, 0, NULL, NULL, 'Bob Haha', '09287172363', ''),
+(168, 2, 5, 6, 'Nasugbu, Batangas', '2025-11-30 10:21:00', 'Confirmed', NULL, '', NULL, NULL, NULL, 1, '2025-12-01 00:21:35', '2025-12-01 01:13:28', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(169, 13, 5, 6, 'Paraig Batangas', '2025-12-03 10:09:00', 'Confirmed', NULL, '', NULL, NULL, NULL, 1, '2025-12-01 01:10:05', '2025-12-01 02:33:46', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL),
+(170, 2, NULL, 5, 'Nasugbu, Batangas', '2025-12-07 07:52:00', 'Pending', NULL, '', NULL, NULL, NULL, 0, '2025-12-01 01:53:00', '2025-12-01 01:53:00', 'Unpaid', NULL, 0, NULL, NULL, NULL, NULL, NULL);
 
 --
 -- Triggers `appointments`
@@ -632,6 +641,436 @@ CREATE TRIGGER `trg_appointment_notifications` AFTER UPDATE ON `appointments` FO
 END
 $$
 DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trg_appointments_delete` AFTER DELETE ON `appointments` FOR EACH ROW BEGIN
+    INSERT INTO audit_logs (user_id, actor_role, action, table_name, record_id, changes, created_at)
+    VALUES (
+        @app_user_id, 
+        @app_user_role, 
+        'DELETE', 
+        'appointments', 
+        OLD.appointment_id, 
+        JSON_OBJECT(
+            'old', JSON_OBJECT('status', OLD.status, 'date', OLD.appointment_date)
+        ),
+        NOW()
+    );
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trg_appointments_insert` AFTER INSERT ON `appointments` FOR EACH ROW BEGIN
+    INSERT INTO audit_logs (user_id, actor_role, action, table_name, record_id, changes, created_at)
+    VALUES (
+        @app_user_id, 
+        @app_user_role, 
+        'CREATE', 
+        'appointments', 
+        NEW.appointment_id, 
+        JSON_OBJECT(
+            'new', JSON_OBJECT(
+                'status', NEW.status, 
+                'date', NEW.appointment_date, 
+                'customer_id', NEW.customer_id
+            )
+        ),
+        NOW()
+    );
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `trg_appointments_update` AFTER UPDATE ON `appointments` FOR EACH ROW BEGIN
+    INSERT INTO audit_logs (user_id, actor_role, action, table_name, record_id, changes, created_at)
+    VALUES (
+        @app_user_id, 
+        @app_user_role, 
+        'UPDATE', 
+        'appointments', 
+        NEW.appointment_id, 
+        JSON_OBJECT(
+            'old', JSON_OBJECT('status', OLD.status, 'date', OLD.appointment_date, 'technician_id', OLD.technician_id),
+            'new', JSON_OBJECT('status', NEW.status, 'date', NEW.appointment_date, 'technician_id', NEW.technician_id)
+        ),
+        NOW()
+    );
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `audit_logs`
+--
+
+CREATE TABLE `audit_logs` (
+  `log_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `actor_role` varchar(50) DEFAULT NULL,
+  `actor_username` varchar(150) DEFAULT NULL,
+  `action` varchar(50) NOT NULL,
+  `table_name` varchar(128) NOT NULL,
+  `record_id` int(11) DEFAULT NULL,
+  `changes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`changes`)),
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `audit_logs`
+--
+
+INSERT INTO `audit_logs` (`log_id`, `user_id`, `actor_role`, `actor_username`, `action`, `table_name`, `record_id`, `changes`, `ip_address`, `user_agent`, `created_at`) VALUES
+(1, 7, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-10 00:17:51'),
+(2, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-17 22:15:44'),
+(3, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-20 19:15:48'),
+(4, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-25 21:34:31'),
+(5, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-12 23:02:37'),
+(6, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-21 07:35:34'),
+(7, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-06 21:07:14'),
+(8, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-17 18:08:14'),
+(9, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-14 22:34:12'),
+(10, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-18 15:29:21'),
+(11, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-01 03:36:59'),
+(12, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-16 02:54:04'),
+(13, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-09 12:20:19'),
+(14, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-15 03:44:57'),
+(15, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-10 18:13:20'),
+(16, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-09 09:10:23'),
+(17, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-20 15:14:41'),
+(18, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-20 03:17:59'),
+(19, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-10 05:26:30'),
+(20, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-02 18:28:16'),
+(21, 29, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-14 13:28:31'),
+(22, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-04 09:08:15'),
+(23, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-30 21:23:44'),
+(24, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-08-31 15:27:13'),
+(25, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-17 06:15:46'),
+(26, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-11 16:57:33'),
+(27, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-16 21:25:09'),
+(28, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-12 10:48:14'),
+(29, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-06 09:15:15'),
+(30, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-05 14:32:05'),
+(31, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-11-11 20:52:50'),
+(32, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-05 15:46:37'),
+(33, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-11-19 12:10:51'),
+(34, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-31 04:11:27'),
+(35, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-08-31 23:41:29'),
+(36, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-29 21:30:32'),
+(37, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-02 17:39:15'),
+(38, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-19 04:45:18'),
+(39, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-09 22:31:49'),
+(40, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-07 19:34:46'),
+(41, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-20 05:00:02'),
+(42, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-27 17:18:20'),
+(43, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-01 05:23:41'),
+(44, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-25 22:58:57'),
+(45, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-13 01:01:47'),
+(46, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-24 11:23:57'),
+(47, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-02 03:44:06'),
+(48, 7, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-15 15:44:22'),
+(49, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-16 10:59:03'),
+(50, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-08 17:39:46'),
+(51, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-25 11:12:18'),
+(52, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-05 12:24:12'),
+(53, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-13 21:43:31'),
+(54, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-09 01:57:27'),
+(55, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-04 08:15:39'),
+(56, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-11 20:05:07'),
+(57, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-02 14:34:47'),
+(58, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-25 19:10:27'),
+(59, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-11 12:54:59'),
+(60, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-09 16:12:23'),
+(61, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-17 00:49:50'),
+(62, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-20 05:53:04'),
+(63, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-19 05:40:11'),
+(64, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-19 15:12:15'),
+(65, 7, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-18 13:57:36'),
+(66, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-09 11:01:29'),
+(67, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-08 15:23:47'),
+(68, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-04 01:42:00'),
+(69, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-21 13:54:02'),
+(70, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-27 01:14:21'),
+(71, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-16 09:21:33'),
+(72, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-05 07:37:23'),
+(73, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-02 23:55:03'),
+(74, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-23 19:13:34'),
+(75, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-08-27 09:07:41'),
+(76, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-30 18:43:11'),
+(77, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-09 09:22:16'),
+(78, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-12 13:13:12'),
+(79, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-14 13:26:14'),
+(80, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-12 06:19:55'),
+(81, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-19 22:03:29'),
+(82, 29, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-19 20:37:21'),
+(83, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-04 17:54:11'),
+(84, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-23 00:33:10'),
+(85, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-20 16:24:23'),
+(86, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-11 08:13:08'),
+(87, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-27 11:12:21'),
+(88, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-18 03:38:23'),
+(89, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-10 00:37:59'),
+(90, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-04 08:25:51'),
+(91, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-03 17:17:22'),
+(92, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-12 13:19:30'),
+(93, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-19 00:58:55'),
+(94, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-07 21:56:13'),
+(95, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-05 06:49:52'),
+(96, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-08-30 09:15:08'),
+(97, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-27 11:15:35'),
+(98, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-23 04:59:06'),
+(99, 12, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-24 05:56:43'),
+(100, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-24 04:13:07'),
+(101, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-12 02:49:21'),
+(102, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-05 01:49:17'),
+(103, 32, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-18 18:28:12'),
+(104, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-21 00:28:25'),
+(105, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-23 12:33:47'),
+(106, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-02 02:23:09'),
+(107, 7, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-17 09:53:05'),
+(108, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-13 06:45:31'),
+(109, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-12 03:01:23'),
+(110, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-07 12:33:09'),
+(111, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-29 16:44:41'),
+(112, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-19 03:32:45'),
+(113, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-10 07:29:26'),
+(114, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-17 22:15:48'),
+(115, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-13 18:20:55'),
+(116, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-08-29 14:08:27'),
+(117, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-24 08:14:21'),
+(118, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-05 10:34:36'),
+(119, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-15 15:25:02'),
+(120, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-09 00:16:29'),
+(121, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-17 02:54:28'),
+(122, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-08-31 04:12:35'),
+(123, 4, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-21 01:23:52'),
+(124, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-23 23:22:32'),
+(125, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-26 08:56:14'),
+(126, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-12 16:39:56'),
+(127, 8, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-09 18:41:35'),
+(128, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-27 14:04:01'),
+(129, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-07 20:58:27'),
+(130, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-10 13:32:05'),
+(131, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-26 18:28:38'),
+(132, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-13 18:31:48'),
+(133, 8, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-16 07:29:55'),
+(134, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-09 02:16:40'),
+(135, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-09 15:31:51'),
+(136, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-13 17:12:13'),
+(137, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-09 12:45:45'),
+(138, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-12 14:36:19'),
+(139, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-11 21:48:37'),
+(140, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-10 17:02:01'),
+(141, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-17 18:45:07'),
+(142, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-13 07:41:02'),
+(143, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-16 23:38:53'),
+(144, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-21 22:20:26'),
+(145, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-30 06:49:20'),
+(146, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-02 10:17:16'),
+(147, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-29 16:33:57'),
+(148, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-10 00:22:34'),
+(149, 7, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-08-30 16:44:31'),
+(150, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-12 09:11:58'),
+(151, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-07 17:55:15'),
+(152, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-06 15:42:02'),
+(153, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-11-04 21:37:15'),
+(154, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-08 06:47:28'),
+(155, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-26 16:01:44'),
+(156, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-26 08:06:16'),
+(157, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-22 02:27:15'),
+(158, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-06 23:12:44'),
+(159, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-20 15:26:55'),
+(160, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-08-26 18:03:09'),
+(161, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-20 22:43:32'),
+(162, 8, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-18 16:04:06'),
+(163, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-03 18:43:48'),
+(164, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-10 06:57:39'),
+(165, 4, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-08-29 18:24:51'),
+(166, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-06 16:49:59'),
+(167, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-19 04:31:35'),
+(168, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-30 19:40:25'),
+(169, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-21 04:38:22'),
+(170, 29, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-23 21:56:24'),
+(171, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-18 07:28:42'),
+(172, 4, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-11-23 10:20:41'),
+(173, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-26 09:34:42'),
+(174, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-21 21:51:06'),
+(175, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-11-14 10:59:58'),
+(176, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-08 16:12:37'),
+(177, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-12 05:40:36'),
+(178, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-19 17:05:34'),
+(179, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-12 03:23:12'),
+(180, 12, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-19 16:29:41'),
+(181, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-13 18:53:00'),
+(182, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-28 17:26:33'),
+(183, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-01 17:40:24'),
+(184, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-13 12:17:31'),
+(185, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-05 07:24:21'),
+(186, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-26 11:46:29'),
+(187, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-19 02:41:54'),
+(188, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-06 07:56:46'),
+(189, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-13 14:38:37'),
+(190, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-02 04:34:06'),
+(191, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-25 14:30:09'),
+(192, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-29 05:36:51'),
+(193, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-08-31 15:01:53'),
+(194, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-21 15:09:36'),
+(195, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-23 10:59:40'),
+(196, 8, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-27 14:55:50'),
+(197, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-28 13:58:40'),
+(198, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-14 18:31:02'),
+(199, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-19 08:09:28'),
+(200, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-20 15:38:29'),
+(201, 8, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-30 22:38:45'),
+(202, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-02 15:43:12'),
+(203, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-14 06:29:10'),
+(204, 32, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-19 12:28:07'),
+(205, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-08 09:17:28'),
+(206, 29, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-08-26 23:38:57'),
+(207, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-01 07:33:49'),
+(208, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-25 19:33:48'),
+(209, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-17 16:40:35'),
+(210, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-01 16:47:47'),
+(211, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-26 23:14:45'),
+(212, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-05 09:36:36'),
+(213, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-08 10:29:11'),
+(214, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-21 08:23:15'),
+(215, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-12 11:26:42'),
+(216, 23, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-26 23:28:04'),
+(217, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-11 01:14:29'),
+(218, 12, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-21 03:00:23'),
+(219, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-07 01:18:42'),
+(220, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-18 11:56:15'),
+(221, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-08-27 16:57:51'),
+(222, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-07 16:51:37'),
+(223, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-08 02:34:13'),
+(224, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-25 21:00:04'),
+(225, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-22 04:53:01'),
+(226, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-10-30 16:08:22'),
+(227, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-15 06:32:22'),
+(228, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-19 13:50:08'),
+(229, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-20 18:24:04'),
+(230, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-16 20:59:03'),
+(231, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-02 10:48:38'),
+(232, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-03 17:01:25'),
+(233, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-08-29 15:17:40'),
+(234, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-24 00:15:19'),
+(235, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-16 13:09:42'),
+(236, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-11 02:29:51'),
+(237, 16, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-13 08:23:15'),
+(238, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-08 20:18:04'),
+(239, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-01 19:43:28'),
+(240, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-22 06:48:47'),
+(241, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-29 13:03:41'),
+(242, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-19 08:12:00'),
+(243, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-19 11:12:31'),
+(244, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-13 06:44:19'),
+(245, 17, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-28 05:03:30'),
+(246, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-21 22:53:50'),
+(247, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-26 01:55:04'),
+(248, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-11-12 14:09:18'),
+(249, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-08-29 22:30:26'),
+(250, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-09 07:27:26'),
+(251, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-22 10:55:09'),
+(252, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-19 18:33:55'),
+(253, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-07 03:30:03'),
+(254, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-06 16:33:35'),
+(255, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-20 21:52:33'),
+(256, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-18 09:37:09'),
+(257, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-06 13:22:35'),
+(258, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-16 23:57:53'),
+(259, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-15 07:58:59'),
+(260, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-09-20 03:58:21'),
+(261, 21, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-24 02:04:22'),
+(262, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-02 15:01:45'),
+(263, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-17 22:44:06'),
+(264, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-09-01 21:16:35'),
+(265, 14, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-05 19:47:13'),
+(266, 28, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-11-04 11:45:08'),
+(267, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-02 23:00:24'),
+(268, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-11-18 13:43:28'),
+(269, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-22 12:21:16'),
+(270, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-27 11:02:18'),
+(271, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-27 11:49:51'),
+(272, 29, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-09-29 18:39:35'),
+(273, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-06 14:53:55'),
+(274, 31, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-08-30 04:41:07'),
+(275, 11, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-27 02:48:29'),
+(276, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-16 07:57:19'),
+(277, 20, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-08-27 15:38:32'),
+(278, 22, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-20 05:35:56'),
+(279, 30, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-09-01 22:53:22'),
+(280, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-11-22 00:00:12'),
+(281, 15, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-10-30 23:31:26'),
+(282, 29, 'User', '', 'User Action', '', NULL, '{\"meta\": \"User Logged In\", \"note\": \"User Logged In\"}', '', '', '2025-10-16 23:07:14'),
+(283, 18, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-10-09 02:37:42'),
+(284, 26, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-01 11:49:47'),
+(285, 13, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Contacted Support\", \"note\": \"Contacted Support\"}', '', '', '2025-10-22 14:39:05'),
+(286, 12, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-09-21 15:15:07'),
+(287, 24, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-09-27 05:23:00'),
+(288, 5, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-10-13 10:59:30'),
+(289, 6, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Updated Profile\", \"note\": \"Updated Profile\"}', '', '', '2025-11-02 21:48:55'),
+(290, 19, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Checked Appointments\", \"note\": \"Checked Appointments\"}', '', '', '2025-11-04 10:56:35'),
+(291, 25, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-10-23 10:01:34'),
+(292, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-13 00:41:31'),
+(293, 3, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-08-27 21:48:29'),
+(294, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-08-27 07:07:07'),
+(295, 10, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Downloaded Report\", \"note\": \"Downloaded Report\"}', '', '', '2025-10-15 12:22:09'),
+(296, 27, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-11-24 05:03:55'),
+(297, 2, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Changed Password\", \"note\": \"Changed Password\"}', '', '', '2025-09-06 22:19:50'),
+(298, 9, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Service List\", \"note\": \"Viewed Service List\"}', '', '', '2025-08-27 05:55:34'),
+(299, 7, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-09-06 02:42:46'),
+(300, 1, 'User', '', 'User Action', '', NULL, '{\"meta\": \"Viewed Dashboard\", \"note\": \"Viewed Dashboard\"}', '', '', '2025-11-11 00:43:23'),
+(301, NULL, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #80 was cancelled Category: Scheduling conflict Reason: sorry bud, there are conflicts in the sched lmao\", \"note\": \"Appointment #80 was cancelled Category: Scheduling conflict Reason: sorry bud, there are conflicts in the sched lmao\"}', '', '', '2025-11-24 12:50:52'),
+(302, NULL, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #91 was cancelled Category: No available technician Reason: YOU\'RE GAY\", \"note\": \"Appointment #91 was cancelled Category: No available technician Reason: YOU\'RE GAY\"}', '', '', '2025-11-24 12:57:10'),
+(303, 1, 'User', '', 'Appointment Rejected', '', NULL, '{\"meta\": \"Appointment #50 was rejected Category: Other Reason: bcos you\'re gay\", \"note\": \"Appointment #50 was rejected Category: Other Reason: bcos you\'re gay\"}', '', '', '2025-11-24 13:07:20'),
+(304, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #16 was cancelled Category: Customer request Reason: mukha kang burat\", \"note\": \"Appointment #16 was cancelled Category: Customer request Reason: mukha kang burat\"}', '', '', '2025-11-24 13:08:05'),
+(305, 1, 'User', '', 'Create Appointment', '', NULL, '{\"meta\": \"Created appointment #151\", \"note\": \"Created appointment #151\"}', '', '', '2025-11-26 08:36:29'),
+(306, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #79 was confirmed\", \"note\": \"Appointment #79 was confirmed\"}', '', '', '2025-11-26 09:12:07'),
+(307, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #121 was confirmed\", \"note\": \"Appointment #121 was confirmed\"}', '', '', '2025-11-26 09:12:09'),
+(308, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #61 was confirmed\", \"note\": \"Appointment #61 was confirmed\"}', '', '', '2025-11-26 09:12:09'),
+(309, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #79 was cancelled\", \"note\": \"Appointment #79 was cancelled\"}', '', '', '2025-11-26 10:24:47'),
+(310, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #121 was cancelled\", \"note\": \"Appointment #121 was cancelled\"}', '', '', '2025-11-26 10:24:59'),
+(311, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #42 was cancelled\", \"note\": \"Appointment #42 was cancelled\"}', '', '', '2025-11-26 10:25:26'),
+(312, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #25 was cancelled\", \"note\": \"Appointment #25 was cancelled\"}', '', '', '2025-11-26 10:25:29'),
+(313, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #151 was cancelled Category: Duplicate booking Reason: Duplicate ka boss\", \"note\": \"Appointment #151 was cancelled Category: Duplicate booking Reason: Duplicate ka boss\"}', '', '', '2025-11-26 11:36:18'),
+(314, 1, 'User', '', 'Appointment Cancelled', '', NULL, '{\"meta\": \"Appointment #61 was cancelled Category: Customer request Reason: ayoko hahaha\", \"note\": \"Appointment #61 was cancelled Category: Customer request Reason: ayoko hahaha\"}', '', '', '2025-11-26 11:36:46'),
+(315, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #88 was confirmed\", \"note\": \"Appointment #88 was confirmed\"}', '', '', '2025-11-26 12:03:56'),
+(316, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #7 was confirmed\", \"note\": \"Appointment #7 was confirmed\"}', '', '', '2025-11-26 12:56:53'),
+(317, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #7 was confirmed\", \"note\": \"Appointment #7 was confirmed\"}', '', '', '2025-11-26 12:56:56'),
+(318, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #51 was confirmed\", \"note\": \"Appointment #51 was confirmed\"}', '', '', '2025-11-26 13:39:13'),
+(319, 1, 'User', '', 'Create Appointment', '', NULL, '{\"meta\": \"Created appointment #153\", \"note\": \"Created appointment #153\"}', '', '', '2025-11-26 13:39:37'),
+(320, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #153 was confirmed\", \"note\": \"Appointment #153 was confirmed\"}', '', '', '2025-11-26 13:39:51'),
+(321, 1, 'User', '', 'Create Appointment', '', NULL, '{\"meta\": \"Created appointment #154\", \"note\": \"Created appointment #154\"}', '', '', '2025-11-26 13:45:59'),
+(322, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #154 was confirmed\", \"note\": \"Appointment #154 was confirmed\"}', '', '', '2025-11-26 13:46:07'),
+(323, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #158 was confirmed\", \"note\": \"Appointment #158 was confirmed\"}', '', '', '2025-11-28 12:17:15'),
+(324, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #158 was confirmed\", \"note\": \"Appointment #158 was confirmed\"}', '', '', '2025-11-28 12:17:18'),
+(325, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #162 was confirmed\", \"note\": \"Appointment #162 was confirmed\"}', '', '', '2025-11-28 13:28:06'),
+(326, 1, 'User', '', 'Appointment Confirmed', '', NULL, '{\"meta\": \"Appointment #163 was confirmed\", \"note\": \"Appointment #163 was confirmed\"}', '', '', '2025-11-28 14:25:33'),
+(512, 2, 'Customer', NULL, 'CREATE', 'appointments', 166, '{\"new\": {\"status\": \"Pending\", \"date\": \"2025-12-01 12:55:00\", \"customer_id\": 2}}', NULL, NULL, '2025-11-30 15:56:11'),
+(513, 1, 'Admin', NULL, 'UPDATE', 'appointments', 38, '{\"old\": {\"status\": \"Pending\", \"date\": \"2025-11-30 09:34:42\", \"technician_id\": null}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-11-30 09:34:42\", \"technician_id\": 4}}', NULL, NULL, '2025-11-30 15:57:08');
+INSERT INTO `audit_logs` (`log_id`, `user_id`, `actor_role`, `actor_username`, `action`, `table_name`, `record_id`, `changes`, `ip_address`, `user_agent`, `created_at`) VALUES
+(514, 1, 'Admin', NULL, 'UPDATE', 'appointments', 166, '{\"old\": {\"status\": \"Pending\", \"date\": \"2025-12-01 12:55:00\", \"technician_id\": null}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-12-01 12:55:00\", \"technician_id\": 4}}', NULL, NULL, '2025-11-30 15:58:57'),
+(515, 4, 'Technician', NULL, 'UPDATE', 'appointments', 165, '{\"old\": {\"status\": \"In Progress\", \"date\": \"2025-11-29 02:23:00\", \"technician_id\": 4}, \"new\": {\"status\": \"Completed\", \"date\": \"2025-11-29 02:23:00\", \"technician_id\": 4}}', NULL, NULL, '2025-11-30 16:00:32'),
+(516, 1, 'Admin', NULL, 'CREATE', 'appointments', 167, '{\"new\": {\"status\": \"Pending\", \"date\": \"2025-12-10 09:08:00\", \"customer_id\": null}}', NULL, NULL, '2025-12-01 00:09:10'),
+(517, 3, 'Receptionist', NULL, 'CREATE', 'appointments', 168, '{\"new\": {\"status\": \"Pending\", \"date\": \"2025-12-02 10:21:00\", \"customer_id\": 2}}', NULL, NULL, '2025-12-01 00:21:35'),
+(518, 3, 'Receptionist', NULL, 'UPDATE', 'appointments', 39, '{\"old\": {\"status\": \"Pending\", \"date\": \"2025-12-01 02:08:09\", \"technician_id\": null}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-12-01 02:08:09\", \"technician_id\": 9}}', NULL, NULL, '2025-12-01 00:34:57'),
+(519, 1, 'Admin', NULL, 'UPDATE', 'users', 33, '{\"old\": {\"first_name\": \"Luna\", \"last_name\": \"Customer\", \"email\": \"ardelarizobal@gmail.com\", \"role\": \"Customer\"}, \"new\": {\"first_name\": \"Luna\", \"last_name\": \"Customer\", \"email\": \"ardelarizobal@gmail.com\", \"role\": \"Technician\"}}', NULL, NULL, '2025-12-01 00:42:24'),
+(520, NULL, NULL, NULL, 'UPDATE', 'users', 5, '{\"old\": {\"first_name\": \"Luna\", \"last_name\": \"Marie\", \"email\": \"luna.marie@example.com\", \"role\": \"Receptionist\"}, \"new\": {\"first_name\": \"Luna\", \"last_name\": \"Marie\", \"email\": \"luna.marie@example.com\", \"role\": \"Technician\"}}', NULL, NULL, '2025-12-01 00:59:46'),
+(521, 3, 'Receptionist', NULL, 'UPDATE', 'appointments', 168, '{\"old\": {\"status\": \"Pending\", \"date\": \"2025-12-02 10:21:00\", \"technician_id\": 4}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-12-02 10:21:00\", \"technician_id\": 33}}', NULL, NULL, '2025-12-01 01:01:15'),
+(522, 5, 'Technician', NULL, 'UPDATE', 'users', 5, '{\"old\": {\"first_name\": \"Luna\", \"last_name\": \"Marie\", \"email\": \"luna.marie@example.com\", \"role\": \"Technician\"}, \"new\": {\"first_name\": \"Luna\", \"last_name\": \"Mariez\", \"email\": \"luna.marie@example.com\", \"role\": \"Technician\"}}', NULL, NULL, '2025-12-01 01:01:56'),
+(523, NULL, NULL, NULL, 'UPDATE', 'users', 33, '{\"old\": {\"first_name\": \"Luna\", \"last_name\": \"Customer\", \"email\": \"ardelarizobal@gmail.com\", \"role\": \"Technician\"}, \"new\": {\"first_name\": \"Luna\", \"last_name\": \"Mariez\", \"email\": \"ardelarizobal@gmail.com\", \"role\": \"Technician\"}}', NULL, NULL, '2025-12-01 01:05:47'),
+(524, 1, 'Admin', NULL, 'UPDATE', 'appointments', 168, '{\"old\": {\"status\": \"Confirmed\", \"date\": \"2025-12-02 10:21:00\", \"technician_id\": 33}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-12-01 10:21:00\", \"technician_id\": 4}}', NULL, NULL, '2025-12-01 01:08:35'),
+(525, 1, 'Admin', NULL, 'UPDATE', 'appointments', 168, '{\"old\": {\"status\": \"Confirmed\", \"date\": \"2025-12-01 10:21:00\", \"technician_id\": 4}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-11-30 10:21:00\", \"technician_id\": 33}}', NULL, NULL, '2025-12-01 01:08:44'),
+(526, 1, 'Admin', NULL, 'CREATE', 'appointments', 169, '{\"new\": {\"status\": \"Pending\", \"date\": \"2025-12-03 10:09:00\", \"customer_id\": 13}}', NULL, NULL, '2025-12-01 01:10:05'),
+(527, NULL, NULL, NULL, 'UPDATE', 'users', 33, '{\"old\": {\"first_name\": \"Luna\", \"last_name\": \"Mariez\", \"email\": \"ardelarizobal@gmail.com\", \"role\": \"Technician\"}, \"new\": {\"first_name\": \"Luna\", \"last_name\": \"Customer\", \"email\": \"ardelarizobal@gmail.com\", \"role\": \"Customer\"}}', NULL, NULL, '2025-12-01 01:13:28'),
+(528, NULL, NULL, NULL, 'UPDATE', 'appointments', 168, '{\"old\": {\"status\": \"Confirmed\", \"date\": \"2025-11-30 10:21:00\", \"technician_id\": 33}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-11-30 10:21:00\", \"technician_id\": 5}}', NULL, NULL, '2025-12-01 01:13:28'),
+(529, NULL, NULL, NULL, 'UPDATE', 'appointments', 169, '{\"old\": {\"status\": \"Pending\", \"date\": \"2025-12-03 10:09:00\", \"technician_id\": 33}, \"new\": {\"status\": \"Pending\", \"date\": \"2025-12-03 10:09:00\", \"technician_id\": 5}}', NULL, NULL, '2025-12-01 01:13:28'),
+(530, 5, 'Technician', NULL, 'UPDATE', 'users', 5, '{\"old\": {\"first_name\": \"Luna\", \"last_name\": \"Mariez\", \"email\": \"luna.marie@example.com\", \"role\": \"Technician\"}, \"new\": {\"first_name\": \"Luna\", \"last_name\": \"Mariez\", \"email\": \"luna.marie@gmail.com\", \"role\": \"Technician\"}}', NULL, NULL, '2025-12-01 01:14:57'),
+(531, 2, 'Customer', NULL, 'CREATE', 'appointments', 170, '{\"new\": {\"status\": \"Pending\", \"date\": \"2025-12-07 07:52:00\", \"customer_id\": 2}}', NULL, NULL, '2025-12-01 01:53:00'),
+(532, 3, 'Receptionist', NULL, 'UPDATE', 'appointments', 169, '{\"old\": {\"status\": \"Pending\", \"date\": \"2025-12-03 10:09:00\", \"technician_id\": 5}, \"new\": {\"status\": \"Confirmed\", \"date\": \"2025-12-03 10:09:00\", \"technician_id\": 5}}', NULL, NULL, '2025-12-01 02:33:46');
 
 -- --------------------------------------------------------
 
@@ -666,6 +1105,41 @@ INSERT INTO `customer_addresses` (`address_id`, `user_id`, `address_label`, `add
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `login_history`
+--
+
+CREATE TABLE `login_history` (
+  `history_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `success` tinyint(1) DEFAULT 1,
+  `failure_reason` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `login_history`
+--
+
+INSERT INTO `login_history` (`history_id`, `user_id`, `ip_address`, `user_agent`, `success`, `failure_reason`, `created_at`) VALUES
+(1, 2, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 15:20:27'),
+(2, 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 15:52:03'),
+(3, 2, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 15:54:13'),
+(4, 3, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 15:54:34'),
+(5, 4, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 0, 'Invalid password', '2025-11-30 15:54:47'),
+(6, 4, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 15:54:50'),
+(7, 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 16:35:12'),
+(8, 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 23:59:04'),
+(9, 2, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 23:59:29'),
+(10, 4, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 23:59:47'),
+(11, 3, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-11-30 23:59:56'),
+(12, 5, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-12-01 01:00:05'),
+(13, 1, '::1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', 1, NULL, '2025-12-01 01:49:50');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `notifications`
 --
 
@@ -689,13 +1163,10 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (3, 28, '', 'Your service for Appointment #2 is complete. Please leave a review!', 0, 2, '2025-11-24 09:18:17'),
 (4, 12, 'New Job Assigned', 'You have been assigned to Appointment #2.', 0, 2, '2025-11-24 09:18:17'),
 (5, 24, '', 'Your service for Appointment #3 is complete. Please leave a review!', 0, 3, '2025-11-24 09:18:17'),
-(6, 4, 'New Job Assigned', 'You have been assigned to Appointment #3.', 0, 3, '2025-11-24 09:18:17'),
 (7, 18, '', 'Your service for Appointment #4 is complete. Please leave a review!', 0, 4, '2025-11-24 09:18:17'),
 (8, 9, 'New Job Assigned', 'You have been assigned to Appointment #4.', 1, 4, '2025-11-24 09:18:17'),
 (9, 18, '', 'Your appointment on 12/6/2025 has been confirmed.', 0, 5, '2025-11-24 09:18:17'),
-(10, 4, 'New Job Assigned', 'You have been assigned to Appointment #5.', 0, 5, '2025-11-24 09:18:17'),
 (11, 14, '', 'Your service for Appointment #8 is complete. Please leave a review!', 1, 8, '2025-11-24 09:18:17'),
-(12, 4, 'New Job Assigned', 'You have been assigned to Appointment #8.', 1, 8, '2025-11-24 09:18:17'),
 (13, 23, '', 'Your service for Appointment #9 is complete. Please leave a review!', 0, 9, '2025-11-24 09:18:17'),
 (14, 12, 'New Job Assigned', 'You have been assigned to Appointment #9.', 0, 9, '2025-11-24 09:18:17'),
 (15, 26, '', 'Your service for Appointment #10 is complete. Please leave a review!', 1, 10, '2025-11-24 09:18:17'),
@@ -707,9 +1178,7 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (21, 23, '', 'Your service for Appointment #13 is complete. Please leave a review!', 1, 13, '2025-11-24 09:18:17'),
 (22, 10, 'New Job Assigned', 'You have been assigned to Appointment #13.', 1, 13, '2025-11-24 09:18:17'),
 (23, 28, '', 'Your service for Appointment #14 is complete. Please leave a review!', 0, 14, '2025-11-24 09:18:17'),
-(24, 4, 'New Job Assigned', 'You have been assigned to Appointment #14.', 0, 14, '2025-11-24 09:18:17'),
 (25, 24, '', 'Your service for Appointment #15 is complete. Please leave a review!', 0, 15, '2025-11-24 09:18:17'),
-(26, 4, 'New Job Assigned', 'You have been assigned to Appointment #15.', 0, 15, '2025-11-24 09:18:17'),
 (27, 20, '', 'Your appointment on 12/23/2025 has been confirmed.', 0, 16, '2025-11-24 09:18:17'),
 (28, 11, 'New Job Assigned', 'You have been assigned to Appointment #16.', 1, 16, '2025-11-24 09:18:17'),
 (29, 31, '', 'Your service for Appointment #17 is complete. Please leave a review!', 1, 17, '2025-11-24 09:18:17'),
@@ -718,12 +1187,9 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (32, 9, 'New Job Assigned', 'You have been assigned to Appointment #18.', 0, 18, '2025-11-24 09:18:17'),
 (33, 19, '', 'Your appointment on 12/17/2025 has been confirmed.', 0, 20, '2025-11-24 09:18:17'),
 (34, 12, 'New Job Assigned', 'You have been assigned to Appointment #20.', 1, 20, '2025-11-24 09:18:17'),
-(35, 2, '', 'Your service for Appointment #22 is complete. Please leave a review!', 0, 22, '2025-11-24 09:18:17'),
-(36, 4, 'New Job Assigned', 'You have been assigned to Appointment #22.', 0, 22, '2025-11-24 09:18:17'),
 (37, 31, '', 'Your appointment on 12/10/2025 has been confirmed.', 0, 23, '2025-11-24 09:18:17'),
 (38, 9, 'New Job Assigned', 'You have been assigned to Appointment #23.', 1, 23, '2025-11-24 09:18:17'),
 (39, 30, '', 'Your appointment on 12/19/2025 has been confirmed.', 0, 24, '2025-11-24 09:18:17'),
-(40, 4, 'New Job Assigned', 'You have been assigned to Appointment #24.', 0, 24, '2025-11-24 09:18:17'),
 (41, 17, '', 'Your service for Appointment #26 is complete. Please leave a review!', 1, 26, '2025-11-24 09:18:17'),
 (42, 12, 'New Job Assigned', 'You have been assigned to Appointment #26.', 1, 26, '2025-11-24 09:18:17'),
 (43, 18, '', 'Your service for Appointment #27 is complete. Please leave a review!', 0, 27, '2025-11-24 09:18:17'),
@@ -731,9 +1197,7 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (45, 21, '', 'Your service for Appointment #28 is complete. Please leave a review!', 0, 28, '2025-11-24 09:18:17'),
 (46, 8, 'New Job Assigned', 'You have been assigned to Appointment #28.', 0, 28, '2025-11-24 09:18:17'),
 (47, 21, '', 'Your service for Appointment #29 is complete. Please leave a review!', 1, 29, '2025-11-24 09:18:17'),
-(48, 4, 'New Job Assigned', 'You have been assigned to Appointment #29.', 1, 29, '2025-11-24 09:18:17'),
 (49, 32, '', 'Your service for Appointment #30 is complete. Please leave a review!', 0, 30, '2025-11-24 09:18:17'),
-(50, 4, 'New Job Assigned', 'You have been assigned to Appointment #30.', 1, 30, '2025-11-24 09:18:17'),
 (51, 18, '', 'Your service for Appointment #31 is complete. Please leave a review!', 1, 31, '2025-11-24 09:18:17'),
 (52, 12, 'New Job Assigned', 'You have been assigned to Appointment #31.', 0, 31, '2025-11-24 09:18:17'),
 (53, 13, 'Appointment Cancelled', 'Appointment #32 has been cancelled.', 1, 32, '2025-11-24 09:18:17'),
@@ -748,7 +1212,6 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (62, 30, '', 'Your appointment on 11/30/2025 has been confirmed.', 1, 37, '2025-11-24 09:18:17'),
 (63, 12, 'New Job Assigned', 'You have been assigned to Appointment #37.', 1, 37, '2025-11-24 09:18:17'),
 (64, 20, '', 'Your service for Appointment #41 is complete. Please leave a review!', 1, 41, '2025-11-24 09:18:17'),
-(65, 4, 'New Job Assigned', 'You have been assigned to Appointment #41.', 0, 41, '2025-11-24 09:18:17'),
 (66, 13, '', 'Your service for Appointment #43 is complete. Please leave a review!', 1, 43, '2025-11-24 09:18:17'),
 (67, 9, 'New Job Assigned', 'You have been assigned to Appointment #43.', 1, 43, '2025-11-24 09:18:17'),
 (68, 19, 'Appointment Cancelled', 'Appointment #44 has been cancelled.', 1, 44, '2025-11-24 09:18:17'),
@@ -764,7 +1227,6 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (78, 31, '', 'Your service for Appointment #53 is complete. Please leave a review!', 1, 53, '2025-11-24 09:18:17'),
 (79, 9, 'New Job Assigned', 'You have been assigned to Appointment #53.', 0, 53, '2025-11-24 09:18:17'),
 (80, 26, '', 'Your service for Appointment #54 is complete. Please leave a review!', 1, 54, '2025-11-24 09:18:17'),
-(81, 4, 'New Job Assigned', 'You have been assigned to Appointment #54.', 0, 54, '2025-11-24 09:18:17'),
 (82, 23, '', 'Your service for Appointment #55 is complete. Please leave a review!', 1, 55, '2025-11-24 09:18:17'),
 (83, 10, 'New Job Assigned', 'You have been assigned to Appointment #55.', 1, 55, '2025-11-24 09:18:17'),
 (84, 21, '', 'Your service for Appointment #56 is complete. Please leave a review!', 0, 56, '2025-11-24 09:18:17'),
@@ -775,20 +1237,15 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (89, 12, 'New Job Assigned', 'You have been assigned to Appointment #58.', 1, 58, '2025-11-24 09:18:17'),
 (90, 26, '', 'Your service for Appointment #59 is complete. Please leave a review!', 0, 59, '2025-11-24 09:18:17'),
 (91, 10, 'New Job Assigned', 'You have been assigned to Appointment #59.', 0, 59, '2025-11-24 09:18:17'),
-(92, 2, '', 'Your service for Appointment #60 is complete. Please leave a review!', 1, 60, '2025-11-24 09:18:17'),
-(93, 4, 'New Job Assigned', 'You have been assigned to Appointment #60.', 0, 60, '2025-11-24 09:18:17'),
 (94, 14, 'Appointment Cancelled', 'Appointment #62 has been cancelled.', 0, 62, '2025-11-24 09:18:17'),
 (95, 25, 'Appointment Cancelled', 'Appointment #63 has been cancelled.', 1, 63, '2025-11-24 09:18:17'),
 (96, 15, 'Appointment Cancelled', 'Appointment #64 has been cancelled.', 1, 64, '2025-11-24 09:18:17'),
 (97, 30, 'Appointment Cancelled', 'Appointment #65 has been cancelled.', 0, 65, '2025-11-24 09:18:17'),
-(98, 2, '', 'Your service for Appointment #66 is complete. Please leave a review!', 1, 66, '2025-11-24 09:18:17'),
-(99, 4, 'New Job Assigned', 'You have been assigned to Appointment #66.', 0, 66, '2025-11-24 09:18:17'),
 (100, 29, '', 'Your service for Appointment #67 is complete. Please leave a review!', 0, 67, '2025-11-24 09:18:17'),
 (101, 12, 'New Job Assigned', 'You have been assigned to Appointment #67.', 1, 67, '2025-11-24 09:18:17'),
 (102, 19, '', 'Your service for Appointment #68 is complete. Please leave a review!', 0, 68, '2025-11-24 09:18:17'),
 (103, 9, 'New Job Assigned', 'You have been assigned to Appointment #68.', 0, 68, '2025-11-24 09:18:17'),
 (104, 20, '', 'Your service for Appointment #69 is complete. Please leave a review!', 0, 69, '2025-11-24 09:18:17'),
-(105, 4, 'New Job Assigned', 'You have been assigned to Appointment #69.', 0, 69, '2025-11-24 09:18:17'),
 (106, 13, '', 'Your service for Appointment #70 is complete. Please leave a review!', 0, 70, '2025-11-24 09:18:17'),
 (107, 9, 'New Job Assigned', 'You have been assigned to Appointment #70.', 1, 70, '2025-11-24 09:18:17'),
 (108, 16, '', 'Your service for Appointment #71 is complete. Please leave a review!', 0, 71, '2025-11-24 09:18:17'),
@@ -796,18 +1253,13 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (110, 13, '', 'Your service for Appointment #72 is complete. Please leave a review!', 0, 72, '2025-11-24 09:18:17'),
 (111, 9, 'New Job Assigned', 'You have been assigned to Appointment #72.', 0, 72, '2025-11-24 09:18:17'),
 (112, 31, '', 'Your service for Appointment #73 is complete. Please leave a review!', 0, 73, '2025-11-24 09:18:17'),
-(113, 4, 'New Job Assigned', 'You have been assigned to Appointment #73.', 0, 73, '2025-11-24 09:18:17'),
-(114, 2, '', 'Your service for Appointment #74 is complete. Please leave a review!', 1, 74, '2025-11-24 09:18:17'),
-(115, 4, 'New Job Assigned', 'You have been assigned to Appointment #74.', 0, 74, '2025-11-24 09:18:17'),
 (116, 24, 'Appointment Cancelled', 'Appointment #75 has been cancelled.', 1, 75, '2025-11-24 09:18:17'),
 (117, 21, '', 'Your appointment on 12/19/2025 has been confirmed.', 0, 76, '2025-11-24 09:18:17'),
 (118, 8, 'New Job Assigned', 'You have been assigned to Appointment #76.', 1, 76, '2025-11-24 09:18:17'),
 (119, 28, '', 'Your service for Appointment #77 is complete. Please leave a review!', 0, 77, '2025-11-24 09:18:17'),
 (120, 12, 'New Job Assigned', 'You have been assigned to Appointment #77.', 0, 77, '2025-11-24 09:18:17'),
-(121, 2, '', 'Your appointment on 12/11/2025 has been confirmed.', 0, 78, '2025-11-24 09:18:17'),
 (122, 10, 'New Job Assigned', 'You have been assigned to Appointment #78.', 0, 78, '2025-11-24 09:18:17'),
 (123, 14, '', 'Your appointment on 12/23/2025 has been confirmed.', 0, NULL, '2025-11-24 09:18:17'),
-(124, 4, 'New Job Assigned', 'You have been assigned to Appointment #80.', 0, NULL, '2025-11-24 09:18:17'),
 (125, 32, '', 'Your service for Appointment #81 is complete. Please leave a review!', 1, 81, '2025-11-24 09:18:17'),
 (126, 11, 'New Job Assigned', 'You have been assigned to Appointment #81.', 1, 81, '2025-11-24 09:18:17'),
 (127, 19, '', 'Your service for Appointment #82 is complete. Please leave a review!', 1, 82, '2025-11-24 09:18:17'),
@@ -820,19 +1272,13 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (134, 16, '', 'Your service for Appointment #86 is complete. Please leave a review!', 1, 86, '2025-11-24 09:18:17'),
 (135, 10, 'New Job Assigned', 'You have been assigned to Appointment #86.', 0, 86, '2025-11-24 09:18:17'),
 (136, 32, '', 'Your service for Appointment #87 is complete. Please leave a review!', 0, 87, '2025-11-24 09:18:17'),
-(137, 4, 'New Job Assigned', 'You have been assigned to Appointment #87.', 1, 87, '2025-11-24 09:18:17'),
 (138, 26, '', 'Your service for Appointment #89 is complete. Please leave a review!', 1, 89, '2025-11-24 09:18:17'),
 (139, 9, 'New Job Assigned', 'You have been assigned to Appointment #89.', 1, 89, '2025-11-24 09:18:17'),
-(140, 2, '', 'Your service for Appointment #90 is complete. Please leave a review!', 0, 90, '2025-11-24 09:18:17'),
 (141, 11, 'New Job Assigned', 'You have been assigned to Appointment #90.', 1, 90, '2025-11-24 09:18:17'),
 (142, 25, '', 'Your appointment on 12/22/2025 has been confirmed.', 1, 91, '2025-11-24 09:18:17'),
 (143, 9, 'New Job Assigned', 'You have been assigned to Appointment #91.', 0, 91, '2025-11-24 09:18:17'),
 (144, 16, '', 'Your service for Appointment #92 is complete. Please leave a review!', 1, 92, '2025-11-24 09:18:17'),
-(145, 4, 'New Job Assigned', 'You have been assigned to Appointment #92.', 1, 92, '2025-11-24 09:18:17'),
-(146, 2, '', 'Your appointment on 11/24/2025 has been confirmed.', 1, 93, '2025-11-24 09:18:17'),
-(147, 4, 'New Job Assigned', 'You have been assigned to Appointment #93.', 1, 93, '2025-11-24 09:18:17'),
 (148, 19, '', 'Your appointment on 12/12/2025 has been confirmed.', 1, 94, '2025-11-24 09:18:17'),
-(149, 4, 'New Job Assigned', 'You have been assigned to Appointment #94.', 1, 94, '2025-11-24 09:18:17'),
 (150, 27, '', 'Your service for Appointment #95 is complete. Please leave a review!', 0, 95, '2025-11-24 09:18:17'),
 (151, 9, 'New Job Assigned', 'You have been assigned to Appointment #95.', 0, 95, '2025-11-24 09:18:17'),
 (152, 29, 'Appointment Cancelled', 'Appointment #96 has been cancelled.', 1, 96, '2025-11-24 09:18:17'),
@@ -844,16 +1290,13 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (158, 12, 'New Job Assigned', 'You have been assigned to Appointment #99.', 0, 99, '2025-11-24 09:18:17'),
 (159, 29, '', 'Your service for Appointment #100 is complete. Please leave a review!', 0, 100, '2025-11-24 09:18:17'),
 (160, 9, 'New Job Assigned', 'You have been assigned to Appointment #100.', 0, 100, '2025-11-24 09:18:17'),
-(161, 2, '', 'Your service for Appointment #101 is complete. Please leave a review!', 1, 101, '2025-11-24 09:18:17'),
 (162, 11, 'New Job Assigned', 'You have been assigned to Appointment #101.', 0, 101, '2025-11-24 09:18:17'),
 (163, 22, '', 'Your service for Appointment #102 is complete. Please leave a review!', 1, 102, '2025-11-24 09:18:17'),
 (164, 10, 'New Job Assigned', 'You have been assigned to Appointment #102.', 0, 102, '2025-11-24 09:18:17'),
 (165, 13, '', 'Your service for Appointment #103 is complete. Please leave a review!', 0, 103, '2025-11-24 09:18:17'),
 (166, 8, 'New Job Assigned', 'You have been assigned to Appointment #103.', 1, 103, '2025-11-24 09:18:17'),
 (167, 29, '', 'Your appointment on 12/18/2025 has been confirmed.', 1, 104, '2025-11-24 09:18:17'),
-(168, 4, 'New Job Assigned', 'You have been assigned to Appointment #104.', 0, 104, '2025-11-24 09:18:17'),
 (169, 28, 'Appointment Cancelled', 'Appointment #105 has been cancelled.', 1, 105, '2025-11-24 09:18:17'),
-(170, 2, 'Appointment Cancelled', 'Appointment #106 has been cancelled.', 0, 106, '2025-11-24 09:18:17'),
 (171, 19, '', 'Your service for Appointment #107 is complete. Please leave a review!', 0, 107, '2025-11-24 09:18:17'),
 (172, 11, 'New Job Assigned', 'You have been assigned to Appointment #107.', 1, 107, '2025-11-24 09:18:17'),
 (173, 16, 'Appointment Cancelled', 'Appointment #108 has been cancelled.', 1, 108, '2025-11-24 09:18:17'),
@@ -879,7 +1322,6 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (193, 10, 'New Job Assigned', 'You have been assigned to Appointment #118.', 1, 118, '2025-11-24 09:18:17'),
 (194, 19, 'Appointment Cancelled', 'Appointment #119 has been cancelled.', 0, 119, '2025-11-24 09:18:17'),
 (195, 29, '', 'Your service for Appointment #120 is complete. Please leave a review!', 1, 120, '2025-11-24 09:18:17'),
-(196, 4, 'New Job Assigned', 'You have been assigned to Appointment #120.', 0, 120, '2025-11-24 09:18:17'),
 (197, 25, '', 'Your service for Appointment #122 is complete. Please leave a review!', 0, 122, '2025-11-24 09:18:17'),
 (198, 4, 'New Job Assigned', 'You have been assigned to Appointment #122.', 0, 122, '2025-11-24 09:18:17'),
 (199, 32, '', 'Your service for Appointment #123 is complete. Please leave a review!', 0, 123, '2025-11-24 09:18:17'),
@@ -894,7 +1336,6 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (208, 12, 'New Job Assigned', 'You have been assigned to Appointment #128.', 1, 128, '2025-11-24 09:18:17'),
 (209, 26, '', 'Your service for Appointment #129 is complete. Please leave a review!', 1, 129, '2025-11-24 09:18:17'),
 (210, 8, 'New Job Assigned', 'You have been assigned to Appointment #129.', 0, 129, '2025-11-24 09:18:17'),
-(211, 2, '', 'Your service for Appointment #130 is complete. Please leave a review!', 0, 130, '2025-11-24 09:18:17'),
 (212, 4, 'New Job Assigned', 'You have been assigned to Appointment #130.', 1, 130, '2025-11-24 09:18:17'),
 (213, 30, 'Appointment Cancelled', 'Appointment #131 has been cancelled.', 1, 131, '2025-11-24 09:18:17'),
 (214, 24, '', 'Your service for Appointment #132 is complete. Please leave a review!', 0, 132, '2025-11-24 09:18:17'),
@@ -907,7 +1348,6 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (221, 12, 'New Job Assigned', 'You have been assigned to Appointment #136.', 0, 136, '2025-11-24 09:18:17'),
 (222, 25, '', 'Your service for Appointment #137 is complete. Please leave a review!', 1, 137, '2025-11-24 09:18:17'),
 (223, 12, 'New Job Assigned', 'You have been assigned to Appointment #137.', 1, 137, '2025-11-24 09:18:17'),
-(224, 2, '', 'Your service for Appointment #138 is complete. Please leave a review!', 1, 138, '2025-11-24 09:18:17'),
 (225, 9, 'New Job Assigned', 'You have been assigned to Appointment #138.', 0, 138, '2025-11-24 09:18:17'),
 (226, 26, '', 'Your service for Appointment #139 is complete. Please leave a review!', 0, 139, '2025-11-24 09:18:17'),
 (227, 12, 'New Job Assigned', 'You have been assigned to Appointment #139.', 1, 139, '2025-11-24 09:18:17'),
@@ -939,40 +1379,26 @@ INSERT INTO `notifications` (`notification_id`, `user_id`, `title`, `message`, `
 (253, 8, 'New Job Assigned', 'You have been assigned to Appointment #151', 0, 151, '2025-11-26 11:19:06'),
 (254, 27, 'Appointment Rejected', 'Rejected. Reason: KAMAGONG', 0, 40, '2025-11-26 11:38:00'),
 (255, 15, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 88, '2025-11-26 12:03:56'),
-(256, 4, 'New Job Assigned', 'You have been assigned to Appointment #88', 0, 88, '2025-11-26 12:03:56'),
 (257, 25, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 7, '2025-11-26 12:56:53'),
-(258, 4, 'New Job Assigned', 'You have been assigned to Appointment #7', 0, 7, '2025-11-26 12:56:53'),
 (259, 25, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 51, '2025-11-26 13:39:13'),
-(260, 4, 'New Job Assigned', 'You have been assigned to Appointment #51', 0, 51, '2025-11-26 13:39:13'),
 (261, 14, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 153, '2025-11-26 13:39:50'),
-(262, 4, 'New Job Assigned', 'You have been assigned to Appointment #153', 0, 153, '2025-11-26 13:39:50'),
 (263, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 154, '2025-11-26 13:46:07'),
-(264, 4, 'New Job Assigned', 'You have been assigned to Appointment #154', 0, 154, '2025-11-26 13:46:07'),
-(265, 4, 'New Job Assigned', 'You have been assigned to Appointment #76', 0, 76, '2025-11-26 14:42:51'),
 (266, 33, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 152, '2025-11-26 15:20:47'),
-(267, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 155, '2025-11-28 12:03:13'),
-(268, 4, 'New Job Assigned', 'You have been assigned to Appointment #155', 0, 155, '2025-11-28 12:03:54'),
-(269, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 156, '2025-11-28 12:07:58'),
-(270, 4, 'New Job Assigned', 'You have been assigned to Appointment #156', 0, 156, '2025-11-28 12:09:21'),
-(271, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 157, '2025-11-28 12:15:24'),
-(272, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 158, '2025-11-28 12:17:15'),
-(273, 4, 'New Job Assigned', 'You have been assigned to Appointment #158', 0, 158, '2025-11-28 12:17:15'),
-(274, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, NULL, '2025-11-28 12:22:12'),
-(275, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, NULL, '2025-11-28 12:48:08'),
-(276, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 161, '2025-11-28 13:12:58'),
-(277, 4, 'New Job Assigned', 'You have been assigned to Appointment #161', 0, 161, '2025-11-28 13:12:58'),
-(278, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 162, '2025-11-28 13:28:06'),
-(279, 4, 'New Job Assigned', 'You have been assigned to Appointment #162', 0, 162, '2025-11-28 13:28:06'),
-(280, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 158, '2025-11-28 14:20:09'),
-(281, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 163, '2025-11-28 14:25:33'),
-(282, 4, 'New Job Assigned', 'You have been assigned to Appointment #163', 0, 163, '2025-11-28 14:25:33'),
-(283, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 154, '2025-11-28 14:31:11'),
 (284, 15, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 88, '2025-11-28 14:31:13'),
-(285, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 164, '2025-11-28 15:40:35'),
-(286, 4, 'New Job Assigned', 'You have been assigned to Appointment #164', 0, 164, '2025-11-28 15:40:35'),
 (287, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 163, '2025-11-28 15:41:40'),
 (288, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 165, '2025-11-28 16:23:40'),
-(289, 4, 'New Job Assigned', 'You have been assigned to Appointment #165', 0, 165, '2025-11-28 16:23:40');
+(290, 24, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 38, '2025-11-30 15:57:08'),
+(292, 2, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 166, '2025-11-30 15:58:57'),
+(293, 4, 'New Job Assigned', 'You have been assigned to Appointment #166', 0, 166, '2025-11-30 15:58:57'),
+(294, 2, 'Appointment Completed', 'Your service is complete. Please rate your technician.', 0, 165, '2025-11-30 16:00:32'),
+(295, 30, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 39, '2025-12-01 00:34:57'),
+(296, 9, 'New Job Assigned', 'You have been assigned to Appointment #39', 0, 39, '2025-12-01 00:34:57'),
+(298, 5, 'New Job Assigned', 'You have been assigned to Appointment #168', 0, 168, '2025-12-01 01:01:15'),
+(299, 4, 'New Job Assigned', 'You have been assigned to Appointment #168', 0, 168, '2025-12-01 01:08:35'),
+(300, 5, 'New Job Assigned', 'You have been assigned to Appointment #168', 0, 168, '2025-12-01 01:08:44'),
+(301, 5, 'New Job Assigned', 'You have been assigned to Appointment #168', 0, 168, '2025-12-01 01:13:28'),
+(302, 5, 'New Job Assigned', 'You have been assigned to Appointment #169', 0, 169, '2025-12-01 01:13:28'),
+(303, 13, 'Appointment Approved', 'Your appointment has been confirmed.', 0, 169, '2025-12-01 02:33:46');
 
 -- --------------------------------------------------------
 
@@ -1158,7 +1584,7 @@ INSERT INTO `technician_profiles` (`profile_id`, `user_id`, `specialty`, `bio`, 
 (4, 10, 'Network Setup', NULL, 'Available', 0, 3.92),
 (5, 11, 'Consultation', NULL, 'Available', 0, 4.29),
 (6, 12, 'Hardware Repair', NULL, 'Available', 0, 4.11),
-(7, 32, 'Network Setup', NULL, 'Available', 0, 0.00);
+(8, 33, 'General', NULL, 'Available', 0, 0.00);
 
 -- --------------------------------------------------------
 
@@ -1190,8 +1616,8 @@ INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, 
 (1, 'sherwin', 'Sherwin', 'Arizobal', 'sherwin@gmail.com', '09634045671', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Admin', '/uploads/profile_pics/user-1-1764513611274-916117309.jpg', 'Active', '2025-10-30 08:32:06', '2025-11-30 14:40:11'),
 (2, 'edrian', 'Edrian', 'Balingbing', 'edrian@gmail.com', '09955824197', 'Nasugbu, Batangas', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', '/uploads/profile_pics/user-2-1764514670699-896750777.jpg', 'Active', '2025-11-24 08:34:33', '2025-11-30 14:57:50'),
 (3, 'denmark', 'Denmark', 'Cabanhao', 'denmark@gmail.com', '09999999999', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', '/uploads/profile_pics/user-3-1764513627435-692111303.jpg', 'Active', '2025-11-07 08:35:44', '2025-11-30 14:40:27'),
-(4, 'glenn', 'Glenn', 'Mikko', 'glenn@gmail.com', '09783813287', 'Manilazzz', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-01 08:35:44', '2025-11-30 14:33:13'),
-(5, 'lunamarie', 'Luna', 'Marie', 'luna.marie@example.com', '09806367741', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
+(4, 'glenn', 'Glenn', 'Mikko', 'glenn@gmail.com', '09783813287', 'Lian, Batangas', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', '/uploads/profile_pics/user-4-1764515035935-675372631.jpg', 'Active', '2025-11-01 08:35:44', '2025-12-01 01:16:19'),
+(5, 'luna', 'Luna', 'Mariez', 'luna.marie@gmail.com', '09806367741', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', '/uploads/profile_pics/user-5-1764551117663-458445770.jpg', 'Active', '2025-11-24 09:18:17', '2025-12-01 01:14:57'),
 (6, 'sarahconnor', 'Sarah', 'Connor', 'sarah.connor@example.com', '09329465187', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (7, 'pambeesly', 'Pam', 'Beesly', 'pam.beesly@example.com', '09211063703', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Receptionist', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (8, 'bobbuilder', 'Bob', 'Builder', 'bobbuilder@example.com', '09532562007', 'Manila', '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Technician', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:49'),
@@ -1219,7 +1645,32 @@ INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, 
 (30, 'richarddavis17', 'Richard', 'Davis', 'richarddavis17@example.com', '09822468053', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (31, 'elizabethmartinez18', 'Elizabeth', 'Martinez', 'elizabethmartinez18@example.com', '09143091841', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 09:18:17'),
 (32, 'davidmiller19', 'David', 'Miller', 'davidmiller19@example.com', '09500137252', NULL, '$2b$10$32KhlcYBYCNObGMou8pQ7.QAKf2dHFgoutDyMlXjOZrStiyOewhUe', 'Customer', NULL, 'Active', '2025-11-24 09:18:17', '2025-11-24 16:19:01'),
-(33, 'ardelarizobal613', 'Luna', 'Customer', 'ardelarizobal@gmail.com', '09783813287', '123 Main St, Nasugbu, Batangas', '$2b$10$VigJAJexvXo6kcFCEbcUUe91S/.L3qDnicJ.Pnl0/JhVapdzaotDG', 'Customer', NULL, 'Active', '2025-11-26 09:41:18', '2025-11-26 09:41:18');
+(33, 'ardelarizobal613', 'Luna', 'Customer', 'ardelarizobal@gmail.com', '09783813287', '123 Main St, Nasugbu, Batangas', '$2b$10$VigJAJexvXo6kcFCEbcUUe91S/.L3qDnicJ.Pnl0/JhVapdzaotDG', 'Customer', NULL, 'Active', '2025-11-26 09:41:18', '2025-12-01 01:13:28');
+
+--
+-- Triggers `users`
+--
+DELIMITER $$
+CREATE TRIGGER `trg_users_update` AFTER UPDATE ON `users` FOR EACH ROW BEGIN
+    -- Only log if significant fields changed
+    IF (OLD.first_name != NEW.first_name OR OLD.last_name != NEW.last_name OR OLD.email != NEW.email OR OLD.role != NEW.role OR OLD.profile_picture != NEW.profile_picture) THEN
+        INSERT INTO audit_logs (user_id, actor_role, action, table_name, record_id, changes, created_at)
+        VALUES (
+            @app_user_id, 
+            @app_user_role, 
+            'UPDATE', 
+            'users', 
+            NEW.user_id, 
+            JSON_OBJECT(
+                'old', JSON_OBJECT('first_name', OLD.first_name, 'last_name', OLD.last_name, 'email', OLD.email, 'role', OLD.role),
+                'new', JSON_OBJECT('first_name', NEW.first_name, 'last_name', NEW.last_name, 'email', NEW.email, 'role', NEW.role)
+            ),
+            NOW()
+        );
+    END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -1241,13 +1692,14 @@ CREATE TABLE `user_addresses` (
 
 INSERT INTO `user_addresses` (`address_id`, `user_id`, `address_line`, `is_primary`, `created_at`) VALUES
 (1, 2, 'Nasugbu, Batangas', 1, '2025-11-30 13:42:29'),
-(2, 4, 'Manilazzz', 1, '2025-11-30 13:42:29'),
+(2, 4, 'Nasugbu Batangas', 1, '2025-11-30 13:42:29'),
 (3, 8, 'Manila', 1, '2025-11-30 13:42:29'),
 (4, 9, 'Manila', 1, '2025-11-30 13:42:29'),
 (5, 10, 'Manila', 1, '2025-11-30 13:42:29'),
 (6, 11, 'Manila', 1, '2025-11-30 13:42:29'),
 (7, 12, 'Manila', 1, '2025-11-30 13:42:29'),
-(8, 33, '123 Main St, Nasugbu, Batangas', 1, '2025-11-30 13:42:29');
+(8, 33, '123 Main St, Nasugbu, Batangas', 1, '2025-11-30 13:42:29'),
+(9, 3, 'Lian, Batangas', 1, '2025-12-01 01:15:41');
 
 --
 -- Indexes for dumped tables
@@ -1272,11 +1724,27 @@ ALTER TABLE `appointments`
   ADD KEY `fk_deletion_marked_by` (`deletion_marked_by`);
 
 --
+-- Indexes for table `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `idx_created_at` (`created_at`),
+  ADD KEY `idx_table_record` (`table_name`,`record_id`),
+  ADD KEY `idx_user_id` (`user_id`);
+
+--
 -- Indexes for table `customer_addresses`
 --
 ALTER TABLE `customer_addresses`
   ADD PRIMARY KEY (`address_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `login_history`
+--
+ALTER TABLE `login_history`
+  ADD PRIMARY KEY (`history_id`),
+  ADD KEY `idx_user_login` (`user_id`,`created_at`);
 
 --
 -- Indexes for table `notifications`
@@ -1338,13 +1806,19 @@ ALTER TABLE `user_addresses`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=327;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=328;
 
 --
 -- AUTO_INCREMENT for table `appointments`
 --
 ALTER TABLE `appointments`
-  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
+  MODIFY `appointment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=171;
+
+--
+-- AUTO_INCREMENT for table `audit_logs`
+--
+ALTER TABLE `audit_logs`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=533;
 
 --
 -- AUTO_INCREMENT for table `customer_addresses`
@@ -1353,10 +1827,16 @@ ALTER TABLE `customer_addresses`
   MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
+-- AUTO_INCREMENT for table `login_history`
+--
+ALTER TABLE `login_history`
+  MODIFY `history_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
-  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=290;
+  MODIFY `notification_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=304;
 
 --
 -- AUTO_INCREMENT for table `reviews`
@@ -1380,7 +1860,7 @@ ALTER TABLE `service_categories`
 -- AUTO_INCREMENT for table `technician_profiles`
 --
 ALTER TABLE `technician_profiles`
-  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `profile_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -1392,7 +1872,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_addresses`
 --
 ALTER TABLE `user_addresses`
-  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `address_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables

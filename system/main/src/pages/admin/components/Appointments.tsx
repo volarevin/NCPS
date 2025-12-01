@@ -664,7 +664,6 @@ export function Appointments() {
         open={isDetailsOpen}
         onOpenChange={setIsDetailsOpen}
         appointment={selectedAppointment}
-        onUpdateStatus={handleStatusUpdate}
         onUpdateDetails={handleUpdateDetails}
         onApprove={(id, technicianId, technicianName) => handleStatusUpdate(id, 'confirmed', technicianId, technicianName)}
         onReject={(id) => setStatusDialog({ open: true, type: 'reject', appointmentId: id })}

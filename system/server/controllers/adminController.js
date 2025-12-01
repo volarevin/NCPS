@@ -31,15 +31,27 @@ exports.checkConflict = async (req, res) => {
 };
 
 exports.getDashboardStats = (req, res) => {
-  const query = 'CALL sp_get_admin_dashboard_stats()';
+  const query = `
+    SELECT 
+      (SELECT COUNT(*) FROM appointments WHERE DATE(appointment_date) = CURRENT_DATE) AS today_appointments,
+      (SELECT COUNT(*) FROM appointments WHERE status = 'Pending') AS pending_requests,
+      (SELECT COUNT(*) FROM appointments WHERE status = 'In Progress') AS in_progress_count,
+      (SELECT COUNT(*) FROM technician_profiles WHERE availability_status = 'Available') AS available_techs,
+      (SELECT COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) 
+       FROM appointments a JOIN services s ON a.service_id = s.service_id 
+       WHERE MONTH(a.appointment_date) = MONTH(CURRENT_DATE) AND YEAR(a.appointment_date) = YEAR(CURRENT_DATE)) AS monthly_revenue,
+      (SELECT COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) 
+       FROM appointments a JOIN services s ON a.service_id = s.service_id) as actual_revenue,
+      (SELECT COALESCE(SUM(CASE WHEN a.status IN ('Pending', 'Confirmed') AND a.total_cost IS NULL THEN s.estimated_price ELSE 0 END), 0) 
+       FROM appointments a JOIN services s ON a.service_id = s.service_id) as projected_revenue
+  `;
   
   db.query(query, (err, results) => {
     if (err) {
       console.error(err);
       return res.status(500).json({ message: 'Database error fetching stats.' });
     }
-    // results[0] contains the result set of the stored procedure
-    res.json(results[0][0]);
+    res.json(results[0]);
   });
 };
 
@@ -94,13 +106,14 @@ exports.getAllAppointments = (req, res) => {
 exports.getMonthlyStats = (req, res) => {
   const query = `
     SELECT 
-      DATE_FORMAT(appointment_date, '%b') as month, 
+      DATE_FORMAT(a.appointment_date, '%b') as month, 
       COUNT(*) as appointments,
-      COALESCE(SUM(total_cost), 0) as revenue
-    FROM appointments 
-    WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 10 MONTH)
-    GROUP BY YEAR(appointment_date), MONTH(appointment_date) 
-    ORDER BY YEAR(appointment_date), MONTH(appointment_date)
+      COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) as revenue
+    FROM appointments a
+    JOIN services s ON a.service_id = s.service_id
+    WHERE a.appointment_date >= DATE_SUB(NOW(), INTERVAL 10 MONTH)
+    GROUP BY YEAR(a.appointment_date), MONTH(a.appointment_date) 
+    ORDER BY YEAR(a.appointment_date), MONTH(a.appointment_date)
   `;
   
   db.query(query, (err, results) => {
@@ -132,9 +145,9 @@ exports.getServiceDistribution = (req, res) => {
 
 exports.getRecentActivity = (req, res) => {
   const query = `
-    SELECT al.description as action, al.created_at as time, u.first_name, u.last_name, u.role
-    FROM activity_logs al
-    JOIN users u ON al.user_id = u.user_id
+    SELECT al.log_id, al.action, al.table_name, al.actor_username, al.created_at, al.changes, u.profile_picture
+    FROM audit_logs al
+    LEFT JOIN users u ON al.user_id = u.user_id
     ORDER BY al.created_at DESC
     LIMIT 5
   `;
@@ -197,18 +210,18 @@ exports.getReportsData = (req, res) => {
   let queryParams = [];
 
   if (startDate && endDate) {
-    dateWhere = "WHERE appointment_date BETWEEN ? AND ?";
-    dateAnd = "AND appointment_date BETWEEN ? AND ?";
+    dateWhere = "WHERE a.appointment_date BETWEEN ? AND ?";
+    dateAnd = "AND a.appointment_date BETWEEN ? AND ?";
     joinCondition = "AND a.appointment_date BETWEEN ? AND ?";
     queryParams = [startDate, endDate];
   } else if (startDate) {
-    dateWhere = "WHERE appointment_date >= ?";
-    dateAnd = "AND appointment_date >= ?";
+    dateWhere = "WHERE a.appointment_date >= ?";
+    dateAnd = "AND a.appointment_date >= ?";
     joinCondition = "AND a.appointment_date >= ?";
     queryParams = [startDate];
   } else if (endDate) {
-    dateWhere = "WHERE appointment_date <= ?";
-    dateAnd = "AND appointment_date <= ?";
+    dateWhere = "WHERE a.appointment_date <= ?";
+    dateAnd = "AND a.appointment_date <= ?";
     joinCondition = "AND a.appointment_date <= ?";
     queryParams = [endDate];
   }
@@ -221,26 +234,27 @@ exports.getReportsData = (req, res) => {
           SUM(CASE WHEN status = 'Pending' THEN 1 ELSE 0 END) as pending,
           SUM(CASE WHEN status = 'Confirmed' THEN 1 ELSE 0 END) as confirmed,
           SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled
-      FROM appointments
+      FROM appointments a
       ${dateWhere}
     `,
     monthly: `
       SELECT 
-          DATE_FORMAT(appointment_date, '%b %Y') as month,
+          DATE_FORMAT(a.appointment_date, '%b %Y') as month,
           COUNT(*) as appointments,
-          SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed,
-          SUM(CASE WHEN status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
-          COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as revenue
-      FROM appointments
-      ${dateWhere || "WHERE appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)"}
-      GROUP BY YEAR(appointment_date), MONTH(appointment_date)
-      ORDER BY YEAR(appointment_date), MONTH(appointment_date)
+          SUM(CASE WHEN a.status = 'Completed' THEN 1 ELSE 0 END) as completed,
+          SUM(CASE WHEN a.status = 'Cancelled' THEN 1 ELSE 0 END) as cancelled,
+          COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) as revenue
+      FROM appointments a
+      JOIN services s ON a.service_id = s.service_id
+      ${dateWhere || "WHERE a.appointment_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)"}
+      GROUP BY YEAR(a.appointment_date), MONTH(a.appointment_date)
+      ORDER BY YEAR(a.appointment_date), MONTH(a.appointment_date)
     `,
     services: `
       SELECT 
           s.name,
           COUNT(a.appointment_id) as requests,
-          COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN a.total_cost ELSE 0 END), 0) as revenue,
+          COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) as revenue,
           COALESCE(AVG(r.rating), 0) as rating
       FROM services s
       LEFT JOIN appointments a ON s.service_id = a.service_id ${joinCondition}
@@ -249,7 +263,8 @@ exports.getReportsData = (req, res) => {
     `,
     staff: `
       SELECT 
-          u.first_name, u.last_name,
+          u.first_name, u.last_name, u.profile_picture,
+          COUNT(a.appointment_id) as totalAssigned,
           COUNT(CASE WHEN a.status = 'Completed' THEN 1 END) as totalHandled,
           COALESCE(AVG(r.rating), 0) as rating
       FROM users u
@@ -260,38 +275,41 @@ exports.getReportsData = (req, res) => {
     `,
     peakHours: `
       SELECT 
-        DATE_FORMAT(appointment_date, '%l %p') as hour, 
+        DATE_FORMAT(a.appointment_date, '%l %p') as hour, 
         COUNT(*) as bookings 
-      FROM appointments 
+      FROM appointments a
       ${dateWhere}
-      GROUP BY HOUR(appointment_date) 
-      ORDER BY HOUR(appointment_date)
+      GROUP BY HOUR(a.appointment_date) 
+      ORDER BY HOUR(a.appointment_date)
     `,
     peakDays: `
       SELECT 
-        DATE_FORMAT(appointment_date, '%a') as day, 
+        DATE_FORMAT(a.appointment_date, '%a') as day, 
         COUNT(*) as bookings 
-      FROM appointments 
+      FROM appointments a
       ${dateWhere}
-      GROUP BY DAYOFWEEK(appointment_date) 
-      ORDER BY DAYOFWEEK(appointment_date)
+      GROUP BY DAYOFWEEK(a.appointment_date) 
+      ORDER BY DAYOFWEEK(a.appointment_date)
     `,
     cancellationReasons: `
       SELECT 
         cancellation_category as reason, 
         COUNT(*) as count 
-      FROM appointments 
+      FROM appointments a
       WHERE status = 'Cancelled' AND cancellation_category IS NOT NULL 
       ${dateAnd}
       GROUP BY cancellation_category
     `,
     revenueStats: `
       SELECT 
-        COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as totalRevenue,
-        COALESCE(AVG(CASE WHEN status = 'Completed' THEN total_cost ELSE NULL END), 0) as avgPerAppointment,
-        COALESCE(SUM(CASE WHEN status = 'Completed' THEN total_cost ELSE 0 END), 0) as totalPaid
-      FROM appointments
-      WHERE status != 'Cancelled' AND status != 'Rejected'
+        COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) as actualRevenue,
+        COALESCE(SUM(CASE WHEN a.status IN ('Pending', 'Confirmed') AND a.total_cost IS NULL THEN s.estimated_price ELSE 0 END), 0) as projectedRevenue,
+        (COALESCE(SUM(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE 0 END), 0) + 
+         COALESCE(SUM(CASE WHEN a.status IN ('Pending', 'Confirmed') AND a.total_cost IS NULL THEN s.estimated_price ELSE 0 END), 0)) as combinedRevenue,
+        COALESCE(AVG(CASE WHEN a.status = 'Completed' THEN COALESCE(a.total_cost, s.estimated_price) ELSE NULL END), 0) as avgPerAppointment
+      FROM appointments a
+      JOIN services s ON a.service_id = s.service_id
+      WHERE a.status != 'Cancelled' AND a.status != 'Rejected'
       ${dateAnd}
     `
   };

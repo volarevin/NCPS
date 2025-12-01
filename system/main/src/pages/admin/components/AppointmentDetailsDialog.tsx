@@ -1,14 +1,11 @@
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getProfilePictureUrl } from "@/lib/utils";
 import { 
-  Calendar, Clock, User, Phone, Mail, MapPin, Wrench, Star, 
+  Calendar, Clock, User, Phone, Mail, MapPin, Wrench, 
   AlertCircle, MessageSquare, Edit2, AlertTriangle, Check, X, 
   Copy, ExternalLink
 } from "lucide-react";
@@ -66,7 +63,6 @@ interface AppointmentDetailsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   appointment: Appointment | null;
-  onUpdateStatus?: (id: string, status: Appointment["status"], technicianId?: string) => void;
   onApprove?: (id: string, technicianId: string, technicianName?: string) => void;
   onReject?: (id: string) => void;
   onCancel?: (id: string) => void;
@@ -77,7 +73,6 @@ export function AppointmentDetailsDialog({
   open,
   onOpenChange,
   appointment,
-  onUpdateStatus,
   onApprove,
   onReject,
   onCancel,
@@ -235,7 +230,7 @@ export function AppointmentDetailsDialog({
               {isEditing && (
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
-                  <Button size="sm" onClick={handleSave} disabled={conflict && !overrideConflict}>Save Changes</Button>
+                  <Button size="sm" onClick={handleSave} disabled={!!(conflict && !overrideConflict)}>Save Changes</Button>
                 </div>
               )}
             </div>

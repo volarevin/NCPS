@@ -12,14 +12,20 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Calendar, Wrench, CheckCircle, Users, UserCheck, TrendingUp, Activity } from "lucide-react";
+import { Calendar, Wrench, CheckCircle, UserCheck, TrendingUp, Activity, Pencil, Trash } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { PageHeader } from "./PageHeader";
+import { Button } from "@/components/ui/button";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 const COLORS = ["#5B8FFF", "#FFB366", "#5DD37C", "#FF6B6B", "#8884d8", "#9CA3AF"]; // Added Gray for Others
 
-export function Dashboard() {
+interface DashboardProps {
+  onNavigate: (page: string) => void;
+}
+
+export function Dashboard({ onNavigate }: DashboardProps) {
   const navigate = useNavigate();
   const [statsData, setStatsData] = useState<any>(null);
   const [monthlyStats, setMonthlyStats] = useState<any[]>([]);
@@ -66,28 +72,33 @@ export function Dashboard() {
           color: s.name === "Others" ? "#9CA3AF" : COLORS[index % COLORS.length]
         })));
 
-        // Format activity
+        // Format activity (Audit Logs)
         setRecentActivity(activity.map((a: any) => {
-          let icon = Users;
+          let icon = Activity;
           let color = "#5B8FFF";
 
-          if (a.action.includes("Appointment") || a.action.includes("Booked")) {
-            icon = Calendar;
-            color = "#5B8FFF";
-          } else if (a.action.includes("Completed") || a.action.includes("Repair")) {
-            icon = CheckCircle;
-            color = "#5DD37C";
-          } else if (a.action.includes("Registered") || a.action.includes("Profile")) {
-            icon = UserCheck;
-            color = "#FFB366";
+          if (a.action.includes("Create") || a.action.includes("Insert")) {
+             icon = CheckCircle;
+             color = "#5DD37C";
+          } else if (a.action.includes("Update") || a.action.includes("Edit")) {
+             icon = Pencil;
+             color = "#FFB366";
+          } else if (a.action.includes("Delete") || a.action.includes("Remove")) {
+             icon = Trash;
+             color = "#FF6B6B";
+          } else if (a.action.includes("Login")) {
+             icon = UserCheck;
+             color = "#5B8FFF";
           }
 
           return {
-            user: `${a.first_name} ${a.last_name}`,
-            action: a.action,
-            time: new Date(a.time).toLocaleString(), // Simple formatting
+            id: a.log_id,
+            title: `${a.action} ${a.table_name}`,
+            user: a.actor_username || 'System',
+            time: new Date(a.created_at).toLocaleString(),
             icon,
-            color
+            color,
+            profile_picture: a.profile_picture
           };
         }));
 
@@ -125,25 +136,25 @@ export function Dashboard() {
       iconBg: "#FFB366",
     },
     {
-      icon: Activity,
-      value: formatNumber(statsData?.in_progress_count),
-      label: "In Progress",
-      bgColor: "bg-blue-100 dark:bg-blue-900/20",
-      iconBg: "#3B82F6",
-    },
-    {
       icon: TrendingUp,
-      value: formatCurrency(statsData?.monthly_revenue),
-      label: "Monthly Revenue",
+      value: formatCurrency(statsData?.actual_revenue),
+      label: "Actual Revenue",
       bgColor: "bg-green-100 dark:bg-green-900/20",
       iconBg: "#5DD37C",
     },
     {
-      icon: Users,
-      value: formatNumber(statsData?.available_techs),
-      label: "Available Technicians",
-      bgColor: "bg-gray-100 dark:bg-gray-800",
-      iconBg: "#757575",
+      icon: Activity,
+      value: formatCurrency(statsData?.projected_revenue),
+      label: "Projected Revenue",
+      bgColor: "bg-purple-100 dark:bg-purple-900/20",
+      iconBg: "#8884d8",
+    },
+    {
+      icon: TrendingUp,
+      value: formatCurrency((Number(statsData?.actual_revenue || 0) + Number(statsData?.projected_revenue || 0))),
+      label: "Combined Revenue",
+      bgColor: "bg-blue-100 dark:bg-blue-900/20",
+      iconBg: "#3B82F6",
     },
   ];
 
@@ -246,27 +257,33 @@ export function Dashboard() {
 
         {/* Recent Activity */}
         <div className="bg-card p-6 rounded-2xl shadow-sm border border-border">
-          <h3 className="text-lg font-semibold text-foreground mb-4">
-            Recent Activity
-          </h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-foreground">
+              Recent Audit Logs
+            </h3>
+            <Button variant="secondary" size="sm" onClick={() => onNavigate('Audit Logs')}>
+              View all
+            </Button>
+          </div>
           <div className="space-y-4">
             {recentActivity.map((activity, index) => (
               <div key={index} className="flex items-start space-x-3">
-                <div
-                  className="p-2 rounded-full mt-1"
-                  style={{ backgroundColor: `${activity.color}20` }}
-                >
-                  <activity.icon
-                    className="w-4 h-4"
-                    style={{ color: activity.color }}
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {activity.user}
+                <img 
+                  src={getProfilePictureUrl(activity.profile_picture) || "https://github.com/shadcn.png"} 
+                  alt={activity.user} 
+                  className="w-8 h-8 rounded-full object-cover" 
+                  onError={(e) => (e.currentTarget.src = "https://github.com/shadcn.png")} 
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <activity.icon className="w-4 h-4" style={{ color: activity.color }} />
+                    <p className="text-sm font-medium text-foreground">
+                      {activity.title}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    by <span className="text-sky-500 dark:text-sky-400">{activity.user}</span> • {activity.time}
                   </p>
-                  <p className="text-xs text-muted-foreground">{activity.action}</p>
-                  <p className="text-xs text-muted-foreground/70 mt-1">{activity.time}</p>
                 </div>
               </div>
             ))}

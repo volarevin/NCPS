@@ -22,7 +22,7 @@ export default function AdminPage() {
   const renderContent = () => {
     switch (activeTab) {
       case "Dashboard":
-        return <Dashboard />;
+        return <Dashboard onNavigate={setActiveTab} />;
       case "Appointments":
         return <Appointments />;
       case "Manage Services":
@@ -38,7 +38,7 @@ export default function AdminPage() {
       case "My Profile":
         return <ProfilePage />;
       default:
-        return <Dashboard />;
+        return <Dashboard onNavigate={setActiveTab} />;
     }
   };
 
