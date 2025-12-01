@@ -271,6 +271,13 @@ export function CustomerAppointments() {
               setIsViewDialogOpen(true);
             }}
             onCreateAppointment={(date) => {
+              // Prevent booking in the past
+              const today = new Date();
+              today.setHours(0, 0, 0, 0);
+              if (date < today) {
+                  return;
+              }
+
               // Format date as YYYY-MM-DD for the input, adjusting for timezone offset
               const offset = date.getTimezoneOffset();
               const localDate = new Date(date.getTime() - (offset * 60 * 1000));

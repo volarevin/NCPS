@@ -39,6 +39,7 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
   
   // Data
   const [services, setServices] = useState<Service[]>([]);
+  const [technicians, setTechnicians] = useState<User[]>([]);
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,6 +61,7 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
 
   const [appointment, setAppointment] = useState({
     service_id: "",
+    technician_id: "",
     date: "",
     time: "",
     address: "",
@@ -77,6 +79,7 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
 
   useEffect(() => {
     fetchServices();
+    fetchTechnicians();
   }, []);
 
   useEffect(() => {
@@ -87,7 +90,7 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
       // setSearchResults([]); // Don't clear results, let the effect fetch them
       setNewUser({ firstName: "", lastName: "", email: "", phone: "", address: "" });
       setGuest({ name: "", email: "", phone: "" });
-      setAppointment({ service_id: "", date: "", time: "", address: "", notes: "" });
+      setAppointment({ service_id: "", technician_id: "", date: "", time: "", address: "", notes: "" });
     }
   }, [open]);
 
@@ -134,6 +137,29 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
     }
   };
 
+  const fetchTechnicians = async () => {
+    try {
+      const token = sessionStorage.getItem('token');
+      const apiBase = getApiBase();
+      // For receptionist, endpoint might be different or same. 
+      // Admin: /api/admin/users?role=Technician
+      // Receptionist: /api/receptionist/technicians
+      
+      let url = `${apiBase}/users?role=Technician`;
+      if (apiBase.includes('receptionist')) {
+          url = `${apiBase}/technicians`;
+      }
+
+      const res = await fetch(url, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setTechnicians(data);
+    } catch (error) {
+      console.error("Error fetching technicians", error);
+    }
+  };
+
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
     setAppointment(prev => ({ ...prev, address: user.address || "" }));
@@ -145,6 +171,7 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
     
     const payload: any = {
       serviceId: appointment.service_id,
+      technicianId: appointment.technician_id || null,
       date: appointment.date,
       time: appointment.time,
       address: appointment.address,
@@ -330,6 +357,23 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
                       {services.map(s => (
                         <SelectItem key={s.service_id} value={s.service_id.toString()}>
                           {s.name} - ₱{s.estimated_price}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="dark:text-foreground">Technician (Optional)</Label>
+                  <Select value={appointment.technician_id} onValueChange={v => setAppointment({...appointment, technician_id: v})}>
+                    <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
+                      <SelectValue placeholder="Select a technician (Optional)" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
+                      <SelectItem value="unassigned">Unassigned</SelectItem>
+                      {technicians.map(t => (
+                        <SelectItem key={t.user_id} value={t.user_id.toString()}>
+                          {t.first_name} {t.last_name}
                         </SelectItem>
                       ))}
                     </SelectContent>

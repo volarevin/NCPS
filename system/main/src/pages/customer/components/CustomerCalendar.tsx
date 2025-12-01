@@ -218,18 +218,20 @@ export function CustomerCalendar({ appointments, setSelectedAppointment, onViewA
             </div>
             
             <DialogFooter className="mt-6">
-                <Button 
-                    className="w-full bg-[#3FA9BC] hover:bg-[#2A6570]"
-                    onClick={() => {
-                        if (selectedDate) {
-                            onCreateAppointment(selectedDate);
-                            setIsDialogOpen(false);
-                        }
-                    }}
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Book Appointment on this Day
-                </Button>
+                {selectedDate && selectedDate >= new Date(new Date().setHours(0,0,0,0)) && (
+                    <Button 
+                        className="w-full bg-[#3FA9BC] hover:bg-[#2A6570]"
+                        onClick={() => {
+                            if (selectedDate) {
+                                onCreateAppointment(selectedDate);
+                                setIsDialogOpen(false);
+                            }
+                        }}
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Book Appointment on this Day
+                    </Button>
+                )}
             </DialogFooter>
         </DialogContent>
     </Dialog>

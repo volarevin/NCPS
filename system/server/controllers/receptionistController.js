@@ -17,12 +17,13 @@ exports.getDashboardStats = (req, res) => {
       SELECT 
         a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id, a.service_address,
         a.cancellation_category,
+        a.walkin_name, a.walkin_phone, a.walkin_email,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
         t.first_name as tech_first, t.last_name as tech_last,
         r.rating
       FROM appointments a
-      JOIN users u ON a.customer_id = u.user_id
+      LEFT JOIN users u ON a.customer_id = u.user_id
       JOIN services s ON a.service_id = s.service_id
       LEFT JOIN service_categories sc ON s.category_id = sc.category_id
       LEFT JOIN users t ON a.technician_id = t.user_id
@@ -34,12 +35,13 @@ exports.getDashboardStats = (req, res) => {
       SELECT 
         a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.technician_id, a.service_address,
         a.cancellation_category,
+        a.walkin_name, a.walkin_phone, a.walkin_email,
         u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
         s.name as service_name, sc.name as category_name,
         t.first_name as tech_first, t.last_name as tech_last,
         r.rating
       FROM appointments a
-      JOIN users u ON a.customer_id = u.user_id
+      LEFT JOIN users u ON a.customer_id = u.user_id
       JOIN services s ON a.service_id = s.service_id
       LEFT JOIN service_categories sc ON s.category_id = sc.category_id
       LEFT JOIN users t ON a.technician_id = t.user_id
@@ -72,9 +74,9 @@ exports.getDashboardStats = (req, res) => {
 
           const formatAppointment = (row) => ({
             id: row.appointment_id.toString(),
-            clientName: `${row.client_first} ${row.client_last}`,
-            phone: row.phone_number,
-            email: row.email,
+            clientName: row.client_first ? `${row.client_first} ${row.client_last}` : (row.walkin_name || 'Guest'),
+            phone: row.phone_number || row.walkin_phone || 'N/A',
+            email: row.email || row.walkin_email || 'N/A',
             address: row.service_address || row.address || 'No address provided',
             service: row.category_name ? `${row.service_name} - ${row.category_name}` : row.service_name,
             date: new Date(row.appointment_date).toLocaleDateString('en-US', { 
@@ -139,12 +141,13 @@ exports.getAllAppointments = (req, res) => {
       a.appointment_id, a.appointment_date, a.status, a.customer_notes, a.service_address,
       a.cancellation_reason, a.cancellation_category, a.rejection_reason,
       a.created_at, a.updated_at,
+      a.walkin_name, a.walkin_phone, a.walkin_email,
       u.first_name as client_first, u.last_name as client_last, u.phone_number, u.email, u.address,
       s.name as service_name, sc.name as category_name,
       t.first_name as tech_first, t.last_name as tech_last,
       r.rating, r.feedback_text as feedback
     FROM appointments a
-    JOIN users u ON a.customer_id = u.user_id
+    LEFT JOIN users u ON a.customer_id = u.user_id
     JOIN services s ON a.service_id = s.service_id
     LEFT JOIN service_categories sc ON s.category_id = sc.category_id
     LEFT JOIN users t ON a.technician_id = t.user_id
@@ -158,9 +161,9 @@ exports.getAllAppointments = (req, res) => {
 
     const formatted = results.map(row => ({
       id: row.appointment_id.toString(),
-      clientName: `${row.client_first} ${row.client_last}`,
-      phone: row.phone_number,
-      email: row.email,
+      clientName: row.client_first ? `${row.client_first} ${row.client_last}` : (row.walkin_name || 'Guest'),
+      phone: row.phone_number || row.walkin_phone || 'N/A',
+      email: row.email || row.walkin_email || 'N/A',
       address: row.service_address || row.address || 'No address provided',
       service: row.service_name,
       category: row.category_name,

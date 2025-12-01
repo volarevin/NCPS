@@ -32,10 +32,12 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [technicians, setTechnicians] = useState<User[]>([]);
   
   const [formData, setFormData] = useState({
     customer_id: "",
     service_id: "",
+    technician_id: "",
     appointment_date: "",
     time: "",
     address: "",
@@ -49,18 +51,21 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
   const fetchData = async () => {
     try {
       const token = sessionStorage.getItem('token');
-      const [usersRes, servicesRes] = await Promise.all([
+      const [usersRes, servicesRes, techsRes] = await Promise.all([
         fetch('http://localhost:5000/api/admin/users', { headers: { 'Authorization': `Bearer ${token}` } }),
-        fetch('http://localhost:5000/api/admin/services', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('http://localhost:5000/api/admin/services', { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch('http://localhost:5000/api/admin/users?role=Technician', { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
       const usersData = await usersRes.json();
       const servicesData = await servicesRes.json();
+      const techsData = await techsRes.json();
 
       // Filter only customers (assuming role check or just showing all for now)
       // Ideally backend should filter or we filter here if we have role info
       setUsers(usersData.filter((u: any) => u.role === 'Customer' || !u.role)); 
       setServices(servicesData);
+      setTechnicians(techsData);
     } catch (error) {
       console.error("Error fetching data", error);
     }
@@ -84,6 +89,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
         body: JSON.stringify({
           customer_id: formData.customer_id,
           service_id: formData.service_id,
+          technician_id: formData.technician_id || null,
           appointment_date: dateTime.toISOString(),
           address: formData.address,
           notes: formData.notes
@@ -97,6 +103,7 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
       setFormData({
         customer_id: "",
         service_id: "",
+        technician_id: "",
         appointment_date: "",
         time: "",
         address: "",
@@ -151,6 +158,26 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
                 {services.map((service) => (
                   <SelectItem key={service.service_id} value={service.service_id.toString()}>
                     {service.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="technician" className="dark:text-foreground">Technician (Optional)</Label>
+            <Select 
+              value={formData.technician_id} 
+              onValueChange={(val) => setFormData({...formData, technician_id: val})}
+            >
+              <SelectTrigger className="bg-white dark:bg-background dark:border-input dark:text-foreground">
+                <SelectValue placeholder="Select a technician (Optional)" />
+              </SelectTrigger>
+              <SelectContent className="bg-white dark:bg-popover dark:text-popover-foreground">
+                <SelectItem value="unassigned">Unassigned</SelectItem>
+                {technicians.map((tech) => (
+                  <SelectItem key={tech.user_id} value={tech.user_id.toString()}>
+                    {tech.first_name} {tech.last_name}
                   </SelectItem>
                 ))}
               </SelectContent>

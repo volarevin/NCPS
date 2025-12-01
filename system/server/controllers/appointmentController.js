@@ -207,6 +207,7 @@ exports.createWalkInAppointment = async (req, res) => {
     newUser, 
     walkinDetails, 
     serviceId, 
+    technicianId,
     date, 
     time, 
     address, 
@@ -256,19 +257,22 @@ exports.createWalkInAppointment = async (req, res) => {
       let insertQuery = '';
       let params = [];
 
+      // Handle "unassigned" string from frontend
+      const finalTechnicianId = (technicianId && technicianId !== 'unassigned') ? technicianId : null;
+
       if (finalCustomerId) {
         insertQuery = `
-          INSERT INTO appointments (customer_id, service_id, appointment_date, customer_notes, service_address, status, is_walk_in)
-          VALUES (?, ?, ?, ?, ?, 'Pending', 1)
+          INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, customer_notes, service_address, status, is_walk_in)
+          VALUES (?, ?, ?, ?, ?, ?, 'Pending', 1)
         `;
-        params = [finalCustomerId, serviceId, appointmentDate, notes, address];
+        params = [finalCustomerId, serviceId, finalTechnicianId, appointmentDate, notes, address];
       } else if (walkinDetails) {
         // Guest Walk-in
         insertQuery = `
-          INSERT INTO appointments (customer_id, service_id, appointment_date, customer_notes, service_address, status, is_walk_in, walkin_name, walkin_phone, walkin_email)
-          VALUES (NULL, ?, ?, ?, ?, 'Pending', 1, ?, ?, ?)
+          INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, customer_notes, service_address, status, is_walk_in, walkin_name, walkin_phone, walkin_email)
+          VALUES (NULL, ?, ?, ?, ?, ?, 'Pending', 1, ?, ?, ?)
         `;
-        params = [serviceId, appointmentDate, notes, address, walkinDetails.name, walkinDetails.phone, walkinDetails.email];
+        params = [serviceId, finalTechnicianId, appointmentDate, notes, address, walkinDetails.name, walkinDetails.phone, walkinDetails.email];
       } else {
         throw new Error('No customer information provided.');
       }

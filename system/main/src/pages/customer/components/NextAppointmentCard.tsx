@@ -12,6 +12,7 @@ interface NextAppointmentCardProps {
     technicianEmail: string;
     address: string;
     notes: string;
+    daysUntil?: string;
   };
   onViewDetails?: () => void;
   onReschedule?: () => void;
@@ -36,6 +37,11 @@ export function NextAppointmentCard({ appointment, onViewDetails, onReschedule }
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
           <h2 className="text-[#0B4F6C] dark:text-primary font-semibold text-base md:text-xl">Next Appointment</h2>
+          {appointment.daysUntil && (
+             <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full text-xs font-medium ml-2">
+               {appointment.daysUntil}
+             </span>
+          )}
         </div>
         <span className={`${statusColors[appointment.status]} text-white px-2 py-0.5 md:px-3 md:py-1 rounded-full text-[10px] md:text-sm`}>
           {statusLabels[appointment.status]}

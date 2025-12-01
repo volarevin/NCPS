@@ -61,6 +61,10 @@ export function CustomerDashboard() {
         }
 
         const apptData = await apptRes.json();
+
+        // Sort appointments by date ascending
+        apptData.sort((a: any, b: any) => new Date(a.appointment_date).getTime() - new Date(b.appointment_date).getTime());
+
         setAllAppointments(apptData);
         
         const now = new Date();
@@ -76,12 +80,14 @@ export function CustomerDashboard() {
              setTodaysAppointment({
                 id: todayAppt.appointment_id,
                 service: todayAppt.service_name,
+                serviceId: todayAppt.service_id,
                 date: 'Today',
+                rawDate: todayAppt.appointment_date,
                 time: new Date(todayAppt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
                 status: todayAppt.status.toLowerCase(),
                 technician: todayAppt.tech_first_name ? `Tech ${todayAppt.tech_first_name} ${todayAppt.tech_last_name}` : 'Pending Assignment',
-                technicianPhone: '', 
-                technicianEmail: '',
+                technicianPhone: todayAppt.tech_phone || '', 
+                technicianEmail: todayAppt.tech_email || '',
                 address: todayAppt.service_address || 'No address provided',
                 notes: todayAppt.customer_notes || 'No notes provided.',
                 description: todayAppt.customer_notes || 'No notes provided.',
@@ -97,17 +103,28 @@ export function CustomerDashboard() {
         });
 
         if (upcoming) {
+          const upcomingDate = new Date(upcoming.appointment_date);
+          
+          // Calculate days difference based on midnight
+          const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const upcomingMidnight = new Date(upcomingDate.getFullYear(), upcomingDate.getMonth(), upcomingDate.getDate());
+          const diffTime = upcomingMidnight.getTime() - todayMidnight.getTime();
+          const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
           setNextAppointment({
             id: upcoming.appointment_id,
             service: upcoming.service_name,
-            date: new Date(upcoming.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-            time: new Date(upcoming.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+            serviceId: upcoming.service_id,
+            date: upcomingDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+            rawDate: upcoming.appointment_date,
+            time: upcomingDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
             status: upcoming.status.toLowerCase(),
             technician: upcoming.tech_first_name ? `Tech ${upcoming.tech_first_name} ${upcoming.tech_last_name}` : 'Pending Assignment',
-            technicianPhone: '', 
-            technicianEmail: '', 
+            technicianPhone: upcoming.tech_phone || '', 
+            technicianEmail: upcoming.tech_email || '', 
             address: '123 Main St, Nasugbu, Batangas', 
             notes: upcoming.customer_notes || 'No notes provided.',
+            daysUntil: diffDays === 1 ? 'Tomorrow' : `In ${diffDays} days`,
           });
         } else {
             setNextAppointment(null);
@@ -188,7 +205,9 @@ export function CustomerDashboard() {
             const formattedAppt = {
                 id: appt.appointment_id,
                 service: appt.service_name,
+                serviceId: appt.service_id,
                 date: new Date(appt.appointment_date).toLocaleDateString(),
+                rawDate: appt.appointment_date,
                 time: new Date(appt.appointment_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 status: appt.status.toLowerCase(),
                 technician: appt.tech_first_name ? `Tech ${appt.tech_first_name} ${appt.tech_last_name}` : 'Pending Assignment',
@@ -312,6 +331,10 @@ export function CustomerDashboard() {
         onOpenChange={setIsViewDialogOpen}
         appointment={selectedAppointment || nextAppointment}
         onEdit={() => {
+          setIsViewDialogOpen(false);
+          setIsEditDialogOpen(true);
+        }}
+        onReschedule={() => {
           setIsViewDialogOpen(false);
           setIsEditDialogOpen(true);
         }}

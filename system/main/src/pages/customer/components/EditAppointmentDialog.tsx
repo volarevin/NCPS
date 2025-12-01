@@ -29,6 +29,7 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
   });
   const [services, setServices] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -38,9 +39,21 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
 
   useEffect(() => {
     if (appointment) {
+      let formattedDate = '';
+      if (appointment.rawDate) {
+          const d = new Date(appointment.rawDate);
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          formattedDate = `${year}-${month}-${day}`;
+          
+          const today = new Date();
+          setIsToday(d.toDateString() === today.toDateString());
+      }
+
       setFormData({
         serviceId: appointment.serviceId?.toString() || '',
-        date: appointment.rawDate || '',
+        date: formattedDate,
         time: appointment.time ? convertTo24Hour(appointment.time) : '',
         notes: appointment.notes || '',
       });
@@ -118,6 +131,14 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
             Update your appointment details below. Only pending appointments can be edited.
           </DialogDescription>
         </DialogHeader>
+
+        {isToday && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <p className="text-yellow-700 text-sm">
+                    You cannot reschedule today's appointment. Please contact us directly if you need assistance.
+                </p>
+            </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-1.5">
@@ -197,8 +218,8 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
             </Button>
             <Button
               type="submit"
-              className="flex-1 bg-[#3FA9BC] hover:bg-[#2A6570] text-white transition-colors duration-200 h-9"
-              disabled={isLoading}
+              className="flex-1 bg-[#3FA9BC] hover:bg-[#2A6570] text-white h-9"
+              disabled={isLoading || isToday}
             >
               {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>

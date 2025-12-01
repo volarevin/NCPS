@@ -159,13 +159,13 @@ export function Appointments() {
 
       const formatted = data.map((appt: any) => ({
         id: appt.appointment_id.toString(),
-        clientName: `${appt.customer_first_name} ${appt.customer_last_name}`,
+        clientName: appt.customer_first_name ? `${appt.customer_first_name} ${appt.customer_last_name}` : (appt.walkin_name || 'Guest'),
         service: appt.service_name,
         date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
         status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-'),
-        phone: appt.customer_phone || 'N/A',
-        email: appt.customer_email || 'N/A',
+        phone: appt.customer_phone || appt.walkin_phone || 'N/A',
+        email: appt.customer_email || appt.walkin_email || 'N/A',
         address: appt.service_address || appt.customer_address || 'N/A', 
         notes: appt.customer_notes || '',
         technicianId: appt.technician_id ? appt.technician_id.toString() : undefined,
