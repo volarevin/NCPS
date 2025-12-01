@@ -134,13 +134,6 @@ export function UserDetailsDialog({
                 <span className="text-muted-foreground">Joined</span>
                 <span className="font-medium dark:text-foreground">{user.joinedDate}</span>
               </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Status</span>
-                <span className="text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
-                  <div className="w-2 h-2 rounded-full bg-green-600 dark:bg-green-400" />
-                  Active
-                </span>
-              </div>
             </div>
 
             {/* Role Management */}

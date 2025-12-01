@@ -193,7 +193,49 @@ exports.deleteNotification = (req, res) => {
     if (result.affectedRows === 0) {
         return res.status(404).json({ message: 'Notification not found or not authorized.' });
     }
-    res.json({ message: 'Notification deleted successfully.' });
+    res.json({ message: 'All notifications cleared successfully.' });
+  });
+};
+
+exports.getAvailability = (req, res) => {
+  const userId = req.params.id || req.userId;
+  
+  const query = `
+    SELECT tp.availability_status, u.is_online, u.last_seen 
+    FROM users u 
+    LEFT JOIN technician_profiles tp ON u.user_id = tp.user_id 
+    WHERE u.user_id = ?
+  `;
+  
+  db.query(query, [userId], (err, results) => {
+    if (err) return res.status(500).json({ message: 'Database error.' });
+    if (results.length === 0) return res.status(404).json({ message: 'Technician not found.' });
+    
+    res.json(results[0]);
+  });
+};
+
+exports.updateAvailability = (req, res) => {
+  const userId = req.userId;
+  const { status } = req.body; // 'available' or 'offline'
+  
+  if (!['available', 'offline'].includes(status)) {
+      return res.status(400).json({ message: 'Invalid status override.' });
+  }
+  
+  // Check if busy
+  const checkBusy = "SELECT COUNT(*) as count FROM appointments WHERE technician_id = ? AND status = 'In Progress'";
+  db.query(checkBusy, [userId], (err, busyRes) => {
+      if (err) return res.status(500).json({ message: 'Database error.' });
+      
+      if (busyRes[0].count > 0) {
+          return res.status(409).json({ message: 'Cannot change status while busy with an appointment.' });
+      }
+      
+      db.query("UPDATE technician_profiles SET availability_status = ? WHERE user_id = ?", [status, userId], (updateErr) => {
+          if (updateErr) return res.status(500).json({ message: 'Database error updating status.' });
+          res.json({ message: 'Status updated.', status });
+      });
   });
 };
 

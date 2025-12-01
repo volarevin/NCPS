@@ -95,6 +95,20 @@ exports.login = (req, res) => {
 
     logLogin(user.user_id, true, null, req);
 
+    // Update presence
+    db.query('UPDATE users SET is_online = 1, last_seen = NOW() WHERE user_id = ?', [user.user_id]);
+    
+    // If technician, update availability to 'available' if not 'busy'
+    if (user.role === 'Technician') {
+       // Check if busy (has in-progress appointment)
+       const checkBusy = "SELECT COUNT(*) as count FROM appointments WHERE technician_id = ? AND status = 'In Progress'";
+       db.query(checkBusy, [user.user_id], (err, busyRes) => {
+          if (!err && busyRes[0].count === 0) {
+             db.query("UPDATE technician_profiles SET availability_status = 'available' WHERE user_id = ? AND availability_status != 'busy'", [user.user_id]);
+          }
+       });
+    }
+
     res.json({
       token,
       user: {
@@ -107,5 +121,51 @@ exports.login = (req, res) => {
         profile_picture: user.profile_picture
       }
     });
+  });
+};
+
+exports.logout = (req, res) => {
+  const userId = req.userId;
+  if (userId) {
+    db.query('UPDATE users SET is_online = 0, last_seen = NOW() WHERE user_id = ?', [userId]);
+    
+    // If technician, set to offline (unless busy? No, if logged out, they are offline regardless of busy status usually, but "busy" implies working. 
+    // However, "offline" means not reachable on the system. 
+    // The prompt says: "offline: is_online=0". So we set to offline.
+    // But wait, "busy: technician has any appointment with status='In Progress'".
+    // If they have an in-progress appointment but log out, are they busy or offline?
+    // Prompt: "busy: technician has any appointment with status='In Progress'".
+    // "offline: is_online=0".
+    // These rules conflict if both are true.
+    // Usually "In Progress" means they are physically working, so they might be "Busy" even if the system session ends.
+    // But "Offline" implies they can't receive new requests.
+    // Let's follow the prompt's view logic: "busy: technician has any appointment... available: is_online=1 AND no in-progress... offline: is_online=0".
+    // So if is_online=0, they are offline.
+    // So we just update users table. The view/logic will handle the rest.
+    // But we also have `technician_profiles.availability_status` column. We should update it to keep it in sync for simple queries.
+    
+    db.query("UPDATE technician_profiles SET availability_status = 'offline' WHERE user_id = ?", [userId]);
+  }
+  res.json({ message: 'Logged out successfully.' });
+};
+
+exports.heartbeat = (req, res) => {
+  const userId = req.userId;
+  db.query('UPDATE users SET is_online = 1, last_seen = NOW() WHERE user_id = ?', [userId], (err) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    
+    // Also ensure technician is 'available' if they were 'offline' but now sending heartbeat, AND not busy
+    // This auto-recovers status if they come back online
+    if (req.userRole === 'Technician') {
+        const checkBusy = "SELECT COUNT(*) as count FROM appointments WHERE technician_id = ? AND status = 'In Progress'";
+        db.query(checkBusy, [userId], (err, busyRes) => {
+            if (!err && busyRes[0].count === 0) {
+                // Only update if currently offline or null, don't overwrite 'busy'
+                db.query("UPDATE technician_profiles SET availability_status = 'available' WHERE user_id = ? AND availability_status = 'offline'", [userId]);
+            }
+        });
+    }
+    
+    res.json({ status: 'ok' });
   });
 };

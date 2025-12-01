@@ -46,7 +46,75 @@ export default function TechnicianPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [technicianProfile, setTechnicianProfile] = useState<any>(null);
+  const [availability, setAvailability] = useState<{ status: string, is_online: number, last_seen: string } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Heartbeat
+  useEffect(() => {
+    const sendHeartbeat = () => {
+      fetch('http://localhost:5000/api/auth/heartbeat', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      }).catch(err => console.error('Heartbeat failed', err));
+    };
+
+    sendHeartbeat(); // Initial
+    const interval = setInterval(sendHeartbeat, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Fetch Availability
+  const fetchAvailability = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:5000/api/technician/availability', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAvailability({
+            status: data.availability_status,
+            is_online: data.is_online,
+            last_seen: data.last_seen
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching availability", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAvailability();
+    const interval = setInterval(fetchAvailability, 10000); // Poll every 10s for updates
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleStatusChange = async (newStatus: string) => {
+      try {
+          const token = localStorage.getItem('token');
+          const res = await fetch('http://localhost:5000/api/technician/availability', {
+              method: 'PUT',
+              headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}` 
+              },
+              body: JSON.stringify({ status: newStatus })
+          });
+          
+          if (res.ok) {
+              fetchAvailability();
+          } else {
+              const err = await res.json();
+              // Show error toast?
+              console.error(err.message);
+          }
+      } catch (error) {
+          console.error("Error updating status", error);
+      }
+  };
 
   useEffect(() => {
     document.title = "Technician Dashboard";

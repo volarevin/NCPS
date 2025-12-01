@@ -25,6 +25,8 @@ interface TechnicianDashboardContentProps {
   getStatusBadge: (status: string) => JSX.Element;
   onDeleteNotification: (e: React.MouseEvent, id: number) => void;
   onClearAllNotifications: () => void;
+  availability?: { status: string, is_online: number, last_seen: string } | null;
+  onStatusChange?: (status: string) => void;
 }
 
 export function TechnicianDashboardContent({
@@ -37,7 +39,9 @@ export function TechnicianDashboardContent({
   setActiveTab,
   getStatusBadge,
   onDeleteNotification,
-  onClearAllNotifications
+  onClearAllNotifications,
+  availability,
+  onStatusChange
 }: TechnicianDashboardContentProps) {
 
   const getNotificationIcon = (title: string) => {
@@ -54,6 +58,29 @@ export function TechnicianDashboardContent({
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
       <PageHeader 
         title="Dashboard Overview"
+        action={
+            availability && (
+                <div className="flex items-center gap-2 bg-card p-2 rounded-lg border shadow-sm">
+                    <span className="text-sm font-medium text-muted-foreground">Status:</span>
+                    <div className="flex items-center gap-2">
+                        <span className={`w-3 h-3 rounded-full ${
+                            availability.status === 'available' ? 'bg-green-500' :
+                            availability.status === 'busy' ? 'bg-orange-500' : 'bg-gray-400'
+                        }`} />
+                        <select 
+                            className="bg-transparent text-sm font-medium outline-none cursor-pointer dark:text-foreground"
+                            value={availability.status}
+                            onChange={(e) => onStatusChange?.(e.target.value)}
+                            disabled={availability.status === 'busy'}
+                        >
+                            <option value="available">Available</option>
+                            <option value="busy" disabled>Busy</option>
+                            <option value="offline">Offline</option>
+                        </select>
+                    </div>
+                </div>
+            )
+        }
       />
 
       {/* Stats Grid */}

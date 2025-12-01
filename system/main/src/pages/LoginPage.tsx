@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useFeedback } from '@/context/FeedbackContext';
 import { Logo } from "@/components/Logo";
 
@@ -13,7 +13,16 @@ type ViewMode = 'login' | 'signup' | 'forgot-password';
 export default function LoginPage() {
   const { showPromise } = useFeedback();
   const navigate = useNavigate();
+  const location = useLocation();
   const [viewMode, setViewMode] = useState<ViewMode>('login');
+
+  useEffect(() => {
+    if (location.pathname === '/register') {
+      setViewMode('signup');
+    } else {
+      setViewMode('login');
+    }
+  }, [location.pathname]);
   
   // Form States
   const [username, setUsername] = useState('');

@@ -23,6 +23,7 @@ app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/technician', require('./routes/technicianRoutes'));
 app.use('/api/receptionist', require('./routes/receptionistRoutes'));
 app.use('/api/profile', require('./routes/profileRoutes'));
+app.use('/api/public', require('./routes/publicRoutes'));
 
 // Basic Route
 app.get('/', (req, res) => {

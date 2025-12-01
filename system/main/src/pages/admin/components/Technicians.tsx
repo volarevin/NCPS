@@ -101,7 +101,7 @@ export function Technicians() {
         email: tech.email,
         location: tech.address || "Manila",
         specialty: tech.specialty || "General",
-        status: tech.availability_status.toLowerCase(),
+        status: (tech.availability_status || 'offline').toLowerCase(),
         activeJobs: tech.active_jobs,
         completedJobs: tech.total_jobs_completed,
         rating: parseFloat(tech.average_rating) || 0,

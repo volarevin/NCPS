@@ -118,6 +118,32 @@ exports.updateAppointmentStatus = (req, res) => {
           });
       }
 
+      // Update Technician Availability Logic
+      const getTechQuery = "SELECT technician_id FROM appointments WHERE appointment_id = ?";
+      (req.db || db).query(getTechQuery, [id], (err, techRes) => {
+          if (!err && techRes.length > 0 && techRes[0].technician_id) {
+              const tId = techRes[0].technician_id;
+              
+              if (status === 'In Progress') {
+                  (req.db || db).query("UPDATE technician_profiles SET availability_status = 'busy' WHERE user_id = ?", [tId]);
+              } else {
+                  // Check if they have OTHER in-progress appointments
+                  const checkBusy = "SELECT COUNT(*) as count FROM appointments WHERE technician_id = ? AND status = 'In Progress' AND appointment_id != ?";
+                  (req.db || db).query(checkBusy, [tId, id], (busyErr, busyRes) => {
+                      if (!busyErr && busyRes[0].count === 0) {
+                          // Not busy anymore. Check if online.
+                          (req.db || db).query("SELECT is_online FROM users WHERE user_id = ?", [tId], (userErr, userRes) => {
+                              if (!userErr && userRes.length > 0) {
+                                  const newStatus = userRes[0].is_online ? 'available' : 'offline';
+                                  (req.db || db).query("UPDATE technician_profiles SET availability_status = ? WHERE user_id = ?", [newStatus, tId]);
+                              }
+                          });
+                      }
+                  });
+              }
+          }
+      });
+
       res.json({ message: 'Appointment status updated.' });
     });
   };
