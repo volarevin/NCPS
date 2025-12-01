@@ -7,9 +7,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFeedback } from "@/context/FeedbackContext";
-import { Search, UserPlus, User, Calendar, Clock, MapPin } from "lucide-react";
+import { Search, User, Calendar, MapPin, AlertTriangle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getProfilePictureUrl } from "@/lib/utils";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CreateWalkInDialogProps {
   open: boolean;
@@ -67,6 +69,9 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
     address: "",
     notes: ""
   });
+  
+  const [conflictWarning, setConflictWarning] = useState<any>(null);
+  const [ignoreConflict, setIgnoreConflict] = useState(false);
 
   const getApiBase = () => {
     const userStr = sessionStorage.getItem('user');
@@ -91,8 +96,15 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
       setNewUser({ firstName: "", lastName: "", email: "", phone: "", address: "" });
       setGuest({ name: "", email: "", phone: "" });
       setAppointment({ service_id: "", technician_id: "", date: "", time: "", address: "", notes: "" });
+      setConflictWarning(null);
+      setIgnoreConflict(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    setConflictWarning(null);
+    setIgnoreConflict(false);
+  }, [appointment.technician_id, appointment.date, appointment.time, appointment.service_id]);
 
   // Search users when query changes
   useEffect(() => {
@@ -175,7 +187,8 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
       date: appointment.date,
       time: appointment.time,
       address: appointment.address,
-      notes: appointment.notes
+      notes: appointment.notes,
+      overrideConflict: ignoreConflict
     };
 
     if (activeTab === "existing") {
@@ -199,11 +212,16 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
         body: JSON.stringify(payload)
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.message || 'Failed to create appointment');
+        if (response.status === 409 && data.conflict) {
+            setConflictWarning(data.conflict);
+            throw new Error("Scheduling conflict detected. Please review or override.");
+        }
+        throw new Error(data.message || 'Failed to create appointment');
       }
-      return await response.json();
+      return data;
     };
 
     await showPromise(promise(), {
@@ -212,8 +230,10 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
       error: (err) => `Error: ${err.message}`
     });
 
-    onSuccess();
-    onOpenChange(false);
+    if (!conflictWarning) {
+        onSuccess();
+        onOpenChange(false);
+    }
   };
 
   const isFormValid = () => {
@@ -413,6 +433,22 @@ export function CreateWalkInDialog({ open, onOpenChange, onSuccess }: CreateWalk
                     className="bg-white dark:bg-background dark:border-input dark:text-foreground"
                   />
                 </div>
+
+                {conflictWarning && (
+                  <Alert variant="destructive" className="mt-4">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Scheduling Conflict</AlertTitle>
+                    <AlertDescription>
+                      Technician has another appointment: {conflictWarning.service_name} ({conflictWarning.appointment_date ? new Date(conflictWarning.appointment_date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : ''})
+                      <div className="flex items-center space-x-2 mt-2">
+                        <Checkbox id="ignore-conflict" checked={ignoreConflict} onCheckedChange={(c) => setIgnoreConflict(!!c)} />
+                        <label htmlFor="ignore-conflict" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                          Ignore conflict and book anyway
+                        </label>
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
             </div>
           </div>

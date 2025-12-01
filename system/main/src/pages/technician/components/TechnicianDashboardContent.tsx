@@ -28,7 +28,7 @@ interface TechnicianDashboardContentProps {
 }
 
 export function TechnicianDashboardContent({
-  technicianProfile,
+  // technicianProfile,
   stats,
   todayAppointments,
   upcomingAppointments,

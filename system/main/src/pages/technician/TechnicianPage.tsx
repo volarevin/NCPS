@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFeedback } from "@/context/FeedbackContext";
-import { Calendar, Clock, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
+import { Calendar, CheckCircle, PlayCircle, Star, StarHalf } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
+import { getProfilePictureUrl } from "@/lib/utils";
 import { TechnicianSidebar } from "./components/TechnicianSidebar";
 import { TechnicianDashboardContent } from "./components/TechnicianDashboardContent";
 import { TechnicianAppointments } from "./components/TechnicianAppointments";
@@ -16,6 +17,7 @@ interface Appointment {
   id: string;
   customerName: string;
   service: string;
+  serviceId?: string;
   date: string;
   time: string;
   phone: string;
@@ -142,11 +144,12 @@ export default function TechnicianPage() {
           id: job.appointment_id.toString(),
           customerName: `${job.customer_first_name} ${job.customer_last_name}`,
           service: job.service_name,
+          serviceId: job.service_id ? job.service_id.toString() : undefined,
           date: new Date(job.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
           time: new Date(job.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
           phone: job.customer_phone || 'N/A',
           email: job.customer_email || 'N/A',
-          address: 'N/A', // TODO
+          address: job.service_address || 'N/A',
           status: status,
           notes: job.customer_notes || '',
           rawDate: new Date(job.appointment_date),
@@ -157,7 +160,7 @@ export default function TechnicianPage() {
           cancelledByRole: job.cancelled_by_role,
           cancelledById: job.cancelled_by_id,
           updatedAt: new Date(job.updated_at),
-          customerAvatar: job.customer_profile_picture
+          customerAvatar: getProfilePictureUrl(job.customer_profile_picture)
         };
       });
 
@@ -252,30 +255,30 @@ export default function TechnicianPage() {
     });
   };
 
-  const updateProfile = async (updatedProfile: any) => {
-    const promise = async () => {
-      const response = await fetch('http://localhost:5000/api/technician/profile', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
-        },
-        body: JSON.stringify(updatedProfile)
-      });
+  // const _updateProfile = async (updatedProfile: any) => {
+  //   const promise = async () => {
+  //     const response = await fetch('http://localhost:5000/api/technician/profile', {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+  //       },
+  //       body: JSON.stringify(updatedProfile)
+  //     });
 
-      if (!response.ok) throw new Error('Failed to update profile');
+  //     if (!response.ok) throw new Error('Failed to update profile');
 
-      await response.json();
-      setTechnicianProfile((prev: any) => ({ ...prev, ...updatedProfile }));
-      return 'Profile updated successfully';
-    };
+  //     await response.json();
+  //     setTechnicianProfile((prev: any) => ({ ...prev, ...updatedProfile }));
+  //     return 'Profile updated successfully';
+  //   };
 
-    showPromise(promise(), {
-      loading: 'Updating profile...',
-      success: (data) => data,
-      error: 'Failed to update profile',
-    });
-  };
+  //   showPromise(promise(), {
+  //     loading: 'Updating profile...',
+  //     success: (data) => data,
+  //     error: 'Failed to update profile',
+  //   });
+  // };
 
   const stats = [
     {
@@ -356,16 +359,16 @@ export default function TechnicianPage() {
     return stars;
   };
 
-  const handleDeleteAccount = () => {
-    if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-      const promise = Promise.resolve("Account deletion requested. Please contact the administrator to complete this process.");
-      showPromise(promise, {
-        loading: 'Processing...',
-        success: (data) => data,
-        error: 'Error',
-      });
-    }
-  };
+  // const _handleDeleteAccount = () => {
+  //   if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+  //     const promise = Promise.resolve("Account deletion requested. Please contact the administrator to complete this process.");
+  //     showPromise(promise, {
+  //       loading: 'Processing...',
+  //       success: (data) => data,
+  //       error: 'Error',
+  //     });
+  //   }
+  // };
 
   const renderContent = () => {
     if (isLoading) {

@@ -43,7 +43,7 @@ export function AddTechnicianDialog({ open, onOpenChange, onTechnicianAdded }: A
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   useEffect(() => {
     if (open) {

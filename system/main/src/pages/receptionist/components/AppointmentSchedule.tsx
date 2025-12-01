@@ -9,14 +9,16 @@ import { AppointmentDetailsDialog } from "./AppointmentDetailsDialog";
 import { RecycleBinDialog } from "./RecycleBinDialog";
 import { StatusChangeDialog } from "./StatusChangeDialog";
 import { CreateWalkInDialog } from "../../admin/components/CreateWalkInDialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ReceptionistCalendar } from "./ReceptionistCalendar";
 import { LayoutList, Calendar as CalendarIcon, Star } from "lucide-react";
+import { getProfilePictureUrl } from "@/lib/utils";
 
 export interface Appointment {
   id: string;
   clientName: string;
   service: string;
+  serviceId?: string;
   date: string;
   time: string;
   status: "pending" | "upcoming" | "completed" | "cancelled" | "in-progress" | "confirmed" | "rejected";
@@ -35,6 +37,7 @@ export interface Appointment {
   category?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  customerAvatar?: string;
 }
 
 interface AppointmentScheduleProps {
@@ -173,7 +176,9 @@ export function AppointmentSchedule({ selectedAppointmentFromDashboard, onClearS
         const mappedData = data.map((appt: any) => ({
           ...appt,
           status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-'),
-          service: appt.category ? `${appt.service} - ${appt.category}` : appt.service
+          service: appt.category ? `${appt.service} - ${appt.category}` : appt.service,
+          serviceId: appt.service_id ? appt.service_id.toString() : undefined,
+          customerAvatar: getProfilePictureUrl(appt.customer_profile_picture)
         }));
         setAppointments(mappedData);
       } else {

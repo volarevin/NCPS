@@ -6,6 +6,7 @@ import ReceptionistPage from './pages/receptionist/ReceptionistPage';
 import TechnicianPage from './pages/technician/TechnicianPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { FeedbackProvider } from './context/FeedbackContext';
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
 
           <Route path="/" element={<Navigate to="/login" replace />} />
         </Routes>
+        <Toaster />
       </FeedbackProvider>
     </Router>
   );

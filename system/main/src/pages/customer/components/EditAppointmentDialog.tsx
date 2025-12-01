@@ -28,7 +28,7 @@ export function EditAppointmentDialog({ open, onOpenChange, appointment }: EditA
     notes: '',
   });
   const [services, setServices] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading] = useState(false);
   const [isToday, setIsToday] = useState(false);
 
   useEffect(() => {

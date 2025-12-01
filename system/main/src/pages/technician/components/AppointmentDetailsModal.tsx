@@ -1,16 +1,33 @@
-import { X, Phone, Mail, MapPin, Calendar, Clock, Wrench, User, CheckCircle, PlayCircle, XCircle, Star, AlertCircle, MessageSquare } from "lucide-react";
-import { Button } from "../../../components/ui/button";
-import { Badge } from "../../../components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  Calendar, Clock, User, Phone, Mail, MapPin, Wrench, Star, 
+  AlertCircle, MessageSquare, PlayCircle, CheckCircle, XCircle, 
+  Copy, ExternalLink, Navigation
+} from "lucide-react";
 import { useState } from "react";
-import { Textarea } from "../../../components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "../../../components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
-import { useFeedback } from "../../../context/FeedbackContext";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
+import { useFeedback } from "@/context/FeedbackContext";
 
 interface Appointment {
   id: string;
   customerName: string;
   service: string;
+  serviceId?: string;
   date: string;
   time: string;
   phone: string;
@@ -25,6 +42,8 @@ interface Appointment {
   rejectionReason?: string;
   cancelledByRole?: string;
   cancelledById?: string;
+  customerAvatar?: string;
+  rawDate?: Date | string;
 }
 
 interface AppointmentDetailsModalProps {
@@ -54,43 +73,9 @@ export default function AppointmentDetailsModal({
     "Other"
   ];
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-800";
-      case "In Progress":
-        return "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800";
-      case "Completed":
-        return "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800";
-      case "Cancelled":
-        return "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300 dark:bg-muted dark:text-muted-foreground dark:border-border";
-    }
-  };
-
-  const handleStatusUpdate = (newStatus: "Pending" | "In Progress" | "Completed" | "Cancelled", reason?: string, category?: string) => {
-    onUpdateStatus(appointment.id, newStatus, reason, category);
-  };
-
-  const handleCancelAppointment = () => {
-    setShowCancelDialog(true);
-  };
-
-  const confirmCancelAppointment = () => {
-    if (!cancelCategory) {
-        showPromise(Promise.reject(new Error("Please select a cancellation category")), {
-            loading: 'Validating...',
-            success: () => '',
-            error: (err) => err.message
-        });
-        return;
-    }
-    handleStatusUpdate("Cancelled", cancelReason, cancelCategory);
-    setShowCancelDialog(false);
-    setCancelReason("");
-    setCancelCategory("");
-    onClose();
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied to clipboard`);
   };
 
   const handleCall = (phone: string) => {
@@ -101,314 +86,350 @@ export default function AppointmentDetailsModal({
     window.location.href = `mailto:${email}`;
   };
 
-  const isToday = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
+  const handleNavigate = (address: string) => {
+    window.open(`https://maps.google.com/?q=${encodeURIComponent(address)}`, '_blank');
+  };
+
+  const confirmCancelAppointment = () => {
+    if (!cancelCategory) {
+        toast.error("Please select a cancellation category");
+        return;
+    }
+    onUpdateStatus(appointment.id, "Cancelled", cancelReason, cancelCategory);
+    setShowCancelDialog(false);
+    setCancelReason("");
+    setCancelCategory("");
+    onClose();
+  };
+
+  const getStatusBadge = (status: string) => {
+    const styles: Record<string, string> = {
+      Pending: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+      Confirmed: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+      "In Progress": "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800",
+      Completed: "bg-green-500/15 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800",
+      Cancelled: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
+    };
+    return styles[status] || "bg-gray-500/15 text-gray-600 border-gray-200";
+  };
+
+  const getDateString = () => {
+    try {
+      const d = appointment.rawDate ? new Date(appointment.rawDate) : new Date(appointment.date);
+      if (isNaN(d.getTime())) return appointment.date;
+      return d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    } catch (e) {
+      return appointment.date;
+    }
   };
 
   return (
     <>
-      <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <div className="flex items-center justify-between pr-8">
-              <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
-                Appointment Details
-              </DialogTitle>
-              <Badge className={`${getStatusColor(appointment.status)} text-xs lg:text-sm`}>
-                {appointment.status}
-              </Badge>
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-background border-border shadow-2xl">
+          
+          {/* Header Section */}
+          <DialogHeader className="p-6 border-b border-border bg-muted/10 space-y-0">
+            <DialogDescription className="sr-only">
+              Appointment details for {appointment.service}
+            </DialogDescription>
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <Badge variant="outline" className={`${getStatusBadge(appointment.status)} capitalize px-3 py-1`}>
+                    {appointment.status}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground font-mono">ID: #{appointment.id}</span>
+                </div>
+                <DialogTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
+                  {appointment.service}
+                </DialogTitle>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={onClose}>
+                  Close
+                </Button>
+              </div>
             </div>
           </DialogHeader>
 
-          <div className="grid gap-6 py-4">
-            {/* Client Info Section */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
-                <User className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
-                Client Information
-              </h3>
-              <div className="grid grid-cols-2 gap-4 pl-6">
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Name</p>
-                  <p className="font-medium">{appointment.customerName}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Phone</p>
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium">{appointment.phone}</p>
-                    <Button
-                        onClick={() => handleCall(appointment.phone)}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 text-green-600 dark:text-green-400"
-                      >
-                        <Phone className="w-3 h-3" />
-                    </Button>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+            
+            {/* Left Column: Main Details */}
+            <div className="lg:col-span-2 p-6 space-y-8 border-r border-border">
+              
+              {/* Date & Time Section */}
+              <section>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <Calendar className="w-4 h-4" /> Schedule
+                </h3>
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border shadow-sm min-w-[200px]">
+                    <div className="p-2 bg-primary/10 rounded-full text-primary">
+                      <Calendar className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Date</p>
+                      <p className="font-medium">{getDateString()}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border shadow-sm min-w-[200px]">
+                    <div className="p-2 bg-primary/10 rounded-full text-primary">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Time</p>
+                      <p className="font-medium">{appointment.time}</p>
+                    </div>
                   </div>
                 </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Email</p>
-                  <div className="flex items-center gap-2">
-                    <Mail className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium">{appointment.email}</p>
-                    <Button
-                        onClick={() => handleEmail(appointment.email)}
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 w-6 p-0 text-blue-600 dark:text-blue-400"
-                      >
-                        <Mail className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Address</p>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium">{appointment.address}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+              </section>
 
-            <div className="border-t border-gray-100 dark:border-border" />
+              <Separator />
 
-            {/* Service Info Section */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
-                <Wrench className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
-                Service Details
-              </h3>
-              <div className="grid grid-cols-2 gap-4 pl-6">
+              {/* Customer & Location */}
+              <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Service Type</p>
-                  <p className="font-medium">{appointment.service}</p>
-                </div>
-                
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Date</p>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium">{appointment.date}</p>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-muted-foreground">Time</p>
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium">{appointment.time}</p>
-                  </div>
-                </div>
-                
-                {appointment.notes && (
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Notes</p>
-                    <p className="font-medium text-gray-700 dark:text-foreground bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg mt-1 border border-yellow-100 dark:border-yellow-900/30">
-                      {appointment.notes}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Completed Appointment Details */}
-            {appointment.status === 'Completed' && (appointment.rating || appointment.feedback) && (
-              <>
-                <div className="border-t border-gray-100 dark:border-border" />
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
-                    <Star className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
-                    Feedback & Rating
+                  <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                    <User className="w-4 h-4" /> Customer
                   </h3>
-                  <div className="pl-6 space-y-3">
-                    {appointment.rating && (
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Rating</p>
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star
-                              key={star}
-                              className={`w-4 h-4 ${
-                                star <= appointment.rating!
-                                  ? "fill-yellow-400 text-yellow-400"
-                                  : "text-gray-300 dark:text-muted"
-                              }`}
-                            />
-                          ))}
+                  <Card className="border-border shadow-sm">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-10 w-10 border border-border">
+                          <AvatarImage src={appointment.customerAvatar} alt={appointment.customerName} className="object-cover" />
+                          <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
+                            {appointment.customerName?.charAt(0).toUpperCase() || '?'}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-semibold">{appointment.customerName || 'Unknown Customer'}</p>
+                          <p className="text-xs text-muted-foreground">Customer</p>
                         </div>
                       </div>
-                    )}
-                    {appointment.feedback && (
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Customer Feedback</p>
-                        <div className="flex gap-2 items-start bg-gray-50 dark:bg-muted/50 p-3 rounded-lg">
-                          <MessageSquare className="w-4 h-4 text-gray-400 dark:text-muted-foreground mt-0.5 shrink-0" />
-                          <p className="text-gray-700 dark:text-foreground italic text-sm">"{appointment.feedback}"</p>
+                      <div className="space-y-2 pt-2">
+                        <div className="flex items-center justify-between text-sm group">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Phone className="w-3 h-3" /> {appointment.phone}
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCall(appointment.phone)}>
+                              <Phone className="w-3 h-3" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopy(appointment.phone, "Phone")}>
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-sm group">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="w-3 h-3" /> {appointment.email}
+                          </div>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleEmail(appointment.email)}>
+                              <Mail className="w-3 h-3" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopy(appointment.email, "Email")}>
+                              <Copy className="w-3 h-3" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
-                    )}
-                  </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </>
-            )}
 
-            {/* Cancelled Details */}
-            {appointment.status === 'Cancelled' && (
-              <>
-                <div className="border-t border-gray-100 dark:border-border" />
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4" />
-                    Cancellation Details
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                    <MapPin className="w-4 h-4" /> Location
                   </h3>
-                  <div className="grid grid-cols-2 gap-4 pl-6">
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-muted-foreground">Category</p>
-                      <Badge variant="outline" className="mt-1 border-red-200 dark:border-red-900/50 text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/20">
-                        {appointment.cancellationCategory || 'N/A'}
-                      </Badge>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-muted-foreground">Reason</p>
-                      <p className="font-medium text-gray-700 dark:text-foreground bg-red-50 dark:bg-red-900/20 p-3 rounded-lg mt-1 border border-red-100 dark:border-red-900/30">
-                        {appointment.cancellationReason || 'No reason provided'}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <p className="text-sm text-gray-500 dark:text-muted-foreground">Cancelled By</p>
-                      <p className="font-medium text-gray-700 dark:text-foreground">
-                        {appointment.cancelledByRole ? (
-                          <span className="capitalize">
-                            {appointment.cancelledByRole} 
-                            {(appointment.cancelledByRole === 'Admin' || appointment.cancelledByRole === 'Receptionist') && appointment.cancelledById && (
-                              <span className="text-gray-400 dark:text-muted-foreground text-xs ml-2">(ID: {appointment.cancelledById})</span>
-                            )}
-                          </span>
-                        ) : 'N/A'}
-                      </p>
-                    </div>
-                  </div>
+                  <Card className="border-border shadow-sm h-full">
+                    <CardContent className="p-4 flex flex-col h-full justify-between">
+                      <p className="text-sm leading-relaxed mb-2">{appointment.address}</p>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full gap-2"
+                        onClick={() => handleNavigate(appointment.address)}
+                      >
+                        <Navigation className="w-3 h-3" /> Navigate
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </div>
-              </>
-            )}
+              </section>
 
-            {/* Actions */}
-            <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-border">
-              {isTechnician && appointment.status !== "Completed" && appointment.status !== "Cancelled" && (
+              <Separator />
+
+              {/* Notes */}
+              <section>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4" /> Notes
+                </h3>
+                <div className="bg-muted/30 p-4 rounded-xl border border-border text-sm leading-relaxed whitespace-pre-wrap">
+                  {appointment.notes || "No notes provided."}
+                </div>
+              </section>
+
+              {/* Ratings & Feedback */}
+              {appointment.status === 'Completed' && appointment.rating !== undefined && (
                 <>
-                  {(appointment.status === "Pending" || appointment.status === "Confirmed") && isToday(appointment.date) && (
-                    <Button
-                      onClick={() => {
-                        handleStatusUpdate("In Progress");
-                      }}
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
-                    >
-                      <PlayCircle className="w-4 h-4 mr-2" />
-                      Start Working
-                    </Button>
-                  )}
-                  {appointment.status === "In Progress" && (
-                    <Button
-                      onClick={() => {
-                        handleStatusUpdate("Completed");
-                        onClose();
-                      }}
-                      className="bg-green-500 hover:bg-green-600 text-white"
-                    >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Mark as Completed
-                    </Button>
-                  )}
-                  <Button
-                    onClick={handleCancelAppointment}
-                    variant="destructive"
-                  >
-                    <XCircle className="w-4 h-4 mr-2" />
-                    Cancel Appointment
-                  </Button>
+                  <Separator />
+                  <section>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                      <Star className="w-4 h-4" /> Customer Feedback
+                    </h3>
+                    <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-3">
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`w-5 h-5 ${i < (appointment.rating || 0) ? "fill-yellow-400 text-yellow-400" : "text-gray-300 dark:text-gray-600"}`} 
+                          />
+                        ))}
+                        <span className="ml-2 font-medium">{appointment.rating}/5</span>
+                      </div>
+                      {appointment.feedback && (
+                        <p className="text-sm leading-relaxed italic text-muted-foreground">
+                          "{appointment.feedback}"
+                        </p>
+                      )}
+                    </div>
+                  </section>
                 </>
               )}
-              
-              {(appointment.status === "Completed" || appointment.status === "Cancelled") && (
-                <Button variant="outline" onClick={onClose}>
-                  Close
-                </Button>
+
+              {/* Cancellation/Rejection Details */}
+              {(appointment.status === 'Cancelled' || appointment.status === 'Rejected') && (
+                <>
+                  <Separator />
+                  <section>
+                    <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2 text-red-600 dark:text-red-400">
+                      <AlertCircle className="w-4 h-4" /> {appointment.status} Details
+                    </h3>
+                    <div className="bg-red-50 dark:bg-red-900/10 p-4 rounded-xl border border-red-100 dark:border-red-900/30 space-y-3">
+                      {appointment.cancellationCategory && (
+                        <div>
+                          <span className="text-xs font-semibold uppercase text-red-600 dark:text-red-400 tracking-wider">Category</span>
+                          <p className="font-medium text-red-900 dark:text-red-200">{appointment.cancellationCategory}</p>
+                        </div>
+                      )}
+                      <div>
+                        <span className="text-xs font-semibold uppercase text-red-600 dark:text-red-400 tracking-wider">Reason</span>
+                        <p className="text-sm leading-relaxed text-red-900 dark:text-red-200">
+                          {appointment.cancellationReason || appointment.rejectionReason || "No reason provided."}
+                        </p>
+                      </div>
+                      {appointment.cancelledByRole && (
+                         <div className="pt-2 border-t border-red-200 dark:border-red-800/30 mt-2">
+                            <p className="text-xs text-red-600 dark:text-red-400">
+                              Action by: <span className="font-medium capitalize">{appointment.cancelledByRole}</span>
+                            </p>
+                         </div>
+                      )}
+                    </div>
+                  </section>
+                </>
               )}
+
+            </div>
+
+            {/* Right Column: Actions */}
+            <div className="bg-muted/5 p-6 space-y-6">
+              
+              <section className="space-y-4">
+                <h3 className="text-sm font-medium text-muted-foreground mb-2 uppercase tracking-wider">Job Actions</h3>
+                
+                {appointment.status === 'Confirmed' && (
+                  <Button 
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 text-lg"
+                    onClick={() => onUpdateStatus(appointment.id, "In Progress")}
+                  >
+                    <PlayCircle className="w-5 h-5 mr-2" /> Start Job
+                  </Button>
+                )}
+
+                {appointment.status === 'In Progress' && (
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white h-12 text-lg"
+                    onClick={() => onUpdateStatus(appointment.id, "Completed")}
+                  >
+                    <CheckCircle className="w-5 h-5 mr-2" /> Complete Job
+                  </Button>
+                )}
+
+                {(appointment.status === 'Confirmed' || appointment.status === 'In Progress') && (
+                  <Button 
+                    variant="destructive" 
+                    className="w-full mt-4"
+                    onClick={() => setShowCancelDialog(true)}
+                  >
+                    <XCircle className="w-4 h-4 mr-2" /> Cancel Job
+                  </Button>
+                )}
+
+                {appointment.status === 'Completed' && (
+                  <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-900 p-4 rounded-lg text-center">
+                    <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400 mx-auto mb-2" />
+                    <p className="font-medium text-green-800 dark:text-green-300">Job Completed</p>
+                    <p className="text-xs text-green-600 dark:text-green-400 mt-1">Great work!</p>
+                  </div>
+                )}
+              </section>
+
+              {/* Metadata */}
+              <section className="pt-6 border-t border-border">
+                <div className="space-y-2 text-xs text-muted-foreground">
+                  <div className="flex justify-between">
+                    <span>Service Type</span>
+                    <span className="font-medium">{appointment.service}</span>
+                  </div>
+                </div>
+              </section>
+
             </div>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Cancel Confirmation Dialog */}
-      {showCancelDialog && (
-        <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                <XCircle className="w-5 h-5" />
-                Cancel Appointment
-              </DialogTitle>
-              <DialogDescription>
-                Are you sure you want to cancel this appointment? You can optionally provide a reason below.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div>
-                <label className="text-sm text-gray-700 dark:text-foreground font-medium mb-2 block">
-                  Cancellation Category <span className="text-red-500 dark:text-red-400">*</span>
-                </label>
-                <Select value={cancelCategory} onValueChange={setCancelCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {cancellationCategories.map((cat) => (
-                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="text-sm text-gray-700 dark:text-foreground font-medium mb-2 block">
-                  Cancellation Reason (Optional)
-                </label>
-                <Textarea
-                  placeholder="Enter reason for cancellation..."
-                  value={cancelReason}
-                  onChange={(e) => setCancelReason(e.target.value)}
-                  className="min-h-[100px] resize-none"
-                />
-              </div>
+      {/* Cancel Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Appointment</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for cancelling this appointment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Category</label>
+              <Select value={cancelCategory} onValueChange={setCancelCategory}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select reason category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cancellationCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <DialogFooter className="flex-col sm:flex-row gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowCancelDialog(false);
-                  setCancelReason("");
-                  setCancelCategory("");
-                }}
-                className="w-full sm:w-auto"
-              >
-                Go Back
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={confirmCancelAppointment}
-                className="w-full sm:w-auto"
-              >
-                <XCircle className="w-4 h-4 mr-2" />
-                Confirm Cancellation
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Additional Details</label>
+              <Textarea 
+                placeholder="Explain why the appointment is being cancelled..."
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>Back</Button>
+            <Button variant="destructive" onClick={confirmCancelAppointment}>Confirm Cancellation</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

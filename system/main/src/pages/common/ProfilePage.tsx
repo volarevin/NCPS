@@ -156,7 +156,7 @@ export default function ProfilePage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
+  const onCropComplete = (_croppedArea: any, _croppedAreaPixels: any) => {
     setCroppedAreaPixels(croppedAreaPixels);
   };
 

@@ -24,13 +24,13 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle,
+  // AlertCircle,
   UserCheck,
   Award,
   Activity,
-  Shield,
+  // Shield,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
+// import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 

@@ -7,6 +7,9 @@ import { Textarea } from "../../../components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../components/ui/select";
 import { useFeedback } from "../../../context/FeedbackContext";
 import { Appointment } from './AppointmentSchedule';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { AlertTriangle } from "lucide-react";
 
 interface AddAppointmentDialogProps {
   open: boolean;
@@ -24,6 +27,14 @@ interface Technician {
   user_id: number;
   first_name: string;
   last_name: string;
+}
+
+interface ConflictDetails {
+  appointmentId: number;
+  serviceName: string;
+  customerName: string;
+  startTime: string;
+  endTime: string;
 }
 
 export function AddAppointmentDialog({
@@ -45,6 +56,9 @@ export function AddAppointmentDialog({
   });
   const [services, setServices] = useState<Service[]>([]);
   const [technicians, setTechnicians] = useState<Technician[]>([]);
+  
+  const [conflict, setConflict] = useState<ConflictDetails | null>(null);
+  const [overrideConflict, setOverrideConflict] = useState(false);
 
   useEffect(() => {
     fetchServices();
@@ -65,8 +79,50 @@ export function AddAppointmentDialog({
         technicianId: '',
         notes: '',
       });
+      setConflict(null);
+      setOverrideConflict(false);
     }
   }, [open]);
+
+  // Conflict check
+  useEffect(() => {
+    const check = async () => {
+      if (formData.technicianId && formData.date && formData.time && formData.serviceId) {
+        
+        try {
+          const token = sessionStorage.getItem('token');
+          const response = await fetch('http://localhost:5000/api/receptionist/appointments/check-conflict', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              technicianId: formData.technicianId,
+              date: formData.date,
+              time: formData.time,
+              serviceId: formData.serviceId
+            })
+          });
+          
+          const data = await response.json();
+          if (data.conflict) {
+            setConflict(data.details);
+            setOverrideConflict(false);
+          } else {
+            setConflict(null);
+          }
+        } catch (error) {
+          console.error("Error checking conflict:", error);
+        }
+      } else {
+        setConflict(null);
+      }
+    };
+
+    const timeoutId = setTimeout(check, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.technicianId, formData.date, formData.time, formData.serviceId]);
 
   const fetchServices = async () => {
     try {
@@ -107,6 +163,8 @@ export function AddAppointmentDialog({
       return;
     }
 
+    if (conflict && !overrideConflict) return;
+
     const promise = async () => {
       const token = sessionStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/receptionist/appointments', {
@@ -115,7 +173,10 @@ export function AddAppointmentDialog({
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify({
+            ...formData,
+            overrideConflict
+        })
       });
 
       if (!response.ok) {
@@ -137,6 +198,8 @@ export function AddAppointmentDialog({
         technicianId: '',
         notes: '',
       });
+      setConflict(null);
+      setOverrideConflict(false);
       
       onOpenChange(false);
       return 'Walk-in appointment added successfully';
@@ -286,6 +349,30 @@ export function AddAppointmentDialog({
               </div>
             </div>
           </div>
+
+          {/* Conflict Warning */}
+          {conflict && (
+            <Alert variant="destructive" className="border-red-500 bg-red-50">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Scheduling Conflict Detected</AlertTitle>
+              <AlertDescription>
+                This technician is already booked for <strong>{conflict.serviceName}</strong> with {conflict.customerName} from {new Date(conflict.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} to {new Date(conflict.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}.
+              </AlertDescription>
+              <div className="mt-2 flex items-center space-x-2">
+                <Checkbox 
+                  id="override" 
+                  checked={overrideConflict}
+                  onCheckedChange={(checked) => setOverrideConflict(checked as boolean)}
+                />
+                <label
+                  htmlFor="override"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Ignore conflict and book anyway
+                </label>
+              </div>
+            </Alert>
+          )}
 
           {/* Notes */}
           <div className="bg-[#E5F4F5] rounded-lg p-4">

@@ -7,7 +7,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, RefreshCw, X } from "lucide-react";
+import { Trash2, RefreshCw } from "lucide-react";
 import { useFeedback } from "@/context/FeedbackContext";
 
 interface DeletedAppointment {
@@ -86,55 +86,55 @@ export function RecycleBinDialog({ open, onOpenChange }: RecycleBinDialogProps) 
     });
   };
 
-  const handlePermanentDelete = async (id: number) => {
-    if (!confirm('Are you sure? This cannot be undone.')) return;
+  // const _handlePermanentDelete = async (id: number) => {
+  //   if (!confirm('Are you sure? This cannot be undone.')) return;
 
-    const promise = async () => {
-      const token = sessionStorage.getItem('token');
-      if (!token) throw new Error("No token found");
+  //   const promise = async () => {
+  //     const token = sessionStorage.getItem('token');
+  //     if (!token) throw new Error("No token found");
 
-      const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/permanent`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+  //     const response = await fetch(`http://localhost:5000/api/receptionist/appointments/${id}/permanent`, {
+  //       method: 'DELETE',
+  //       headers: { 'Authorization': `Bearer ${token}` }
+  //     });
       
-      if (!response.ok) throw new Error('Failed to delete item');
+  //     if (!response.ok) throw new Error('Failed to delete item');
       
-      fetchDeletedItems();
-      return "Appointment permanently deleted";
-    };
+  //     fetchDeletedItems();
+  //     return "Appointment permanently deleted";
+  //   };
 
-    showPromise(promise(), {
-      loading: 'Deleting appointment permanently...',
-      success: (data) => data,
-      error: 'Failed to delete item',
-    });
-  };
+  //   showPromise(promise(), {
+  //     loading: 'Deleting appointment permanently...',
+  //     success: (data) => data,
+  //     error: 'Failed to delete item',
+  //   });
+  // };
 
-  const handleEmptyBin = async () => {
-    if (!confirm('Are you sure you want to empty the recycle bin? All items will be permanently lost.')) return;
+  // const _handleEmptyBin = async () => {
+  //   if (!confirm('Are you sure you want to empty the recycle bin? All items will be permanently lost.')) return;
 
-    const promise = async () => {
-      const token = sessionStorage.getItem('token');
-      if (!token) throw new Error("No token found");
+  //   const promise = async () => {
+  //     const token = sessionStorage.getItem('token');
+  //     if (!token) throw new Error("No token found");
 
-      const response = await fetch('http://localhost:5000/api/receptionist/appointments/recycle-bin', {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+  //     const response = await fetch('http://localhost:5000/api/receptionist/appointments/recycle-bin', {
+  //       method: 'DELETE',
+  //       headers: { 'Authorization': `Bearer ${token}` }
+  //     });
       
-      if (!response.ok) throw new Error('Failed to empty bin');
+  //     if (!response.ok) throw new Error('Failed to empty bin');
       
-      fetchDeletedItems();
-      return "Recycle bin emptied";
-    };
+  //     fetchDeletedItems();
+  //     return "Recycle bin emptied";
+  //   };
 
-    showPromise(promise(), {
-      loading: 'Emptying recycle bin...',
-      success: (data) => data,
-      error: 'Failed to empty bin',
-    });
-  };
+  //   showPromise(promise(), {
+  //     loading: 'Emptying recycle bin...',
+  //     success: (data) => data,
+  //     error: 'Failed to empty bin',
+  //   });
+  // };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

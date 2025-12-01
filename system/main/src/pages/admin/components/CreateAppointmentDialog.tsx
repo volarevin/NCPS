@@ -6,7 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useFeedback } from "@/context/FeedbackContext";
-import { Loader2 } from "lucide-react";
+import { Loader2, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CreateAppointmentDialogProps {
   open: boolean;
@@ -27,9 +29,17 @@ interface Service {
   price: number;
 }
 
+interface ConflictDetails {
+  appointmentId: number;
+  serviceName: string;
+  customerName: string;
+  startTime: string;
+  endTime: string;
+}
+
 export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: CreateAppointmentDialogProps) {
   const { showPromise } = useFeedback();
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
   const [services, setServices] = useState<Service[]>([]);
   const [technicians, setTechnicians] = useState<User[]>([]);
@@ -44,9 +54,53 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
     notes: ""
   });
 
+  const [conflict, setConflict] = useState<ConflictDetails | null>(null);
+  const [overrideConflict, setOverrideConflict] = useState(false);
+  // const [checkingConflict] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const check = async () => {
+      if (formData.technician_id && formData.technician_id !== "unassigned" && 
+          formData.appointment_date && formData.time && formData.service_id) {
+        
+        try {
+          const token = sessionStorage.getItem('token');
+          const response = await fetch('http://localhost:5000/api/admin/appointments/check-conflict', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              technicianId: formData.technician_id,
+              date: formData.appointment_date,
+              time: formData.time,
+              serviceId: formData.service_id
+            })
+          });
+          
+          const data = await response.json();
+          if (data.conflict) {
+            setConflict(data.details);
+            setOverrideConflict(false);
+          } else {
+            setConflict(null);
+          }
+        } catch (error) {
+          console.error("Error checking conflict:", error);
+        }
+      } else {
+        setConflict(null);
+      }
+    };
+
+    const timeoutId = setTimeout(check, 500); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [formData.technician_id, formData.appointment_date, formData.time, formData.service_id]);
 
   const fetchData = async () => {
     try {
@@ -74,6 +128,8 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (conflict && !overrideConflict) return;
+
     const promise = async () => {
       const token = sessionStorage.getItem('token');
       
@@ -89,14 +145,18 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
         body: JSON.stringify({
           customer_id: formData.customer_id,
           service_id: formData.service_id,
-          technician_id: formData.technician_id || null,
+          technician_id: formData.technician_id === "unassigned" ? null : formData.technician_id,
           appointment_date: dateTime.toISOString(),
           address: formData.address,
-          notes: formData.notes
+          notes: formData.notes,
+          overrideConflict: overrideConflict
         })
       });
 
-      if (!response.ok) throw new Error('Failed to create appointment');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create appointment');
+      }
 
       onSuccess();
       onOpenChange(false);
@@ -109,19 +169,21 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
         address: "",
         notes: ""
       });
+      setConflict(null);
+      setOverrideConflict(false);
       return "Appointment created successfully";
     };
 
     showPromise(promise(), {
       loading: 'Creating appointment...',
       success: (data) => data,
-      error: 'Failed to create appointment',
+      error: (err) => err.message || 'Failed to create appointment',
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] bg-white dark:bg-card dark:text-foreground">
+      <DialogContent className="sm:max-w-[500px] bg-white dark:bg-card dark:text-foreground max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Appointment</DialogTitle>
         </DialogHeader>
@@ -221,6 +283,29 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
             </div>
           </div>
 
+          {conflict && (
+            <Alert variant="destructive" className="border-red-500 bg-red-50 dark:bg-red-900/20">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Scheduling Conflict Detected</AlertTitle>
+              <AlertDescription>
+                This technician is already booked for <strong>{conflict.serviceName}</strong> with {conflict.customerName} from {new Date(conflict.startTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} to {new Date(conflict.endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}.
+              </AlertDescription>
+              <div className="mt-2 flex items-center space-x-2">
+                <Checkbox 
+                  id="override" 
+                  checked={overrideConflict}
+                  onCheckedChange={(checked) => setOverrideConflict(checked as boolean)}
+                />
+                <label
+                  htmlFor="override"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Ignore conflict and book anyway
+                </label>
+              </div>
+            </Alert>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="notes" className="dark:text-foreground">Notes</Label>
             <Textarea 
@@ -236,7 +321,11 @@ export function CreateAppointmentDialog({ open, onOpenChange, onSuccess }: Creat
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit" disabled={loading || !formData.customer_id || !formData.service_id || !formData.appointment_date || !formData.time} className="bg-[#0B4F6C] hover:bg-[#093e54]">
+            <Button 
+              type="submit" 
+              disabled={loading || !formData.customer_id || !formData.service_id || !formData.appointment_date || !formData.time || (!!conflict && !overrideConflict)} 
+              className="bg-[#0B4F6C] hover:bg-[#093e54]"
+            >
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Appointment
             </Button>

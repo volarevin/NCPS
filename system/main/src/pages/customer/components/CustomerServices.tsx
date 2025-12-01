@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, Star, ChevronRight, Tag, Wrench, Laptop, Smartphone, Wifi, Shield, Camera, Server, Printer, Speaker } from 'lucide-react';
+import { Search, Star, ChevronRight, Wrench, Laptop, Smartphone, Wifi, Shield, Camera, Server, Printer, Speaker } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { Input } from "../../../components/ui/input";
 import { Badge } from "../../../components/ui/badge";

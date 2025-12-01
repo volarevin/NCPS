@@ -1,4 +1,34 @@
 const db = require('../config/db');
+const checkTechnicianConflict = require('../utils/conflictChecker');
+
+exports.checkConflict = async (req, res) => {
+  const { technicianId, date, time, serviceId, appointmentId } = req.body;
+
+  if (!technicianId || !date || !time || !serviceId) {
+    return res.status(400).json({ message: 'Missing required fields for conflict check.' });
+  }
+
+  try {
+    // Get service duration
+    const serviceQuery = 'SELECT duration_minutes FROM services WHERE service_id = ?';
+    db.query(serviceQuery, [serviceId], async (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (results.length === 0) return res.status(404).json({ message: 'Service not found.' });
+
+      const duration = results[0].duration_minutes || 60;
+      const appointmentDate = `${date} ${time}`;
+
+      try {
+        const conflict = await checkTechnicianConflict(technicianId, appointmentDate, duration, appointmentId);
+        res.json({ conflict: !!conflict, details: conflict ? conflict.details : null });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 exports.getDashboardStats = (req, res) => {
   const queries = {
@@ -219,7 +249,7 @@ exports.getAllCategories = (req, res) => {
 };
 
 exports.createAppointment = (req, res) => {
-  const { clientName, phone, email, address, serviceId, date, time, technicianId, notes } = req.body;
+  const { clientName, phone, email, address, serviceId, date, time, technicianId, notes, overrideConflict } = req.body;
 
   // Helper to create appointment
   const insertAppointment = (customerId) => {
@@ -234,70 +264,163 @@ exports.createAppointment = (req, res) => {
     });
   };
 
-  // Check if user exists
-  (req.db || db).query('SELECT user_id FROM users WHERE email = ?', [email], (err, results) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    if (results.length > 0) {
-      insertAppointment(results[0].user_id);
-    } else {
-      // Create new user
-      const [firstName, ...lastNameParts] = clientName.split(' ');
-      const lastName = lastNameParts.join(' ') || 'Customer';
-      const username = email.split('@')[0] + Math.floor(Math.random() * 1000); // Generate username
-      const bcrypt = require('bcryptjs');
-      const defaultPass = bcrypt.hashSync('password123', 10);
-      
-      const createUserQuery = `
-        INSERT INTO users (username, first_name, last_name, email, phone_number, address, password_hash, role, status)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'Customer', 'Active')
-      `;
-      (req.db || db).query(createUserQuery, [username, firstName, lastName, email, phone, address, defaultPass], (err, result) => {
+  const proceed = () => {
+      // Check if user exists
+      (req.db || db).query('SELECT user_id FROM users WHERE email = ?', [email], (err, results) => {
         if (err) return res.status(500).json({ error: err.message });
-        insertAppointment(result.insertId);
+
+        if (results.length > 0) {
+          insertAppointment(results[0].user_id);
+        } else {
+          // Create new user
+          const [firstName, ...lastNameParts] = clientName.split(' ');
+          const lastName = lastNameParts.join(' ') || 'Customer';
+          const username = email.split('@')[0] + Math.floor(Math.random() * 1000); // Generate username
+          const bcrypt = require('bcryptjs');
+          const defaultPass = bcrypt.hashSync('password123', 10);
+          
+          const createUserQuery = `
+            INSERT INTO users (username, first_name, last_name, email, phone_number, address, password_hash, role, status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'Customer', 'Active')
+          `;
+          (req.db || db).query(createUserQuery, [username, firstName, lastName, email, phone, address, defaultPass], (err, result) => {
+            if (err) return res.status(500).json({ error: err.message });
+            insertAppointment(result.insertId);
+          });
+        }
       });
-    }
-  });
+  };
+
+  if (technicianId && !overrideConflict) {
+      const serviceQuery = 'SELECT duration_minutes FROM services WHERE service_id = ?';
+      db.query(serviceQuery, [serviceId], async (err, results) => {
+          if (err) return res.status(500).json({ error: err.message });
+          
+          const duration = (results.length > 0) ? results[0].duration_minutes : 60;
+          const appointmentDate = `${date} ${time}`;
+          
+          try {
+              const conflict = await checkTechnicianConflict(technicianId, appointmentDate, duration);
+              if (conflict) {
+                  return res.status(409).json({ 
+                      message: 'Technician has a scheduling conflict.', 
+                      conflict: conflict 
+                  });
+              }
+              proceed();
+          } catch (error) {
+              return res.status(500).json({ error: error.message });
+          }
+      });
+  } else {
+      proceed();
+  }
 };
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status, reason, category, technicianId } = req.body;
+  const { status, reason, category, technicianId, overrideConflict } = req.body;
   
-  let query = 'UPDATE appointments SET status = ?';
-  const params = [status];
+  const proceed = () => {
+      let query = 'UPDATE appointments SET status = ?';
+      const params = [status];
 
-  if (status === 'cancelled') {
-    query += ', cancellation_reason = ?, cancellation_category = ?, cancelled_by = ?';
-    params.push(reason, category, req.userId);
-  } else if (status === 'rejected') {
-    query += ', rejection_reason = ?';
-    params.push(reason);
-  } else if (status.toLowerCase() === 'confirmed' && technicianId) {
-    query += ', technician_id = ?';
-    params.push(technicianId);
+      if (status === 'cancelled') {
+        query += ', cancellation_reason = ?, cancellation_category = ?, cancelled_by = ?';
+        params.push(reason, category, req.userId);
+      } else if (status === 'rejected') {
+        query += ', rejection_reason = ?';
+        params.push(reason);
+      } else if (status.toLowerCase() === 'confirmed' && technicianId) {
+        query += ', technician_id = ?';
+        params.push(technicianId);
+      }
+
+      query += ' WHERE appointment_id = ?';
+      params.push(id);
+
+      (req.db || db).query(query, params, (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Status updated successfully' });
+      });
+  };
+
+  if (status.toLowerCase() === 'confirmed' && technicianId && !overrideConflict) {
+      const detailsQuery = `
+        SELECT a.appointment_date, s.duration_minutes 
+        FROM appointments a
+        JOIN services s ON a.service_id = s.service_id
+        WHERE a.appointment_id = ?
+      `;
+      (req.db || db).query(detailsQuery, [id], async (err, results) => {
+          if (err) return res.status(500).json({ error: err.message });
+          if (results.length === 0) return res.status(404).json({ message: 'Appointment not found' });
+          
+          const { appointment_date, duration_minutes } = results[0];
+          try {
+              const conflict = await checkTechnicianConflict(technicianId, appointment_date, duration_minutes, id);
+              if (conflict) {
+                  return res.status(409).json({ 
+                      message: 'Technician has a scheduling conflict.', 
+                      conflict: conflict 
+                  });
+              }
+              proceed();
+          } catch (error) {
+              return res.status(500).json({ error: error.message });
+          }
+      });
+  } else {
+      proceed();
   }
-
-  query += ' WHERE appointment_id = ?';
-  params.push(id);
-
-  (req.db || db).query(query, params, (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Status updated successfully' });
-  });
 };
 
 exports.updateAppointmentDetails = (req, res) => {
   const { id } = req.params;
-  const { date, time, technicianId } = req.body;
+  const { date, time, technicianId, overrideConflict } = req.body;
   
   const appointmentDate = `${date} ${time}`;
-  const query = 'UPDATE appointments SET appointment_date = ?, technician_id = ? WHERE appointment_id = ?';
-  
-  (req.db || db).query(query, [appointmentDate, technicianId || null, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Appointment details updated successfully' });
-  });
+
+  const proceed = () => {
+      const query = 'UPDATE appointments SET appointment_date = ?, technician_id = ? WHERE appointment_id = ?';
+      
+      (req.db || db).query(query, [appointmentDate, technicianId || null, id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Appointment details updated successfully' });
+      });
+  };
+
+  if (technicianId && !overrideConflict) {
+      const apptQuery = 'SELECT service_id FROM appointments WHERE appointment_id = ?';
+      db.query(apptQuery, [id], (err, apptResults) => {
+          if (err) return res.status(500).json({ error: err.message });
+          if (apptResults.length === 0) return res.status(404).json({ message: 'Appointment not found' });
+
+          const serviceId = apptResults[0].service_id;
+          const serviceQuery = 'SELECT duration_minutes FROM services WHERE service_id = ?';
+          
+          db.query(serviceQuery, [serviceId], async (err, serviceResults) => {
+              if (err) return res.status(500).json({ error: err.message });
+              
+              const duration = (serviceResults.length > 0) ? serviceResults[0].duration_minutes : 60;
+              
+              try {
+                  const conflict = await checkTechnicianConflict(technicianId, appointmentDate, duration, id);
+                  if (conflict) {
+                      return res.status(409).json({ 
+                          message: 'Technician has a scheduling conflict.', 
+                          conflict: conflict 
+                      });
+                  }
+                  proceed();
+              } catch (error) {
+                  return res.status(500).json({ error: error.message });
+              }
+          });
+      });
+  } else {
+      proceed();
+  }
 };
 
 exports.softDeleteAppointment = (req, res) => {

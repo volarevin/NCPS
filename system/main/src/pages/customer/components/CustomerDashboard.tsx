@@ -1,5 +1,5 @@
 import { 
-  Calendar, Clock, Wrench, CheckCircle2, AlertCircle, Plus, Bell
+  Calendar, Clock, Wrench, CheckCircle2, Plus, Bell
 } from 'lucide-react';
 import { StatCard } from './StatCard';
 import { NextAppointmentCard } from './NextAppointmentCard';
@@ -36,7 +36,7 @@ export function CustomerDashboard() {
   const [allAppointments, setAllAppointments] = useState<any[]>([]);
   const [featuredServices, setFeaturedServices] = useState<any[]>([]);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
-  const [user, setUser] = useState<any>(null);
+  // const [user] = useState<any>(null);
 
   const fetchDashboardData = async () => {
       try {
@@ -146,7 +146,7 @@ export function CustomerDashboard() {
         if (notifRes.ok) {
             const notifData = await notifRes.json();
             // Ensure we are not setting stale data if a delete happened concurrently
-            setNotifications(prev => {
+            setNotifications(() => {
                 // If we just cleared them (length 0), and the fetch returns some, it might be a race condition or they are actually there.
                 // But since we fetch on mount, and delete updates state locally, we should trust the fetch unless we want to be very careful.
                 // However, the user says they reappear. This implies the fetch is happening AFTER the delete and getting the old data?
@@ -171,7 +171,7 @@ export function CustomerDashboard() {
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      // setUser(JSON.parse(storedUser));
     }
     fetchDashboardData();
   }, []);

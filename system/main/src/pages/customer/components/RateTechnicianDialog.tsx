@@ -23,7 +23,7 @@ export function RateTechnicianDialog({ open, onOpenChange, appointment }: RateTe
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [feedback, setFeedback] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     const promise = async () => {

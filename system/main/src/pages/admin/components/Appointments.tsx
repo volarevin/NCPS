@@ -23,13 +23,14 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useFeedback } from "@/context/FeedbackContext";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getProfilePictureUrl } from "@/lib/utils";
 
 interface Appointment {
   id: string;
   clientName: string;
   service: string;
+  serviceId?: string;
   date: string;
   time: string;
   status: "pending" | "upcoming" | "completed" | "cancelled" | "in-progress" | "confirmed" | "rejected";
@@ -161,6 +162,7 @@ export function Appointments() {
         id: appt.appointment_id.toString(),
         clientName: appt.customer_first_name ? `${appt.customer_first_name} ${appt.customer_last_name}` : (appt.walkin_name || 'Guest'),
         service: appt.service_name,
+        serviceId: appt.service_id ? appt.service_id.toString() : undefined,
         date: new Date(appt.appointment_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         time: new Date(appt.appointment_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
         status: appt.status.trim().toLowerCase().replace(/[ _]/g, '-'),
@@ -309,7 +311,7 @@ export function Appointments() {
     });
   };
 
-  const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string) => {
+  const handleUpdateDetails = async (id: string, date: string, time: string, technicianId: string, overrideConflict?: boolean) => {
     const token = sessionStorage.getItem('token');
     if (!token) return;
 
@@ -320,10 +322,13 @@ export function Appointments() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ date, time, technicianId })
+        body: JSON.stringify({ date, time, technicianId, overrideConflict })
       });
 
-      if (!response.ok) throw new Error("Failed to update details");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update details");
+      }
       fetchAppointments();
       return "Appointment details updated successfully";
     };
@@ -331,7 +336,7 @@ export function Appointments() {
     showPromise(promise(), {
       loading: 'Updating appointment details...',
       success: (data) => data,
-      error: 'Failed to update appointment details',
+      error: (err) => err.message || 'Failed to update appointment details',
     });
   };
 

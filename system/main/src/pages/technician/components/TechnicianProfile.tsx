@@ -34,7 +34,7 @@ const SPECIALIZATIONS = [
 
 export function TechnicianProfile({
   technicianProfile,
-  setTechnicianProfile,
+  // setTechnicianProfile,
   updateProfile,
   handleDeleteAccount,
   renderStars

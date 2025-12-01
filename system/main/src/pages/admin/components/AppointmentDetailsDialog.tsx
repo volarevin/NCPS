@@ -5,16 +5,28 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, User, Phone, Mail, MapPin, Wrench, Star, AlertCircle, MessageSquare, Edit2, Save, X } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getProfilePictureUrl } from "@/lib/utils";
+import { 
+  Calendar, Clock, User, Phone, Mail, MapPin, Wrench, Star, 
+  AlertCircle, MessageSquare, Edit2, AlertTriangle, Check, X, 
+  Copy, ExternalLink
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Appointment {
   id: string;
   clientName: string;
   service: string;
+  serviceId?: string;
   date: string;
   time: string;
   status: "pending" | "upcoming" | "completed" | "cancelled" | "in-progress" | "confirmed" | "rejected";
@@ -23,7 +35,7 @@ interface Appointment {
   address: string;
   notes: string;
   technician?: string;
-  technicianId?: string; // Added for pre-selection
+  technicianId?: string;
   rating?: number;
   feedback?: string;
   cancellationReason?: string;
@@ -31,12 +43,23 @@ interface Appointment {
   rejectionReason?: string;
   cancelledByRole?: string;
   cancelledById?: string;
+  created_at?: string;
+  updated_at?: string;
+  customerAvatar?: string;
 }
 
 interface Technician {
   user_id: number;
   first_name: string;
   last_name: string;
+}
+
+interface ConflictDetails {
+  appointment_id: number;
+  service_name: string;
+  technician_name: string;
+  appointment_date: string;
+  duration_minutes: number;
 }
 
 interface AppointmentDetailsDialogProps {
@@ -47,7 +70,7 @@ interface AppointmentDetailsDialogProps {
   onApprove?: (id: string, technicianId: string, technicianName?: string) => void;
   onReject?: (id: string) => void;
   onCancel?: (id: string) => void;
-  onUpdateDetails?: (id: string, date: string, time: string, technicianId: string) => void;
+  onUpdateDetails?: (id: string, date: string, time: string, technicianId: string, overrideConflict?: boolean) => void;
 }
 
 export function AppointmentDetailsDialog({
@@ -65,21 +88,21 @@ export function AppointmentDetailsDialog({
   const [isEditing, setIsEditing] = useState(false);
   const [editDate, setEditDate] = useState("");
   const [editTime, setEditTime] = useState("");
+  
+  const [conflict, setConflict] = useState<ConflictDetails | null>(null);
+  const [overrideConflict, setOverrideConflict] = useState(false);
 
   useEffect(() => {
     if (open) {
       fetchTechnicians();
       if (appointment) {
-        // Reset state when dialog opens
         setSelectedTechnician(appointment.technicianId || "");
         
-        // Parse date properly
         const dateObj = new Date(appointment.date);
         if (!isNaN(dateObj.getTime())) {
             setEditDate(dateObj.toISOString().split('T')[0]);
         }
 
-        // Parse time properly (convert 12h to 24h for input)
         if (appointment.time) {
             const [timeStr, modifier] = appointment.time.split(' ');
             let [hours, minutes] = timeStr.split(':');
@@ -90,12 +113,57 @@ export function AppointmentDetailsDialog({
                 hours = (parseInt(hours, 10) + 12).toString();
             }
             setEditTime(`${hours.padStart(2, '0')}:${minutes}`);
+        } else {
+            setEditTime("");
         }
         
         setIsEditing(false);
+        setConflict(null);
+        setOverrideConflict(false);
       }
     }
   }, [open, appointment]);
+
+  useEffect(() => {
+    const check = async () => {
+      if (isEditing && selectedTechnician && editDate && editTime && appointment) {
+        try {
+          const token = sessionStorage.getItem('token');
+          let currentServiceId = appointment.serviceId;
+          
+          const response = await fetch('http://localhost:5000/api/admin/appointments/check-conflict', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              technicianId: selectedTechnician,
+              date: editDate,
+              time: editTime,
+              serviceId: currentServiceId,
+              appointmentId: appointment.id
+            })
+          });
+          
+          const data = await response.json();
+          if (data.conflict) {
+            setConflict(data.details);
+            setOverrideConflict(false);
+          } else {
+            setConflict(null);
+          }
+        } catch (error) {
+          console.error("Error checking conflict:", error);
+        }
+      } else {
+        setConflict(null);
+      }
+    };
+
+    const timeoutId = setTimeout(check, 500);
+    return () => clearTimeout(timeoutId);
+  }, [isEditing, selectedTechnician, editDate, editTime, appointment]);
 
   const fetchTechnicians = async () => {
     try {
@@ -106,338 +174,344 @@ export function AppointmentDetailsDialog({
       const data = await response.json();
       setTechnicians(data);
     } catch (error) {
-      console.error('Error fetching technicians:', error);
+      console.error("Error fetching technicians:", error);
     }
   };
 
-  if (!appointment) return null;
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`${label} copied to clipboard`);
+  };
 
-  const handleSaveChanges = async () => {
-    if (onUpdateDetails && appointment) {
-      await onUpdateDetails(appointment.id, editDate, editTime, selectedTechnician);
+  const handleSave = () => {
+    if (appointment && onUpdateDetails) {
+      if (conflict && !overrideConflict) {
+        toast.error("Please resolve the conflict or override it.");
+        return;
+      }
+      onUpdateDetails(appointment.id, editDate, editTime, selectedTechnician, overrideConflict);
       setIsEditing(false);
     }
   };
 
-  const handleApproveClick = () => {
-    if (onApprove && appointment) {
-        const tech = technicians.find(t => t.user_id.toString() === selectedTechnician);
-        const techName = tech ? `${tech.first_name} ${tech.last_name}` : undefined;
-        onApprove(appointment.id, selectedTechnician, techName);
-    }
+  const getStatusBadge = (status: string) => {
+    const styles: Record<string, string> = {
+      pending: "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800",
+      confirmed: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800",
+      "in-progress": "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800",
+      completed: "bg-green-500/15 text-green-600 dark:text-green-400 border-green-200 dark:border-green-800",
+      cancelled: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
+      rejected: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800",
+    };
+    return styles[status.toLowerCase()] || "bg-gray-500/15 text-gray-600 border-gray-200";
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-200 dark:border-yellow-800";
-      case "upcoming":
-      case "confirmed":
-        return "bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-800";
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-200 dark:border-green-800";
-      case "cancelled":
-      case "rejected":
-        return "bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-200 dark:border-red-800";
-      case "in-progress":
-        return "bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700";
-    }
-  };
+  if (!appointment) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto dark:bg-card dark:text-foreground dark:border-border">
-        <DialogHeader>
-          <div className="flex items-center justify-between pr-8">
-            <DialogTitle className="text-xl font-bold text-[#0B4F6C] dark:text-primary">
-              Appointment Details
-            </DialogTitle>
+      <DialogContent className="sm:max-w-7xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-background border-border shadow-2xl">
+        
+        {/* Header Section */}
+        <div className="p-6 border-b border-border bg-muted/10">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <div className="flex items-center gap-3 mb-2">
+                <Badge variant="outline" className={`${getStatusBadge(appointment.status)} capitalize px-3 py-1`}>
+                  {appointment.status}
+                </Badge>
+                <span className="text-xs text-muted-foreground font-mono">ID: #{appointment.id}</span>
+              </div>
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                {appointment.service}
+              </h2>
+            </div>
             <div className="flex items-center gap-2">
-              {(appointment.status === 'confirmed' || appointment.status === 'upcoming') && !isEditing && (
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
-                  <Edit2 className="w-4 h-4 mr-2" />
-                  Edit Details
+              {!isEditing && appointment.status !== 'cancelled' && appointment.status !== 'completed' && (
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="gap-2">
+                  <Edit2 className="w-4 h-4" /> Edit / Reschedule
                 </Button>
               )}
-              <Badge className={`${getStatusColor(appointment.status)} text-white`}>
-                {appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1)}
-              </Badge>
+              {isEditing && (
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
+                  <Button size="sm" onClick={handleSave} disabled={conflict && !overrideConflict}>Save Changes</Button>
+                </div>
+              )}
             </div>
           </div>
-        </DialogHeader>
+        </div>
 
-        <div className="grid gap-6 py-4">
-          {/* Client Info Section */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
-              <User className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
-              Client Information
-            </h3>
-            <div className="grid grid-cols-2 gap-4 pl-6">
-              <div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Name</p>
-                <p className="font-medium dark:text-foreground">{appointment.clientName}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Phone</p>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                  <p className="font-medium dark:text-foreground">{appointment.phone}</p>
-                </div>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Email</p>
-                <div className="flex items-center gap-2">
-                  <Mail className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                  <p className="font-medium dark:text-foreground">{appointment.email}</p>
-                </div>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Address</p>
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                  <p className="font-medium dark:text-foreground">{appointment.address}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-gray-100 dark:border-border" />
-
-          {/* Service Info Section */}
-          <div className="space-y-4">
-            <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
-              <Wrench className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
-              Service Details
-            </h3>
-            <div className="grid grid-cols-2 gap-4 pl-6">
-              <div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Service Type</p>
-                <p className="font-medium dark:text-foreground">{appointment.service}</p>
-              </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
+          
+          {/* Left Column: Main Details */}
+          <div className="lg:col-span-2 p-6 space-y-8 border-r border-border">
+            
+            {/* Date & Time Section */}
+            <section>
+              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                <Calendar className="w-4 h-4" /> Schedule
+              </h3>
               
-              {/* Technician Selection Logic */}
-              <div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Technician</p>
-                {isEditing || appointment.status === 'pending' ? (
-                  <Select 
-                    value={selectedTechnician} 
-                    onValueChange={setSelectedTechnician}
-                  >
-                    <SelectTrigger className="h-8 mt-1 dark:bg-muted/50 dark:border-border">
-                      <SelectValue placeholder="Assign Technician" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {technicians.map((tech) => (
-                        <SelectItem key={tech.user_id} value={tech.user_id.toString()}>
-                          {tech.first_name} {tech.last_name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <p className="font-medium text-[#0B4F6C] dark:text-primary">
-                    {appointment.technician || "Not Assigned"}
-                  </p>
-                )}
-              </div>
-
-              {/* Date & Time Logic */}
-              <div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Date</p>
-                {isEditing ? (
-                  <Input 
-                    type="date" 
-                    value={editDate} 
-                    onChange={(e) => setEditDate(e.target.value)}
-                    className="h-8 mt-1 dark:bg-muted/50 dark:border-border"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium dark:text-foreground">{appointment.date}</p>
+              {isEditing ? (
+                <div className="bg-muted/30 p-4 rounded-xl border border-border space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Date</label>
+                      <Input 
+                        type="date" 
+                        value={editDate} 
+                        onChange={(e) => setEditDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Time</label>
+                      <Input 
+                        type="time" 
+                        value={editTime} 
+                        onChange={(e) => setEditTime(e.target.value)}
+                      />
+                    </div>
                   </div>
-                )}
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Time</p>
-                {isEditing ? (
-                  <Input 
-                    type="time" 
-                    value={editTime} 
-                    onChange={(e) => setEditTime(e.target.value)}
-                    className="h-8 mt-1 dark:bg-muted/50 dark:border-border"
-                  />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-3 h-3 text-gray-400 dark:text-muted-foreground" />
-                    <p className="font-medium dark:text-foreground">{appointment.time}</p>
-                  </div>
-                )}
-              </div>
-              
-              <div className="col-span-2">
-                <p className="text-sm text-gray-500 dark:text-muted-foreground">Notes</p>
-                <p className="font-medium text-gray-700 dark:text-foreground bg-gray-50 dark:bg-muted/50 p-3 rounded-lg mt-1">
-                  {appointment.notes}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Completed Appointment Details */}
-          {appointment.status === 'completed' && (appointment.rating || appointment.feedback) && (
-            <>
-              <div className="border-t border-gray-100 dark:border-border" />
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900 dark:text-foreground flex items-center gap-2">
-                  <Star className="w-4 h-4 text-[#0B4F6C] dark:text-primary" />
-                  Feedback & Rating
-                </h3>
-                <div className="pl-6 space-y-3">
-                  {appointment.rating && (
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Rating</p>
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <Star
-                            key={star}
-                            className={`w-4 h-4 ${
-                              star <= appointment.rating!
-                                ? "fill-yellow-400 text-yellow-400"
-                                : "text-gray-300 dark:text-muted"
-                            }`}
-                          />
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Technician</label>
+                    <Select value={selectedTechnician} onValueChange={setSelectedTechnician}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select technician" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">Unassigned</SelectItem>
+                        {technicians.map((tech) => (
+                          <SelectItem key={tech.user_id} value={tech.user_id.toString()}>
+                            {tech.first_name} {tech.last_name}
+                          </SelectItem>
                         ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {conflict && (
+                    <Alert variant="destructive" className="bg-red-500/10 border-red-500/20 text-red-600 dark:text-red-400">
+                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTitle>Scheduling Conflict</AlertTitle>
+                      <AlertDescription>
+                        Technician is busy with <strong>{conflict.service_name}</strong> from {new Date(conflict.appointment_date).toLocaleTimeString()} for {conflict.duration_minutes} mins.
+                      </AlertDescription>
+                      <div className="mt-2 flex items-center gap-2">
+                        <Checkbox 
+                          id="override" 
+                          checked={overrideConflict} 
+                          onCheckedChange={(c) => setOverrideConflict(c as boolean)} 
+                        />
+                        <label htmlFor="override" className="text-sm font-medium cursor-pointer">Override conflict</label>
                       </div>
-                    </div>
+                    </Alert>
                   )}
-                  {appointment.feedback && (
+                </div>
+              ) : (
+                <div className="flex flex-wrap gap-4">
+                  <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border shadow-sm min-w-[200px]">
+                    <div className="p-2 bg-primary/10 rounded-full text-primary">
+                      <Calendar className="w-5 h-5" />
+                    </div>
                     <div>
-                      <p className="text-sm text-gray-500 dark:text-muted-foreground mb-1">Customer Feedback</p>
-                      <div className="flex gap-2 items-start bg-gray-50 dark:bg-muted/50 p-3 rounded-lg">
-                        <MessageSquare className="w-4 h-4 text-gray-400 dark:text-muted-foreground mt-0.5 shrink-0" />
-                        <p className="text-gray-700 dark:text-foreground italic text-sm">"{appointment.feedback}"</p>
+                      <p className="text-xs text-muted-foreground">Date</p>
+                      <p className="font-medium">{new Date(appointment.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border shadow-sm min-w-[200px]">
+                    <div className="p-2 bg-primary/10 rounded-full text-primary">
+                      <Clock className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Time</p>
+                      <p className="font-medium">{appointment.time}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            <Separator />
+
+            {/* Customer & Location */}
+            <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <User className="w-4 h-4" /> Customer
+                </h3>
+                <Card className="border-border shadow-sm">
+                  <CardContent className="p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10 border border-border">
+                        <AvatarImage src={appointment.customerAvatar} alt={appointment.clientName} className="object-cover" />
+                        <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-bold">
+                          {appointment.clientName.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold">{appointment.clientName}</p>
+                        <p className="text-xs text-muted-foreground">Customer</p>
                       </div>
                     </div>
-                  )}
-                </div>
+                    <div className="space-y-2 pt-2">
+                      <div className="flex items-center justify-between text-sm group">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Phone className="w-3 h-3" /> {appointment.phone}
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100" onClick={() => handleCopy(appointment.phone, "Phone")}>
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between text-sm group">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Mail className="w-3 h-3" /> {appointment.email}
+                        </div>
+                        <Button variant="ghost" size="icon" className="h-6 w-6 opacity-0 group-hover:opacity-100" onClick={() => handleCopy(appointment.email, "Email")}>
+                          <Copy className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
-            </>
-          )}
 
-          {/* Cancelled/Rejected Details */}
-          {(appointment.status === 'cancelled' || appointment.status === 'rejected') && (
-            <>
-              <div className="border-t border-gray-100 dark:border-border" />
-              <div className="space-y-4">
-                <h3 className="font-semibold text-red-600 dark:text-red-400 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" />
-                  {appointment.status === 'cancelled' ? 'Cancellation' : 'Rejection'} Details
+              <div>
+                <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                  <MapPin className="w-4 h-4" /> Location
                 </h3>
-                <div className="grid grid-cols-2 gap-4 pl-6">
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Category</p>
-                    <Badge variant="outline" className="mt-1 border-red-200 dark:border-red-900 text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-900/20">
-                      {appointment.cancellationCategory || 'N/A'}
-                    </Badge>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-500 dark:text-muted-foreground">Reason</p>
-                    <p className="font-medium text-gray-700 dark:text-foreground bg-red-50 dark:bg-red-900/10 p-3 rounded-lg mt-1 border border-red-100 dark:border-red-900/30">
-                      {appointment.status === 'cancelled' ? appointment.cancellationReason : appointment.rejectionReason || 'No reason provided'}
-                    </p>
-                  </div>
-                  <div className="col-span-2">
-                    <p className="text-sm text-gray-500 dark:text-muted-foreground">
-                      {appointment.status === 'cancelled' ? 'Cancelled By' : 'Rejected By'}
-                    </p>
-                    <p className="font-medium text-gray-700 dark:text-foreground">
-                      {appointment.cancelledByRole ? (
-                        <span className="capitalize">
-                          {appointment.cancelledByRole} 
-                          {(appointment.cancelledByRole === 'Admin' || appointment.cancelledByRole === 'Receptionist') && appointment.cancelledById && (
-                            <span className="text-gray-400 dark:text-muted-foreground text-xs ml-2">(ID: {appointment.cancelledById})</span>
-                          )}
-                        </span>
-                      ) : 'N/A'}
-                    </p>
-                  </div>
+                <Card className="border-border shadow-sm h-full">
+                  <CardContent className="p-4">
+                    <p className="text-sm leading-relaxed">{appointment.address}</p>
+                    <Button variant="link" className="px-0 text-xs mt-2 h-auto" onClick={() => window.open(`https://maps.google.com/?q=${encodeURIComponent(appointment.address)}`, '_blank')}>
+                      View on Map <ExternalLink className="w-3 h-3 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+
+            <Separator />
+
+            {/* Notes */}
+            <section>
+              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Notes
+              </h3>
+              <div className="bg-muted/30 p-4 rounded-xl border border-border text-sm leading-relaxed whitespace-pre-wrap">
+                {appointment.notes || "No notes provided."}
+              </div>
+            </section>
+
+          </div>
+
+          {/* Right Column: Status & Actions */}
+          <div className="bg-muted/5 p-6 space-y-6">
+            
+            {/* Technician Assignment */}
+            <section>
+              <h3 className="text-sm font-medium text-muted-foreground mb-4 uppercase tracking-wider flex items-center gap-2">
+                <Wrench className="w-4 h-4" /> Technician
+              </h3>
+              <Card className="border-border shadow-sm">
+                <CardContent className="p-4">
+                  {appointment.status === 'pending' ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-500 mb-2">
+                        <AlertCircle className="w-5 h-5" />
+                        <span className="font-medium">Assign Technician</span>
+                      </div>
+                      <Select 
+                        value={selectedTechnician} 
+                        onValueChange={(value) => {
+                          setSelectedTechnician(value);
+                          // Trigger conflict check if needed, though useEffect handles it if isEditing is true.
+                          // Since we are not in isEditing mode here, we might want to manually trigger check or just let the user approve.
+                          // For now, we just set the state so Approve button can use it.
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select a technician" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unassigned">Unassigned</SelectItem>
+                          {technicians.map((tech) => (
+                            <SelectItem key={tech.user_id} value={tech.user_id.toString()}>
+                              {tech.first_name} {tech.last_name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : appointment.technician ? (
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                        <Wrench className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{appointment.technician}</p>
+                        <p className="text-xs text-muted-foreground">Assigned Technician</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-yellow-600 dark:text-yellow-500">
+                      <AlertCircle className="w-5 h-5" />
+                      <span className="font-medium">Unassigned</span>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* Actions */}
+            <section className="space-y-3">
+              <h3 className="text-sm font-medium text-muted-foreground mb-2 uppercase tracking-wider">Actions</h3>
+              
+              {appointment.status === 'pending' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <Button 
+                    className="w-full bg-green-600 hover:bg-green-700 text-white" 
+                    onClick={() => onApprove?.(appointment.id, selectedTechnician || appointment.technicianId || "")}
+                  >
+                    <Check className="w-4 h-4 mr-2" /> Approve
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    className="w-full"
+                    onClick={() => onReject?.(appointment.id)}
+                  >
+                    <X className="w-4 h-4 mr-2" /> Reject
+                  </Button>
+                </div>
+              )}
+
+              {appointment.status !== 'cancelled' && appointment.status !== 'completed' && appointment.status !== 'rejected' && (
+                <Button 
+                  variant="outline" 
+                  className="w-full border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/30 dark:hover:bg-red-900/20"
+                  onClick={() => onCancel?.(appointment.id)}
+                >
+                  <AlertCircle className="w-4 h-4 mr-2" /> Cancel Appointment
+                </Button>
+              )}
+            </section>
+
+            {/* Metadata */}
+            <section className="pt-6 border-t border-border">
+              <div className="space-y-2 text-xs text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Created</span>
+                  <span>{appointment.created_at ? new Date(appointment.created_at).toLocaleDateString() : 'N/A'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Last Updated</span>
+                  <span>{appointment.updated_at ? new Date(appointment.updated_at).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
-            </>
-          )}
+            </section>
 
-          {/* Actions */}
-          <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-gray-100 dark:border-border">
-            {isEditing ? (
-              <>
-                <Button variant="outline" onClick={() => setIsEditing(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
-                  Cancel Edit
-                </Button>
-                <Button 
-                  className="bg-[#0B4F6C] hover:bg-[#012A4A] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
-                  onClick={handleSaveChanges}
-                >
-                  Save Changes
-                </Button>
-              </>
-            ) : (
-              <>
-                {appointment.status === 'pending' && (
-                  <>
-                    <Button 
-                      variant="destructive" 
-                      onClick={() => onReject?.(appointment.id)}
-                    >
-                      Reject
-                    </Button>
-                    <Button 
-                      className="bg-[#0B4F6C] hover:bg-[#012A4A] dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90"
-                      onClick={handleApproveClick}
-                      disabled={!selectedTechnician}
-                    >
-                      Approve
-                    </Button>
-                  </>
-                )}
-
-                {(appointment.status === 'confirmed' || appointment.status === 'upcoming') && (
-                  <>
-                    <Button 
-                      variant="destructive" 
-                      onClick={() => onCancel?.(appointment.id)}
-                    >
-                      Cancel Appointment
-                    </Button>
-                    <Button 
-                      variant="outline"
-                      onClick={() => setIsEditing(true)}
-                      className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80"
-                    >
-                      Edit Details
-                    </Button>
-                  </>
-                )}
-
-                {appointment.status === 'in-progress' && (
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 dark:text-white"
-                    onClick={() => onUpdateStatus?.(appointment.id, 'completed')}
-                  >
-                    Mark as Completed
-                  </Button>
-                )}
-                
-                {(appointment.status === 'completed' || appointment.status === 'cancelled' || appointment.status === 'rejected') && (
-                  <Button variant="outline" onClick={() => onOpenChange(false)} className="dark:bg-muted dark:text-foreground dark:hover:bg-muted/80">
-                    Close
-                  </Button>
-                )}
-              </>
-            )}
           </div>
         </div>
       </DialogContent>

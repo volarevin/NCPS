@@ -7,19 +7,19 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Trash2, RefreshCw, AlertTriangle, X } from "lucide-react";
+import { Trash2, RefreshCw, X } from "lucide-react";
 import { useFeedback } from "@/context/FeedbackContext";
 
-interface DeletedAppointment {
-  appointment_id: number;
-  customer_first: string;
-  customer_last: string;
-  service_name: string;
-  appointment_date: string;
-  deletion_marked_at: string;
-  marked_by_first: string;
-  marked_by_last: string;
-}
+// interface DeletedAppointment {
+//   appointment_id: number;
+//   customer_first: string;
+//   customer_last: string;
+//   service_name: string;
+//   appointment_date: string;
+//   deletion_marked_at: string;
+//   marked_by_first: string;
+//   marked_by_last: string;
+// }
 
 interface RecycleBinDialogProps {
   open: boolean;

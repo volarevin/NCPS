@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShieldAlert, Ban, Save, X } from "lucide-react";
+import { ShieldAlert, Ban, Save } from "lucide-react";
 import { useState, useEffect } from "react";
 import { SPECIALTIES } from "./AddTechnicianDialog";
 

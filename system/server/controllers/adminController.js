@@ -1,4 +1,34 @@
 const db = require('../config/db');
+const checkTechnicianConflict = require('../utils/conflictChecker');
+
+exports.checkConflict = async (req, res) => {
+  const { technicianId, date, time, serviceId, appointmentId } = req.body;
+
+  if (!technicianId || !date || !time || !serviceId) {
+    return res.status(400).json({ message: 'Missing required fields for conflict check.' });
+  }
+
+  try {
+    // Get service duration
+    const serviceQuery = 'SELECT duration_minutes FROM services WHERE service_id = ?';
+    db.query(serviceQuery, [serviceId], async (err, results) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (results.length === 0) return res.status(404).json({ message: 'Service not found.' });
+
+      const duration = results[0].duration_minutes || 60;
+      const appointmentDate = `${date} ${time}`;
+
+      try {
+        const conflict = await checkTechnicianConflict(technicianId, appointmentDate, duration, appointmentId);
+        res.json({ conflict: !!conflict, details: conflict ? conflict.details : null });
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 exports.getDashboardStats = (req, res) => {
   const query = 'CALL sp_get_admin_dashboard_stats()';
@@ -543,58 +573,124 @@ exports.getAppointmentDetails = (req, res) => {
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status, reason, category, technicianId } = req.body;
-  const userId = req.userId || req.body.userId; // Use authenticated user ID
+  const { status, reason, category, technicianId, overrideConflict } = req.body;
+  const userId = req.userId || req.body.userId;
 
   console.log(`Updating appointment ${id} status to ${status}. TechnicianId: ${technicianId}`);
 
-  let query = 'UPDATE appointments SET status = ?';
-  let params = [status];
+  const proceed = () => {
+      let query = 'UPDATE appointments SET status = ?';
+      let params = [status];
 
-  // Always update technician if provided
-  if (technicianId) {
-      query += ', technician_id = ?';
-      params.push(technicianId);
+      if (technicianId) {
+          query += ', technician_id = ?';
+          params.push(technicianId);
+      }
+
+      if (status === 'Cancelled') {
+        query += ', cancellation_reason = ?, cancellation_category = ?, cancelled_by = ?';
+        params.push(reason, category, userId);
+      } else if (status === 'Rejected') {
+          query += ', rejection_reason = ?, cancellation_category = ?, cancelled_by = ?';
+          params.push(reason, category, userId);
+      }
+
+      query += ' WHERE appointment_id = ?';
+      params.push(id);
+
+      db.query(query, params, (err, result) => {
+        if (err) {
+            console.error("Error updating appointment status:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        
+        // Log activity
+        const action = `Appointment ${status}`;
+        const desc = `Appointment #${id} was ${status.toLowerCase()}${category ? ` Category: ${category}` : ''}${reason ? ` Reason: ${reason}` : ''}`;
+        db.query('INSERT INTO activity_logs (user_id, action_type, description) VALUES (?, ?, ?)', 
+          [userId, action, desc]);
+
+        res.json({ message: 'Appointment updated successfully' });
+      });
+  };
+
+  if (technicianId && !overrideConflict) {
+      const detailsQuery = `
+        SELECT a.appointment_date, s.duration_minutes 
+        FROM appointments a
+        JOIN services s ON a.service_id = s.service_id
+        WHERE a.appointment_id = ?
+      `;
+      db.query(detailsQuery, [id], async (err, results) => {
+          if (err) return res.status(500).json({ error: err.message });
+          if (results.length === 0) return res.status(404).json({ message: 'Appointment not found' });
+          
+          const { appointment_date, duration_minutes } = results[0];
+          try {
+              const conflict = await checkTechnicianConflict(technicianId, appointment_date, duration_minutes, id);
+              if (conflict) {
+                  return res.status(409).json({ 
+                      message: 'Technician has a scheduling conflict.', 
+                      conflict: conflict 
+                  });
+              }
+              proceed();
+          } catch (error) {
+              return res.status(500).json({ error: error.message });
+          }
+      });
+  } else {
+      proceed();
   }
-
-  if (status === 'Cancelled') {
-    query += ', cancellation_reason = ?, cancellation_category = ?, cancelled_by = ?';
-    params.push(reason, category, userId);
-  } else if (status === 'Rejected') {
-      query += ', rejection_reason = ?, cancellation_category = ?, cancelled_by = ?';
-      params.push(reason, category, userId);
-  }
-
-  query += ' WHERE appointment_id = ?';
-  params.push(id);
-
-  db.query(query, params, (err, result) => {
-    if (err) {
-        console.error("Error updating appointment status:", err);
-        return res.status(500).json({ error: err.message });
-    }
-    
-    // Log activity
-    const action = `Appointment ${status}`;
-    const desc = `Appointment #${id} was ${status.toLowerCase()}${category ? ` Category: ${category}` : ''}${reason ? ` Reason: ${reason}` : ''}`;
-    db.query('INSERT INTO activity_logs (user_id, action_type, description) VALUES (?, ?, ?)', 
-      [userId, action, desc]);
-
-    res.json({ message: 'Appointment updated successfully' });
-  });
 };
 
 exports.updateAppointmentDetails = (req, res) => {
   const { id } = req.params;
-  const { date, time, technicianId } = req.body;
+  const { date, time, technicianId, overrideConflict } = req.body;
   
   const appointmentDate = `${date} ${time}`;
-  const query = 'UPDATE appointments SET appointment_date = ?, technician_id = ? WHERE appointment_id = ?';
-  
-  db.query(query, [appointmentDate, technicianId || null, id], (err, result) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ message: 'Appointment details updated successfully' });
-  });
+
+  const proceedWithUpdate = () => {
+      const query = 'UPDATE appointments SET appointment_date = ?, technician_id = ? WHERE appointment_id = ?';
+      
+      db.query(query, [appointmentDate, technicianId || null, id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json({ message: 'Appointment details updated successfully' });
+      });
+  };
+
+  if (technicianId && !overrideConflict) {
+      // Need to get service_id for this appointment to check duration
+      const apptQuery = 'SELECT service_id FROM appointments WHERE appointment_id = ?';
+      db.query(apptQuery, [id], (err, apptResults) => {
+          if (err) return res.status(500).json({ error: err.message });
+          if (apptResults.length === 0) return res.status(404).json({ message: 'Appointment not found' });
+
+          const serviceId = apptResults[0].service_id;
+          const serviceQuery = 'SELECT duration_minutes FROM services WHERE service_id = ?';
+          
+          db.query(serviceQuery, [serviceId], async (err, serviceResults) => {
+              if (err) return res.status(500).json({ error: err.message });
+              
+              const duration = (serviceResults.length > 0) ? serviceResults[0].duration_minutes : 60;
+              
+              try {
+                  const conflict = await checkTechnicianConflict(technicianId, appointmentDate, duration, id);
+                  if (conflict) {
+                      return res.status(409).json({ 
+                          message: 'Technician has a scheduling conflict.', 
+                          conflict: conflict 
+                      });
+                  }
+                  proceedWithUpdate();
+              } catch (error) {
+                  return res.status(500).json({ error: error.message });
+              }
+          });
+      });
+  } else {
+      proceedWithUpdate();
+  }
 };
 
 exports.deleteAppointment = (req, res) => {
@@ -635,31 +731,58 @@ exports.emptyRecycleBin = (req, res) => {
 };
 
 exports.createAppointment = (req, res) => {
-    const { customer_id, service_id, technician_id, appointment_date, notes, address } = req.body;
+    const { customer_id, service_id, technician_id, appointment_date, notes, address, overrideConflict } = req.body;
     // Basic validation
     if (!customer_id || !service_id || !appointment_date) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
-    const query = 'INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, status, customer_notes, service_address, created_at) VALUES (?, ?, ?, ?, "Pending", ?, ?, NOW())';
-    
-    db.query(query, [customer_id, service_id, technician_id || null, appointment_date, notes, address], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ message: 'Database error creating appointment.' });
-        }
+    // Check for conflicts if technician is assigned
+    const proceedWithCreation = () => {
+        const query = 'INSERT INTO appointments (customer_id, service_id, technician_id, appointment_date, status, customer_notes, service_address, created_at) VALUES (?, ?, ?, ?, "Pending", ?, ?, NOW())';
         
-        // Log activity
-        const userId = req.userId || null;
-        const action = 'Create Appointment';
-        const desc = `Created appointment #${result.insertId}`;
-        if (userId) {
-             db.query('INSERT INTO activity_logs (user_id, action_type, description) VALUES (?, ?, ?)', 
-                  [userId, action, desc]);
-        }
+        db.query(query, [customer_id, service_id, technician_id || null, appointment_date, notes, address], (err, result) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ message: 'Database error creating appointment.' });
+            }
+            
+            // Log activity
+            const userId = req.userId || null;
+            const action = 'Create Appointment';
+            const desc = `Created appointment #${result.insertId}`;
+            if (userId) {
+                 db.query('INSERT INTO activity_logs (user_id, action_type, description) VALUES (?, ?, ?)', 
+                      [userId, action, desc]);
+            }
+    
+            res.json({ message: 'Appointment created successfully', id: result.insertId });
+        });
+    };
 
-        res.json({ message: 'Appointment created successfully', id: result.insertId });
-    });
+    if (technician_id && !overrideConflict) {
+        const serviceQuery = 'SELECT duration_minutes FROM services WHERE service_id = ?';
+        db.query(serviceQuery, [service_id], async (err, results) => {
+            if (err) return res.status(500).json({ error: err.message });
+            
+            const duration = (results.length > 0) ? results[0].duration_minutes : 60;
+            
+            try {
+                const conflict = await checkTechnicianConflict(technician_id, appointment_date, duration);
+                if (conflict) {
+                    return res.status(409).json({ 
+                        message: 'Technician has a scheduling conflict.', 
+                        conflict: conflict 
+                    });
+                }
+                proceedWithCreation();
+            } catch (error) {
+                return res.status(500).json({ error: error.message });
+            }
+        });
+    } else {
+        proceedWithCreation();
+    }
 };
 
 exports.getRecycleBinCount = (req, res) => {

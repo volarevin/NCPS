@@ -11,6 +11,7 @@ router.use(auditMiddleware);
 
 router.get('/dashboard-stats', receptionistController.getDashboardStats);
 router.get('/appointments', receptionistController.getAllAppointments);
+router.post('/appointments/check-conflict', receptionistController.checkConflict);
 router.post('/appointments', receptionistController.createAppointment);
 router.put('/appointments/:id/status', receptionistController.updateAppointmentStatus);
 router.put('/appointments/:id/details', receptionistController.updateAppointmentDetails);

@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Appointment } from "./AppointmentSchedule";
 
@@ -40,7 +40,7 @@ export function ReceptionistCalendar({ appointments, onAppointmentClick }: Recep
 
   const getAppointmentsForDate = (date: Date) => {
     return appointments.filter(apt => {
-        const aptDate = new Date(apt.date); // Assuming apt.date is a string or Date object that can be parsed
+        // const aptDate = new Date(apt.date); // Assuming apt.date is a string or Date object that can be parsed
         // If apt.date is a formatted string like "October 10, 2023", new Date() handles it.
         // If it's ISO, it also works.
         // Let's be safe and try to use rawDate if available, or parse the date string.

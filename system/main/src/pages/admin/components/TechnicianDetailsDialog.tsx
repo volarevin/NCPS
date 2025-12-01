@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User, Phone, Mail, Star, ExternalLink, Calendar, MapPin, Clock } from "lucide-react";
+import { User, Phone, Mail, Star, ExternalLink, Calendar, MapPin } from "lucide-react";
 import { SPECIALTIES } from "./AddTechnicianDialog";
 
 interface Review {

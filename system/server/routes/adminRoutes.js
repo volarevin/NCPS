@@ -44,6 +44,7 @@ router.delete('/appointments/recycle-bin', adminController.emptyRecycleBin);
 router.get('/appointments/marked-deletion', adminController.getMarkedForDeletion);
 router.post('/appointments/bulk-delete', adminController.bulkDeleteAppointments); // Add this line
 
+router.post('/appointments/check-conflict', adminController.checkConflict);
 router.get('/appointments/:id', adminController.getAppointmentDetails); // Add this line
 router.put('/appointments/:id/status', adminController.updateAppointmentStatus);
 router.put('/appointments/:id/details', adminController.updateAppointmentDetails);

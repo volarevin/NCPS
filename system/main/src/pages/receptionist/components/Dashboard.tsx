@@ -7,7 +7,7 @@ import {
   Calendar, 
   Clock, 
   CheckCircle, 
-  Users,
+  // Users,
   Activity,
   TrendingUp,
   Check,
@@ -47,7 +47,7 @@ interface DashboardProps {
   onAppointmentClick?: (appointment: Appointment) => void;
 }
 
-export function Dashboard({ onAppointmentClick: propOnAppointmentClick }: DashboardProps) {
+export function Dashboard({ onAppointmentClick: _propOnAppointmentClick }: DashboardProps) {
   const { showPromise } = useFeedback();
   const navigate = useNavigate();
   const [stats, setStats] = useState({

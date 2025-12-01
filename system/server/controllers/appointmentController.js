@@ -1,5 +1,6 @@
 const db = require('../config/db');
 const bcrypt = require('bcryptjs');
+const { checkTechnicianConflict } = require('../utils/conflictChecker');
 
 exports.createAppointment = (req, res) => {
   const { serviceId, date, time, notes, address, saveAddress } = req.body;
@@ -39,72 +40,104 @@ exports.createAppointment = (req, res) => {
 
 exports.updateAppointmentStatus = (req, res) => {
   const { id } = req.params;
-  const { status, reason, category, technicianId } = req.body;
+  const { status, reason, category, technicianId, overrideConflict } = req.body;
   const validStatuses = ['Pending', 'Confirmed', 'In Progress', 'Completed', 'Cancelled', 'Rejected'];
 
   if (!validStatuses.includes(status)) {
     return res.status(400).json({ message: 'Invalid status.' });
   }
 
-  let query = 'UPDATE appointments SET status = ?';
-  const params = [status];
+  const proceedWithUpdate = () => {
+    let query = 'UPDATE appointments SET status = ?';
+    const params = [status];
 
-  if (technicianId) {
-    query += ', technician_id = ?';
-    params.push(technicianId);
+    if (technicianId) {
+      query += ', technician_id = ?';
+      params.push(technicianId);
+    }
+
+    if (status === 'Cancelled' || status === 'Rejected') {
+      if (reason) {
+        query += ', cancellation_reason = ?';
+        params.push(reason);
+      }
+      if (category) {
+        query += ', cancellation_category = ?';
+        params.push(category);
+      }
+      // Also track who cancelled it if we have user info in request (from middleware)
+      if (req.userId) {
+          query += ', cancelled_by = ?';
+          params.push(req.userId);
+      }
+    }
+
+    query += ' WHERE appointment_id = ?';
+    params.push(id);
+
+    (req.db || db).query(query, params, (err, result) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ message: 'Database error updating appointment.' });
+      }
+
+      // If status is Completed, notify the technician (confirmation)
+      if (status === 'Completed') {
+          // We need to fetch appointment details to get technician_id and service name
+          const detailsQuery = `
+              SELECT a.technician_id, s.name as service_name, u.first_name, u.last_name 
+              FROM appointments a 
+              JOIN services s ON a.service_id = s.service_id 
+              JOIN users u ON a.customer_id = u.user_id
+              WHERE a.appointment_id = ?
+          `;
+          (req.db || db).query(detailsQuery, [id], (detErr, detResults) => {
+              if (!detErr && detResults.length > 0) {
+                  const appt = detResults[0];
+                  if (appt.technician_id) {
+                      const notifQuery = 'INSERT INTO notifications (user_id, title, message, related_appointment_id) VALUES (?, ?, ?, ?)';
+                      const message = `You marked "${appt.service_name}" for ${appt.first_name} ${appt.last_name} as completed.`;
+                      (req.db || db).query(notifQuery, [appt.technician_id, 'Job Completed', message, id], (notifErr) => {
+                          if (notifErr) console.error('Error creating completion notification:', notifErr);
+                      });
+                  }
+              }
+          });
+      }
+
+      res.json({ message: 'Appointment status updated.' });
+    });
+  };
+
+  if (technicianId && !overrideConflict) {
+    const detailsQuery = `
+      SELECT a.appointment_date, s.duration_minutes 
+      FROM appointments a
+      JOIN services s ON a.service_id = s.service_id
+      WHERE a.appointment_id = ?
+    `;
+    (req.db || db).query(detailsQuery, [id], async (err, results) => {
+      if (err) return res.status(500).json({ message: 'Database error fetching details.' });
+      if (results.length === 0) return res.status(404).json({ message: 'Appointment not found.' });
+
+      const { appointment_date, duration_minutes } = results[0];
+      try {
+        const conflict = await checkTechnicianConflict(technicianId, appointment_date, duration_minutes, id);
+        if (conflict) {
+          return res.status(409).json({
+            message: 'Technician has a scheduling conflict.',
+            conflict: conflict
+          });
+        }
+        proceedWithUpdate();
+      } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Error checking conflicts.' });
+      }
+    });
+  } else {
+    proceedWithUpdate();
   }
-
-  if (status === 'Cancelled' || status === 'Rejected') {
-    if (reason) {
-      query += ', cancellation_reason = ?';
-      params.push(reason);
-    }
-    if (category) {
-      query += ', cancellation_category = ?';
-      params.push(category);
-    }
-    // Also track who cancelled it if we have user info in request (from middleware)
-    if (req.userId) {
-        query += ', cancelled_by = ?';
-        params.push(req.userId);
-    }
-  }
-
-  query += ' WHERE appointment_id = ?';
-  params.push(id);
-
-  (req.db || db).query(query, params, (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ message: 'Database error updating appointment.' });
-    }
-
-    // If status is Completed, notify the technician (confirmation)
-    if (status === 'Completed') {
-        // We need to fetch appointment details to get technician_id and service name
-        const detailsQuery = `
-            SELECT a.technician_id, s.name as service_name, u.first_name, u.last_name 
-            FROM appointments a 
-            JOIN services s ON a.service_id = s.service_id 
-            JOIN users u ON a.customer_id = u.user_id
-            WHERE a.appointment_id = ?
-        `;
-        (req.db || db).query(detailsQuery, [id], (detErr, detResults) => {
-            if (!detErr && detResults.length > 0) {
-                const appt = detResults[0];
-                if (appt.technician_id) {
-                    const notifQuery = 'INSERT INTO notifications (user_id, title, message, related_appointment_id) VALUES (?, ?, ?, ?)';
-                    const message = `You marked "${appt.service_name}" for ${appt.first_name} ${appt.last_name} as completed.`;
-                    (req.db || db).query(notifQuery, [appt.technician_id, 'Job Completed', message, id], (notifErr) => {
-                        if (notifErr) console.error('Error creating completion notification:', notifErr);
-                    });
-                }
-            }
-        });
-    }
-
-    res.json({ message: 'Appointment status updated.' });
-  });
 };
 
 exports.updateAppointment = (req, res) => {
@@ -244,7 +277,8 @@ exports.createWalkInAppointment = async (req, res) => {
     date, 
     time, 
     address, 
-    notes 
+    notes,
+    overrideConflict
   } = req.body;
 
   if (!serviceId || !date || !time || !address) {
@@ -253,6 +287,35 @@ exports.createWalkInAppointment = async (req, res) => {
 
   const appointmentDate = `${date} ${time}:00`;
   const connection = req.db || db;
+
+  // Check conflict before transaction
+  if (technicianId && technicianId !== 'unassigned' && !overrideConflict) {
+      try {
+          const simpleQuery = (sql, args) => {
+              return new Promise((resolve, reject) => {
+                  (req.db || db).query(sql, args, (err, rows) => {
+                      if (err) return reject(err);
+                      resolve(rows);
+                  });
+              });
+          };
+          
+          const serviceRows = await simpleQuery('SELECT duration_minutes FROM services WHERE service_id = ?', [serviceId]);
+          if (serviceRows.length > 0) {
+              const duration = serviceRows[0].duration_minutes;
+              const conflict = await checkTechnicianConflict(technicianId, appointmentDate, duration);
+              if (conflict) {
+                  return res.status(409).json({
+                      message: 'Technician has a scheduling conflict.',
+                      conflict: conflict
+                  });
+              }
+          }
+      } catch (err) {
+          console.error('Conflict check error:', err);
+          return res.status(500).json({ message: 'Error checking conflicts.' });
+      }
+  }
 
   const runTransaction = async () => {
     const query = (sql, args) => {
