@@ -22,6 +22,8 @@ router.get('/users/:userId/logs', adminController.getUserActivityLogs);
 router.post('/users', adminController.createUser);
 router.put('/users/:id', adminController.updateUser);
 router.delete('/users/:id', adminController.deleteUser);
+router.delete('/users/:id/notifications', adminController.clearUserNotifications);
+router.delete('/notifications', adminController.clearAllSystemNotifications);
 
 router.get('/reports', adminController.getReportsData);
 

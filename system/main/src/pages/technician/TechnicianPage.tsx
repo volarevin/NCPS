@@ -80,6 +80,33 @@ export default function TechnicianPage() {
     }
   };
 
+  const handleDeleteNotification = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    try {
+        const token = sessionStorage.getItem('token');
+        await fetch(`http://localhost:5000/api/technician/notifications/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setNotifications(prev => prev.filter(n => n.id !== id));
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+    }
+  };
+
+  const handleClearAllNotifications = async () => {
+    try {
+        const token = sessionStorage.getItem('token');
+        await fetch('http://localhost:5000/api/technician/notifications', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setNotifications([]);
+    } catch (error) {
+        console.error('Error clearing notifications:', error);
+    }
+  };
+
   const fetchJobs = async () => {
     try {
       const token = sessionStorage.getItem('token');
@@ -372,6 +399,8 @@ export default function TechnicianPage() {
             setSelectedAppointment={setSelectedAppointment}
             setActiveTab={setActiveTab}
             getStatusBadge={getStatusBadge}
+            onDeleteNotification={handleDeleteNotification}
+            onClearAllNotifications={handleClearAllNotifications}
           />
         );
       case "appointments":

@@ -14,5 +14,7 @@ router.get('/profile', technicianController.getProfile);
 router.put('/profile', technicianController.updateProfile);
 router.put('/availability', technicianController.updateAvailability);
 router.get('/notifications', technicianController.getNotifications);
+router.delete('/notifications/:id', technicianController.deleteNotification);
+router.delete('/notifications', technicianController.clearAllNotifications);
 
 module.exports = router;

@@ -1,17 +1,21 @@
-import { Bell, CheckCircle2, XCircle, AlertCircle, CheckCheck, Calendar } from 'lucide-react';
+import { Bell, CheckCircle2, XCircle, AlertCircle, CheckCheck, Calendar, X } from 'lucide-react';
 
 interface NotificationCardProps {
   notification: {
+    notification_id?: number;
+    id?: string | number;
     title: string;
     message: string;
-    created_at: string;
-    is_read: number;
+    created_at?: string;
+    time?: string;
+    is_read?: number;
     service_name?: string;
   };
   onClick?: () => void;
+  onDelete?: (e: React.MouseEvent) => void;
 }
 
-export function NotificationCard({ notification, onClick }: NotificationCardProps) {
+export function NotificationCard({ notification, onClick, onDelete }: NotificationCardProps) {
   const getIcon = () => {
     const title = notification.title || '';
     if (title.includes('Approved')) return <CheckCircle2 className="w-5 h-5 text-green-500" />;
@@ -21,12 +25,23 @@ export function NotificationCard({ notification, onClick }: NotificationCardProp
     return <Bell className="w-5 h-5 text-[#4DBDCC]" />;
   };
 
+  const dateStr = notification.created_at || notification.time;
+
   return (
     <div 
       onClick={onClick}
-      className={`border-l-4 border-l-[#4DBDCC] bg-white dark:bg-card p-4 rounded-r-lg shadow-sm hover:shadow-md transition-all cursor-pointer mb-3 border border-gray-100 dark:border-border`}
+      className={`relative border-l-4 border-l-[#4DBDCC] bg-white dark:bg-card p-4 rounded-r-lg shadow-sm hover:shadow-md transition-all cursor-pointer mb-3 border border-gray-100 dark:border-border group`}
     >
-      <div className="flex gap-3">
+      {onDelete && (
+        <button 
+            onClick={onDelete}
+            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+            title="Delete notification"
+        >
+            <X className="w-4 h-4" />
+        </button>
+      )}
+      <div className="flex gap-3 pr-6">
         <div className="mt-1 flex-shrink-0">
             {getIcon()}
         </div>
@@ -34,7 +49,7 @@ export function NotificationCard({ notification, onClick }: NotificationCardProp
             <div className="flex justify-between items-start">
                 <h4 className="font-semibold text-[#0B4F6C] dark:text-primary text-sm md:text-base truncate pr-2">{notification.title}</h4>
                 <span className="text-[10px] text-gray-400 dark:text-muted-foreground whitespace-nowrap flex-shrink-0">
-                    {new Date(notification.created_at).toLocaleDateString()}
+                    {dateStr ? new Date(dateStr).toLocaleDateString() : ''}
                 </span>
             </div>
             

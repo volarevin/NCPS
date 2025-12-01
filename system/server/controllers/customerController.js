@@ -22,6 +22,38 @@ exports.getNotifications = (req, res) => {
   });
 };
 
+exports.deleteNotification = (req, res) => {
+  const userId = req.userId;
+  const notificationId = req.params.id;
+  
+  const query = 'DELETE FROM notifications WHERE notification_id = ? AND user_id = ?';
+  
+  db.query(query, [notificationId, userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error deleting notification.' });
+    }
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Notification not found or not authorized.' });
+    }
+    res.json({ message: 'Notification deleted successfully.' });
+  });
+};
+
+exports.clearAllNotifications = (req, res) => {
+  const userId = req.userId;
+  
+  const query = 'DELETE FROM notifications WHERE user_id = ?';
+  
+  db.query(query, [userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error clearing notifications.' });
+    }
+    res.json({ message: 'All notifications cleared successfully.' });
+  });
+};
+
 exports.getDashboardStats = (req, res) => {
   const userId = req.userId;
   const query = 'CALL sp_get_customer_stats(?)';

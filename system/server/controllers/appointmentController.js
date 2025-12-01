@@ -78,6 +78,31 @@ exports.updateAppointmentStatus = (req, res) => {
       console.error(err);
       return res.status(500).json({ message: 'Database error updating appointment.' });
     }
+
+    // If status is Completed, notify the technician (confirmation)
+    if (status === 'Completed') {
+        // We need to fetch appointment details to get technician_id and service name
+        const detailsQuery = `
+            SELECT a.technician_id, s.name as service_name, u.first_name, u.last_name 
+            FROM appointments a 
+            JOIN services s ON a.service_id = s.service_id 
+            JOIN users u ON a.customer_id = u.user_id
+            WHERE a.appointment_id = ?
+        `;
+        (req.db || db).query(detailsQuery, [id], (detErr, detResults) => {
+            if (!detErr && detResults.length > 0) {
+                const appt = detResults[0];
+                if (appt.technician_id) {
+                    const notifQuery = 'INSERT INTO notifications (user_id, title, message, related_appointment_id) VALUES (?, ?, ?, ?)';
+                    const message = `You marked "${appt.service_name}" for ${appt.first_name} ${appt.last_name} as completed.`;
+                    (req.db || db).query(notifQuery, [appt.technician_id, 'Job Completed', message, id], (notifErr) => {
+                        if (notifErr) console.error('Error creating completion notification:', notifErr);
+                    });
+                }
+            }
+        });
+    }
+
     res.json({ message: 'Appointment status updated.' });
   });
 };
@@ -194,6 +219,14 @@ exports.rateAppointment = (req, res) => {
           if (updateErr) {
             console.error('Error updating technician rating:', updateErr);
           }
+
+          // Notify Technician about the review
+          const notifQuery = 'INSERT INTO notifications (user_id, title, message, related_appointment_id) VALUES (?, ?, ?, ?)';
+          const message = `New ${rating}-star rating received from a customer.`;
+          (req.db || db).query(notifQuery, [appointment.technician_id, 'New Rating Received', message, id], (notifErr) => {
+              if (notifErr) console.error('Error creating review notification:', notifErr);
+          });
+
           res.status(201).json({ message: 'Rating submitted successfully.' });
         });
       });

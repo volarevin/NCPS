@@ -11,6 +11,8 @@ router.use(auditMiddleware);
 
 router.get('/stats', customerController.getDashboardStats);
 router.get('/notifications', customerController.getNotifications);
+router.delete('/notifications/:id', customerController.deleteNotification);
+router.delete('/notifications', customerController.clearAllNotifications);
 router.get('/appointments', customerController.getAppointments);
 router.get('/addresses', customerController.getAddresses);
 router.post('/addresses', customerController.addAddress);

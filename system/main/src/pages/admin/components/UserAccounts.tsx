@@ -2,9 +2,20 @@ import { PageHeader } from "./PageHeader";
 import { useState, useEffect } from "react";
 import { UserCard } from "./UserCard";
 import { UserDetailsDialog } from "./UserDetailsDialog";
-import { Search, Users, Shield, UserPlus, UserCheck, Activity } from "lucide-react";
+import { Search, Users, Shield, UserPlus, UserCheck, Activity, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { getProfilePictureUrl } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ActivityLog {
   id: string;
@@ -117,7 +128,25 @@ export function UserAccounts() {
       
       setSelectedUser({ ...user, activityLogs: formattedLogs });
     } catch (error) {
-        console.error("Error fetching logs", error);
+      console.error('Error fetching logs:', error);
+    }
+  };
+
+  const handleClearAllNotifications = async () => {
+    try {
+        const token = sessionStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/admin/notifications', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            // Optional: Show a toast or success message
+            console.log('All notifications cleared successfully.');
+        } else {
+            console.error('Failed to clear notifications.');
+        }
+    } catch (error) {
+        console.error('Error clearing notifications:', error);
     }
   };
 
@@ -154,10 +183,37 @@ export function UserAccounts() {
         title="User Accounts" 
         description="Manage system users, roles, and permissions."
         action={
-          <button className="bg-[#0B4F6C] dark:bg-sky-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] dark:hover:bg-sky-700 transition-colors">
-            <UserPlus className="w-4 h-4" />
-            Add New User
-          </button>
+          <div className="flex gap-2">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button 
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-600 transition-colors shadow-sm"
+                >
+                    <Trash2 className="w-4 h-4" />
+                    Empty Notifications
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete ALL notifications for ALL users from the system database.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAllNotifications} className="bg-red-500 hover:bg-red-600">
+                    Yes, clear all
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            
+            <button className="bg-[#0B4F6C] dark:bg-sky-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-[#093e54] dark:hover:bg-sky-700 transition-colors shadow-sm">
+                <UserPlus className="w-4 h-4" />
+                Add New User
+            </button>
+          </div>
         }
       />
 

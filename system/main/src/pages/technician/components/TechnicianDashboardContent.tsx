@@ -1,7 +1,18 @@
-import { Calendar, Clock, PlayCircle } from "lucide-react";
+import { Calendar, Clock, PlayCircle, X, Bell, CheckCircle2, XCircle, AlertCircle, CheckCheck } from "lucide-react";
 import { Button } from "../../../components/ui/button";
 import { Card, CardContent } from "../../../components/ui/card";
 import { PageHeader } from "./PageHeader";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface TechnicianDashboardContentProps {
   technicianProfile: any;
@@ -12,6 +23,8 @@ interface TechnicianDashboardContentProps {
   setSelectedAppointment: (apt: any) => void;
   setActiveTab: (tab: "dashboard" | "appointments" | "profile" | "ratings") => void;
   getStatusBadge: (status: string) => JSX.Element;
+  onDeleteNotification: (e: React.MouseEvent, id: number) => void;
+  onClearAllNotifications: () => void;
 }
 
 export function TechnicianDashboardContent({
@@ -22,8 +35,21 @@ export function TechnicianDashboardContent({
   notifications,
   setSelectedAppointment,
   setActiveTab,
-  getStatusBadge
+  getStatusBadge,
+  onDeleteNotification,
+  onClearAllNotifications
 }: TechnicianDashboardContentProps) {
+
+  const getNotificationIcon = (title: string) => {
+    if (title.includes('Approved')) return <CheckCircle2 className="w-5 h-5 text-green-500" />;
+    if (title.includes('Rejected')) return <XCircle className="w-5 h-5 text-red-500" />;
+    if (title.includes('Cancelled')) return <AlertCircle className="w-5 h-5 text-orange-500" />;
+    if (title.includes('Completed')) return <CheckCheck className="w-5 h-5 text-blue-500" />;
+    if (title.includes('Assigned')) return <Calendar className="w-5 h-5 text-blue-500" />;
+    if (title.includes('Rating')) return <CheckCircle2 className="w-5 h-5 text-yellow-500" />;
+    return <Bell className="w-5 h-5 text-[#4DBDCC]" />;
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto animate-fade-in">
       <PageHeader 
@@ -137,29 +163,70 @@ export function TechnicianDashboardContent({
 
         {/* Recent Activity / Notifications */}
         <div className="space-y-4">
-          <h2 className="text-xl font-bold text-[#0B4F6C] dark:text-primary">Notifications</h2>
-          <Card className="bg-card">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-[#0B4F6C] dark:text-primary">Notifications</h2>
+            {notifications.length > 0 && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-xs text-gray-500 hover:text-red-500 h-8"
+                        >
+                            Clear All
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Clear all notifications?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. All your notifications will be permanently deleted.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={onClearAllNotifications} className="bg-red-500 hover:bg-red-600">
+                                Yes, clear all
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
+          </div>
+          <Card className="bg-transparent border-none shadow-none">
             <CardContent className="p-0">
-              <div className="divide-y max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+              <div className="max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent pr-2">
                 {notifications.length > 0 ? (
                   notifications.map((notification) => (
-                    <div key={notification.id} className="p-4 hover:bg-muted/50 transition-colors">
-                      <div className="flex gap-3">
-                        <div className="mt-1">
-                          <div className={`w-2 h-2 rounded-full bg-${notification.color}-500 ${notification.type === 'assignment' ? 'animate-pulse' : ''}`}></div>
+                    <div 
+                        key={notification.id} 
+                        className="relative border-l-4 border-l-[#4DBDCC] bg-white dark:bg-card p-4 rounded-r-lg shadow-sm hover:shadow-md transition-all cursor-pointer mb-3 border border-gray-100 dark:border-border group"
+                    >
+                      <button 
+                          onClick={(e) => onDeleteNotification(e, notification.id)}
+                          className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                          title="Delete notification"
+                      >
+                          <X className="w-4 h-4" />
+                      </button>
+                      <div className="flex gap-3 pr-6">
+                        <div className="mt-1 flex-shrink-0">
+                          {getNotificationIcon(notification.title)}
                         </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900 dark:text-foreground">{notification.title}</p>
-                          <p className="text-xs text-gray-500 dark:text-muted-foreground mt-1">{notification.message}</p>
-                          <p className="text-xs text-gray-400 dark:text-muted-foreground mt-2">
-                            {new Date(notification.time).toLocaleString()}
-                          </p>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start">
+                              <h4 className="font-semibold text-[#0B4F6C] dark:text-primary text-sm md:text-base truncate pr-2">{notification.title}</h4>
+                              <span className="text-[10px] text-gray-400 dark:text-muted-foreground whitespace-nowrap flex-shrink-0">
+                                  {new Date(notification.time).toLocaleString()}
+                              </span>
+                          </div>
+                          <p className="text-gray-600 dark:text-muted-foreground text-xs md:text-sm mt-1 line-clamp-2">{notification.message}</p>
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="p-8 text-center text-gray-500 dark:text-muted-foreground">
+                  <div className="p-8 text-center text-gray-500 dark:text-muted-foreground bg-card rounded-lg border border-dashed">
                     <p>No new notifications.</p>
                   </div>
                 )}

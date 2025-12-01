@@ -137,71 +137,75 @@ exports.updateProfile = (req, res) => {
 
 exports.getNotifications = (req, res) => {
   const technicianId = req.userId;
+  
+  const query = `
+    SELECT * FROM notifications 
+    WHERE user_id = ? 
+    ORDER BY created_at DESC 
+    LIMIT 50
+  `;
 
-  const queries = {
-    assignments: `
-      SELECT a.appointment_id, a.appointment_date, a.created_at, s.name as service_name
-      FROM appointments a
-      JOIN services s ON a.service_id = s.service_id
-      WHERE a.technician_id = ? AND a.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-      ORDER BY a.created_at DESC
-    `,
-    reviews: `
-      SELECT r.rating, r.created_at, u.first_name, u.last_name
-      FROM reviews r
-      JOIN appointments a ON r.appointment_id = a.appointment_id
-      JOIN users u ON a.customer_id = u.user_id
-      WHERE a.technician_id = ? AND r.created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-      ORDER BY r.created_at DESC
-    `,
-    completed: `
-      SELECT a.appointment_id, a.updated_at, s.name as service_name, u.first_name, u.last_name
-      FROM appointments a
-      JOIN services s ON a.service_id = s.service_id
-      JOIN users u ON a.customer_id = u.user_id
-      WHERE a.technician_id = ? AND a.status = 'Completed' AND a.updated_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-      ORDER BY a.updated_at DESC
-    `
-  };
-
-  db.query(queries.assignments, [technicianId], (err, assignments) => {
-    if (err) return res.status(500).json({ error: err.message });
-
-    db.query(queries.reviews, [technicianId], (err, reviews) => {
-      if (err) return res.status(500).json({ error: err.message });
-
-      db.query(queries.completed, [technicianId], (err, completed) => {
-        if (err) return res.status(500).json({ error: err.message });
-
-        const notifications = [
-          ...assignments.map(a => ({
-            id: `assign-${a.appointment_id}`,
-            type: 'assignment',
-            title: 'New appointment assigned',
-            message: `You have been assigned to a ${a.service_name} on ${new Date(a.appointment_date).toLocaleDateString()}.`,
-            time: a.created_at,
-            color: 'blue'
-          })),
-          ...reviews.map(r => ({
-            id: `review-${r.created_at}`,
-            type: 'review',
-            title: 'New Rating Received',
-            message: `${r.first_name} ${r.last_name} gave you ${r.rating} stars!`,
-            time: r.created_at,
-            color: 'yellow'
-          })),
-          ...completed.map(c => ({
-            id: `complete-${c.appointment_id}`,
-            type: 'completed',
-            title: 'Job completed successfully',
-            message: `You marked "${c.service_name}" for ${c.first_name} ${c.last_name} as completed.`,
-            time: c.updated_at,
-            color: 'green'
-          }))
-        ].sort((a, b) => new Date(b.time) - new Date(a.time));
-
-        res.json(notifications);
-      });
+  db.query(query, [technicianId], (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error fetching notifications.' });
+    }
+    
+    // Map to frontend format if needed, or just send as is.
+    // The frontend expects: id, type, title, message, time, color
+    // The DB has: notification_id, title, message, created_at, related_appointment_id
+    
+    const notifications = results.map(n => {
+        let type = 'info';
+        let color = 'blue';
+        
+        if (n.title.includes('Assigned')) { type = 'assignment'; color = 'blue'; }
+        else if (n.title.includes('Rating')) { type = 'review'; color = 'yellow'; }
+        else if (n.title.includes('Completed')) { type = 'completed'; color = 'green'; }
+        
+        return {
+            id: n.notification_id,
+            type: type,
+            title: n.title,
+            message: n.message,
+            time: n.created_at,
+            color: color,
+            related_appointment_id: n.related_appointment_id
+        };
     });
+
+    res.json(notifications);
+  });
+};
+
+exports.deleteNotification = (req, res) => {
+  const userId = req.userId;
+  const notificationId = req.params.id;
+  
+  const query = 'DELETE FROM notifications WHERE notification_id = ? AND user_id = ?';
+  
+  db.query(query, [notificationId, userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error deleting notification.' });
+    }
+    if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'Notification not found or not authorized.' });
+    }
+    res.json({ message: 'Notification deleted successfully.' });
+  });
+};
+
+exports.clearAllNotifications = (req, res) => {
+  const userId = req.userId;
+  
+  const query = 'DELETE FROM notifications WHERE user_id = ?';
+  
+  db.query(query, [userId], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error clearing notifications.' });
+    }
+    res.json({ message: 'All notifications cleared successfully.' });
   });
 };

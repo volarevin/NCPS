@@ -752,6 +752,32 @@ exports.deleteUser = (req, res) => {
     });
 };
 
+exports.clearUserNotifications = (req, res) => {
+  const { id } = req.params;
+  
+  const query = 'DELETE FROM notifications WHERE user_id = ?';
+  
+  (req.db || db).query(query, [id], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error clearing user notifications.' });
+    }
+    res.json({ message: 'User notifications cleared successfully.' });
+  });
+};
+
+exports.clearAllSystemNotifications = (req, res) => {
+  const query = 'TRUNCATE TABLE notifications';
+  
+  (req.db || db).query(query, (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Database error clearing all notifications.' });
+    }
+    res.json({ message: 'All system notifications cleared successfully.' });
+  });
+};
+
 // --- Service Management ---
 
 exports.createService = (req, res) => {

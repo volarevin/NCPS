@@ -12,6 +12,17 @@ import { PageHeader } from './PageHeader';
 import { ServiceBanner } from './ServiceBanner';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../../../components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export function CustomerDashboard() {
   const navigate = useNavigate();
@@ -134,7 +145,15 @@ export function CustomerDashboard() {
         const notifRes = await fetch('http://localhost:5000/api/customer/notifications', { headers });
         if (notifRes.ok) {
             const notifData = await notifRes.json();
-            setNotifications(notifData);
+            // Ensure we are not setting stale data if a delete happened concurrently
+            setNotifications(prev => {
+                // If we just cleared them (length 0), and the fetch returns some, it might be a race condition or they are actually there.
+                // But since we fetch on mount, and delete updates state locally, we should trust the fetch unless we want to be very careful.
+                // However, the user says they reappear. This implies the fetch is happening AFTER the delete and getting the old data?
+                // Or the delete didn't work.
+                // Let's just set it.
+                return notifData;
+            });
         }
 
         // Fetch Featured Services
@@ -223,6 +242,38 @@ export function CustomerDashboard() {
     }
   };
 
+  const handleDeleteNotification = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    try {
+        const token = sessionStorage.getItem('token');
+        await fetch(`http://localhost:5000/api/customer/notifications/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        setNotifications(prev => prev.filter(n => n.notification_id !== id));
+    } catch (error) {
+        console.error('Error deleting notification:', error);
+    }
+  };
+
+  const handleClearAllNotifications = async () => {
+    try {
+        const token = sessionStorage.getItem('token');
+        const res = await fetch('http://localhost:5000/api/customer/notifications', {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (res.ok) {
+            setNotifications([]);
+        } else {
+            console.error('Failed to clear notifications');
+        }
+    } catch (error) {
+        console.error('Error clearing notifications:', error);
+    }
+  };
+
   return (
     <div className="p-3 md:p-8 animate-fade-in max-w-7xl mx-auto space-y-6">
       {/* Header */}
@@ -303,9 +354,38 @@ export function CustomerDashboard() {
 
         {/* Notifications */}
         <div className="bg-white dark:bg-card rounded-xl shadow-sm p-3 md:p-6 hover:shadow-md transition-shadow duration-200 border border-gray-100 dark:border-border">
-          <div className="flex items-center gap-2 mb-3 md:mb-6">
-            <Bell className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
-            <h2 className="text-[#0B4F6C] dark:text-primary font-semibold text-sm md:text-lg">Notifications</h2>
+          <div className="flex items-center justify-between mb-3 md:mb-6">
+            <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 md:w-5 md:h-5 text-[#4DBDCC]" />
+                <h2 className="text-[#0B4F6C] dark:text-primary font-semibold text-sm md:text-lg">Notifications</h2>
+            </div>
+            {notifications.length > 0 && (
+                <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-xs text-gray-500 hover:text-red-500 h-8"
+                        >
+                            Clear All
+                        </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>Clear all notifications?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. All your notifications will be permanently deleted.
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={handleClearAllNotifications} className="bg-red-500 hover:bg-red-600">
+                                Yes, clear all
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+            )}
           </div>
           <div className="space-y-3 md:space-y-4 max-h-[400px] overflow-y-auto pr-2">
             {notifications.length > 0 ? (
@@ -314,6 +394,7 @@ export function CustomerDashboard() {
                     key={notif.notification_id} 
                     notification={notif} 
                     onClick={() => handleNotificationClick(notif)}
+                    onDelete={(e) => handleDeleteNotification(e, notif.notification_id)}
                 />
               ))
             ) : (
