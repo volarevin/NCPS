@@ -31,7 +31,9 @@ exports.getProfile = (req, res) => {
   const userId = req.userId;
   
   const query = `
-    SELECT tp.*, u.first_name, u.last_name, u.email, u.phone_number, u.address, u.created_at, u.profile_picture
+    SELECT tp.profile_id, tp.specialty, tp.bio, tp.availability_status, tp.average_rating,
+           (SELECT COUNT(*) FROM appointments WHERE technician_id = u.user_id AND status = 'Completed') as total_jobs_completed,
+           u.first_name, u.last_name, u.email, u.phone_number, u.address, u.created_at, u.profile_picture
     FROM users u
     LEFT JOIN technician_profiles tp ON u.user_id = tp.user_id
     WHERE u.user_id = ?
@@ -52,7 +54,6 @@ exports.getProfile = (req, res) => {
         data.specialty = 'General';
         data.availability_status = 'Available';
         data.average_rating = 0;
-        data.total_jobs_completed = 0;
     }
     
     res.json(data);

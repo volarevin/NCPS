@@ -151,10 +151,13 @@ exports.getRecentActivity = (req, res) => {
 exports.getAllTechnicians = (req, res) => {
   const query = `
     SELECT u.user_id, u.first_name, u.last_name, u.email, u.phone_number, u.address, u.profile_picture,
-           tp.specialty, tp.availability_status, tp.total_jobs_completed, tp.average_rating,
+           COALESCE(tp.specialty, 'General') as specialty, 
+           COALESCE(tp.availability_status, 'Available') as availability_status, 
+           (SELECT COUNT(*) FROM appointments WHERE technician_id = u.user_id AND status = 'Completed') as total_jobs_completed,
+           COALESCE(tp.average_rating, 0) as average_rating,
            (SELECT COUNT(*) FROM appointments WHERE technician_id = u.user_id AND status IN ('Pending', 'Confirmed', 'In Progress')) as active_jobs
     FROM users u
-    JOIN technician_profiles tp ON u.user_id = tp.user_id
+    LEFT JOIN technician_profiles tp ON u.user_id = tp.user_id
     WHERE u.role = 'Technician'
   `;
   
