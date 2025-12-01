@@ -1,0 +1,12 @@
+graph TD
+    subgraph "NCPS System"
+        S[Web Application]
+    end
+    
+    C[Customer] <-->|Book, View History, Feedback| S
+    A[Admin] <-->|Manage Users, Services, Reports| S
+    R[Receptionist] <-->|Schedule, Assign, Walk-ins| S
+    T[Technician] <-->|View Jobs, Update Status| S
+    
+    DB[(MySQL Database)] <--> S
+    E[Email Service] -.->|Notifications| S

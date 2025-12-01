@@ -1,0 +1,15 @@
+graph LR
+    Client["Client Layer (React/Vite)"]
+    Server["Server Layer (Node/Express)"]
+    Data["Data Layer (MySQL)"]
+    FS["File System (/uploads)"]
+
+    Client -->|HTTP/REST| Server
+    Server -->|SQL Queries| Data
+    Server -->|Serve Static| FS
+    
+    subgraph "Backend Components"
+    Server --> Auth[Auth Middleware]
+    Server --> Controllers
+    Controllers --> Utils["Helpers/ConflictChecker"]
+    end

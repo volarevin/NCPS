@@ -1,0 +1,9 @@
+graph TD
+    A[Customer] -->|Calls/Visits| B(Receptionist)
+    B -->|Checks Paper Schedule| C{Slot Available?}
+    C -- No --> D[Reject/Reschedule]
+    C -- Yes --> E[Record in Logbook]
+    E --> F["Notify Technician (Phone/SMS)"]
+    F --> G[Technician Performs Service]
+    G --> H["Payment (Cash/Offline)"]
+    H --> I[Manual Receipt]

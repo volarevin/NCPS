@@ -1,0 +1,400 @@
+{
+  "admin": [
+    {
+      "method": "GET",
+      "path": "/stats"
+    },
+    {
+      "method": "GET",
+      "path": "/audit-logs"
+    },
+    {
+      "method": "GET",
+      "path": "/audit-logs/export"
+    },
+    {
+      "method": "GET",
+      "path": "/users"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments"
+    },
+    {
+      "method": "GET",
+      "path": "/monthly-stats"
+    },
+    {
+      "method": "GET",
+      "path": "/service-distribution"
+    },
+    {
+      "method": "GET",
+      "path": "/recent-activity"
+    },
+    {
+      "method": "GET",
+      "path": "/technicians"
+    },
+    {
+      "method": "GET",
+      "path": "/users/:userId/logs"
+    },
+    {
+      "method": "POST",
+      "path": "/users"
+    },
+    {
+      "method": "PUT",
+      "path": "/users/:id"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/:id"
+    },
+    {
+      "method": "DELETE",
+      "path": "/users/:id/notifications"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications"
+    },
+    {
+      "method": "GET",
+      "path": "/reports"
+    },
+    {
+      "method": "GET",
+      "path": "/services"
+    },
+    {
+      "method": "POST",
+      "path": "/services"
+    },
+    {
+      "method": "PUT",
+      "path": "/services/:id"
+    },
+    {
+      "method": "DELETE",
+      "path": "/services/:id"
+    },
+    {
+      "method": "GET",
+      "path": "/categories"
+    },
+    {
+      "method": "PUT",
+      "path": "/categories/:id"
+    },
+    {
+      "method": "GET",
+      "path": "/technicians/:techId"
+    },
+    {
+      "method": "PUT",
+      "path": "/technicians/:techId/profile"
+    },
+    {
+      "method": "PUT",
+      "path": "/technicians/:techId/status"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments/recycle-bin/count"
+    },
+    {
+      "method": "DELETE",
+      "path": "/appointments/recycle-bin"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments/marked-deletion"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments/bulk-delete"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments/check-conflict"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments/:id"
+    },
+    {
+      "method": "PUT",
+      "path": "/appointments/:id/status"
+    },
+    {
+      "method": "PUT",
+      "path": "/appointments/:id/details"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments"
+    },
+    {
+      "method": "DELETE",
+      "path": "/appointments/:id"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments/:id/restore"
+    },
+    {
+      "method": "DELETE",
+      "path": "/appointments/:id/permanent"
+    },
+    {
+      "method": "POST",
+      "path": "/technicians/promote"
+    }
+  ],
+  "appointment": [
+    {
+      "method": "POST",
+      "path": "/"
+    },
+    {
+      "method": "POST",
+      "path": "/walkin"
+    },
+    {
+      "method": "PUT",
+      "path": "/:id/status"
+    },
+    {
+      "method": "PUT",
+      "path": "/:id"
+    },
+    {
+      "method": "POST",
+      "path": "/:id/rate"
+    }
+  ],
+  "auth": [
+    {
+      "method": "POST",
+      "path": "/register"
+    },
+    {
+      "method": "POST",
+      "path": "/login"
+    },
+    {
+      "method": "POST",
+      "path": "/logout"
+    },
+    {
+      "method": "POST",
+      "path": "/heartbeat"
+    }
+  ],
+  "customer": [
+    {
+      "method": "GET",
+      "path": "/stats"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications/:id"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments"
+    },
+    {
+      "method": "GET",
+      "path": "/addresses"
+    },
+    {
+      "method": "POST",
+      "path": "/addresses"
+    },
+    {
+      "method": "GET",
+      "path": "/profile"
+    },
+    {
+      "method": "PUT",
+      "path": "/profile"
+    },
+    {
+      "method": "PUT",
+      "path": "/change-password"
+    },
+    {
+      "method": "DELETE",
+      "path": "/account"
+    },
+    {
+      "method": "GET",
+      "path": "/featured-services"
+    },
+    {
+      "method": "GET",
+      "path": "/services"
+    }
+  ],
+  "profile": [
+    {
+      "method": "GET",
+      "path": "/"
+    },
+    {
+      "method": "GET",
+      "path": "/login-history"
+    },
+    {
+      "method": "PUT",
+      "path": "/"
+    },
+    {
+      "method": "POST",
+      "path": "/picture"
+    },
+    {
+      "method": "POST",
+      "path": "/addresses"
+    },
+    {
+      "method": "PUT",
+      "path": "/addresses/:id"
+    },
+    {
+      "method": "DELETE",
+      "path": "/addresses/:id"
+    },
+    {
+      "method": "PUT",
+      "path": "/addresses/:id/primary"
+    },
+    {
+      "method": "PUT",
+      "path": "/password"
+    }
+  ],
+  "public": [
+    {
+      "method": "GET",
+      "path": "/services"
+    },
+    {
+      "method": "GET",
+      "path": "/testimonials"
+    }
+  ],
+  "receptionist": [
+    {
+      "method": "GET",
+      "path": "/dashboard-stats"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments/check-conflict"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments"
+    },
+    {
+      "method": "PUT",
+      "path": "/appointments/:id/status"
+    },
+    {
+      "method": "PUT",
+      "path": "/appointments/:id/details"
+    },
+    {
+      "method": "DELETE",
+      "path": "/appointments/:id/soft"
+    },
+    {
+      "method": "GET",
+      "path": "/appointments/marked-deletion"
+    },
+    {
+      "method": "POST",
+      "path": "/appointments/:id/restore"
+    },
+    {
+      "method": "DELETE",
+      "path": "/appointments/:id/permanent"
+    },
+    {
+      "method": "DELETE",
+      "path": "/appointments/recycle-bin"
+    },
+    {
+      "method": "GET",
+      "path": "/services"
+    },
+    {
+      "method": "GET",
+      "path": "/technicians"
+    },
+    {
+      "method": "GET",
+      "path": "/categories"
+    },
+    {
+      "method": "GET",
+      "path": "/users"
+    }
+  ],
+  "service": [
+    {
+      "method": "GET",
+      "path": "/"
+    }
+  ],
+  "technician": [
+    {
+      "method": "GET",
+      "path": "/jobs"
+    },
+    {
+      "method": "GET",
+      "path": "/profile"
+    },
+    {
+      "method": "PUT",
+      "path": "/profile"
+    },
+    {
+      "method": "GET",
+      "path": "/availability"
+    },
+    {
+      "method": "PUT",
+      "path": "/availability"
+    },
+    {
+      "method": "GET",
+      "path": "/notifications"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications/:id"
+    },
+    {
+      "method": "DELETE",
+      "path": "/notifications"
+    }
+  ]
+}

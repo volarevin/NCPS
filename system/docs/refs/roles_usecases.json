@@ -1,0 +1,33 @@
+{
+  "Admin": [
+    "Manage Users (Create, Update, Delete, List)",
+    "Manage Services (Add, Edit, Remove, Upload Images)",
+    "View All Appointments",
+    "Generate Reports (Revenue, Service Popularity, Cancellations)",
+    "View Audit Logs",
+    "System Configuration"
+  ],
+  "Technician": [
+    "View Assigned Appointments",
+    "Update Appointment Status (In Progress, Completed)",
+    "Set Final Cost and Notes",
+    "View Schedule/Calendar",
+    "Update Availability Status",
+    "View Profile"
+  ],
+  "Receptionist": [
+    "View All Appointments",
+    "Approve/Reject Pending Appointments",
+    "Assign Technicians to Appointments",
+    "Manage Walk-in Appointments",
+    "View Technician Availability"
+  ],
+  "Customer": [
+    "Browse Services",
+    "Book Appointment",
+    "View Appointment History",
+    "Cancel Appointment",
+    "Update Profile (Address, Phone)",
+    "Provide Feedback/Rating"
+  ]
+}

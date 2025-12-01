@@ -1,0 +1,187 @@
+NCPS SYSTEM DOCUMENTATION
+=========================
+
+1 BUSINESS CASE
+
+1.1 Background of the Project
+
+1.1.1 Organizational Context
+NCPS CCTV & Computer Services is a service-oriented business located at 3JCJ+RJJ, Brias Street, Barangay 3, Nasugbu, Batangas. The business specializes in providing technical solutions including CCTV installation and maintenance, computer repair, and networking services.
+
+1.1.2 Existing System or Current Practice
+Prior to the proposed system, NCPS operated using a manual scheduling and management process.
+- Booking: Customers booked appointments via phone calls, text messages, or walk-ins.
+- Scheduling: Receptionists used a physical logbook or whiteboard to track appointments.
+- Dispatch: Technicians were assigned ad-hoc based on who was present in the office.
+- Records: Customer history and service records were kept in paper files, making retrieval difficult.
+- Reporting: Revenue and performance reports were manually calculated, leading to potential inaccuracies.
+
+1.1.3 Identified Problems or Gaps
+- Scheduling Conflicts: Double-booking occurred due to lack of real-time availability checking.
+- Inefficient Dispatching: Difficulty in tracking technician location and status (Available/Busy).
+- Data Loss: Paper records were prone to damage or loss.
+- Lack of Analytics: Business owners lacked insights into service popularity, peak times, and revenue trends.
+- Communication Delays: Customers had to call to check status; no automated notifications.
+
+1.1.4 Need for the Proposed System (Justification)
+The proposed "NCPS Unified System" is necessary to modernize operations. It provides:
+- Centralized Booking: A web-based platform for customers to book and track services.
+- Automated Conflict Checking: Prevents double-booking by checking technician and time slot availability.
+- Role-Based Access: Specific dashboards for Admin, Receptionist, Technician, and Customer.
+- Digital Records: Secure storage of customer data, service history, and audit logs.
+- Accurate Reporting: Automated generation of revenue and performance reports.
+
+1.2 Objectives of the Project
+- To reduce scheduling conflicts by 100% using an automated conflict checker.
+- To improve technician utilization by tracking real-time status (Online/Busy).
+- To provide accurate financial reporting based on actual service costs and technician inputs.
+- To enhance customer satisfaction through a transparent booking and feedback system.
+- To secure business data with role-based authentication and audit logging.
+
+1.3 Scope and Delimitations
+
+Scope:
+- User Management: Registration and authentication for Customers, Admins, Receptionists, and Technicians.
+- Service Management: CRUD operations for services (CCTV, Repair, etc.) with images and pricing.
+- Appointment Booking: Customer-initiated booking with date/time selection.
+- Scheduling & Assignment: Receptionist/Admin approval and technician assignment.
+- Job Management: Technicians can view jobs, update status (In Progress, Completed), and enter final costs.
+- Billing: Calculation of total cost (Service Estimate + Additional Costs).
+- Reporting: Visual analytics for revenue, service popularity, and cancellations.
+- Audit Trail: Logging of all critical system actions.
+
+Delimitations:
+- The system does not currently support online payment processing (Cash/Offline payment only).
+- Inventory management for spare parts is not included in this phase.
+- SMS notifications are simulated or rely on external triggers; native SMS gateway is out of scope.
+
+1.4 SWOT Analysis
+
+Strengths:
+- Custom-built solution tailored to NCPS workflows.
+- Modern tech stack (React, Node.js) ensuring scalability.
+- Real-time availability tracking.
+
+Weaknesses:
+- Dependence on internet connectivity for web access.
+- Initial learning curve for staff transitioning from manual methods.
+
+Opportunities:
+- Integration with online payment gateways (GCash, PayMaya) in the future.
+- Mobile app development for technicians.
+- Expansion to inventory management.
+
+Threats:
+- Data security risks (mitigated by auth and backups).
+- Hardware failure at the office (mitigated by cloud deployment options).
+
+1.5 Gantt Chart
+(See system/docs/diagrams/gantt.mmd for Mermaid source)
+[Diagram: Gantt Chart – insert exported PNG here]
+
+2 SYSTEM ANALYSIS
+
+2.1 Flowchart of the Existing System
+(See system/docs/diagrams/existing_flowchart.mmd for Mermaid source)
+[Diagram: Existing System Flowchart – insert exported PNG here]
+
+2.2 Flowchart of the Proposed System
+(See system/docs/diagrams/proposed_flowchart.mmd for Mermaid source)
+[Diagram: Proposed System Flowchart – insert exported PNG here]
+
+2.3 Context Diagram of the Proposed System
+(See system/docs/diagrams/context.mmd for Mermaid source)
+[Diagram: Context Diagram – insert exported PNG here]
+
+2.4 Data Flow Diagram (DFD) Level 1 of the Proposed System
+(See system/docs/diagrams/dfd-level1.mmd for Mermaid source)
+[Diagram: DFD Level 1 – insert exported PNG here]
+
+2.5 Use Case Diagram of the Proposed System
+(See system/docs/diagrams/use-cases.mmd for Mermaid source)
+[Diagram: Use Case Diagram – insert exported PNG here]
+
+3. OPERATIONAL FRAMEWORK
+
+3.1 Materials
+
+3.1.1 Software
+- Backend: Node.js, Express.js
+- Database: MySQL (using mysql2 driver)
+- Frontend: React.js, Vite, Tailwind CSS
+- Libraries:
+  - bcryptjs (Password hashing)
+  - jsonwebtoken (Authentication)
+  - recharts (Data visualization)
+  - lucide-react (Icons)
+  - date-fns (Date manipulation)
+  - multer (File uploads)
+
+3.1.2 Hardware
+- Server: Local office server or cloud instance (e.g., AWS/DigitalOcean).
+- Workstations: Desktop computers for Receptionist and Admin.
+- Mobile Devices: Smartphones/Tablets for Technicians to access their dashboard in the field.
+
+3.2 System Design
+
+3.2.1 Data Design
+The database `ncps_db` consists of the following key tables:
+
+- users: Stores account info, roles (Admin, Technician, etc.), and status.
+- services: Catalog of offered services with base prices and images.
+- appointments: Core table linking customers, services, and technicians. Tracks status, costs, and dates.
+- technician_profiles: Extended info for technicians (specialty, availability).
+- audit_logs: Records system activities for security and accountability.
+- notifications: System alerts for users.
+- customer_addresses: Multiple addresses per customer.
+
+(See system/docs/refs/schema.json for full schema details)
+
+Cancellation Categories:
+The system tracks the following cancellation reasons for reporting:
+- Emergency
+- Duplicate booking
+- Customer request
+- Other
+- No available technician
+- Scheduling conflict
+
+Key Data Logic:
+- Revenue is calculated as `SUM(total_cost)` from completed appointments.
+- Availability is determined by checking if a technician has any appointment with status 'In Progress' or 'Confirmed' overlapping the requested slot.
+
+3.2.2 System Architecture
+The system follows a client-server architecture:
+- Client: React Single Page Application (SPA) communicating via REST API.
+- Server: Express.js REST API handling business logic and DB interactions.
+- Database: MySQL relational database.
+- Static Files: Images (logos, service photos) served from `system/server/uploads`.
+
+Overall Data Flow:
+1. Customer logs in and requests a service via the Client.
+2. Server validates the request and checks for conflicts using `conflictChecker.js`.
+3. If valid, the appointment is saved to MySQL with status 'Pending'.
+4. Receptionist views the pending request and assigns a Technician.
+5. Technician receives a notification and views the job details.
+6. Upon completion, Technician updates status and enters final cost.
+7. Admin views the completed job in the Revenue Report.
+
+APPENDIX 1 – User Manual
+
+[Screenshot: Homepage – Hero]
+The Homepage welcomes users and showcases available services.
+
+[Screenshot: Customer – Services & Booking]
+Customers can browse services and book appointments by selecting a date and time.
+
+[Screenshot: Admin Dashboard – Overview tiles]
+The Admin Dashboard provides a quick view of total users, revenue, and pending appointments.
+
+[Screenshot: Receptionist – Scheduling]
+Receptionists manage the schedule, approving requests and assigning technicians.
+
+[Screenshot: Technician – Appointments & Complete Job modal]
+Technicians can view their assigned tasks and mark them as complete.
+
+[Screenshot: Admin – Reports & Analytics]
+Detailed charts show business performance and service trends.

@@ -1,0 +1,1072 @@
+{
+  "schema": {
+    "activity_logs": [
+      {
+        "Field": "log_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "action_type",
+        "Type": "varchar(50)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "description",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "appointments": [
+      {
+        "Field": "appointment_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "customer_id",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "technician_id",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "service_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "service_address",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "appointment_date",
+        "Type": "datetime",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "status",
+        "Type": "enum('Pending','Confirmed','In Progress','Completed','Cancelled','Rejected')",
+        "Null": "YES",
+        "Key": "",
+        "Default": "Pending",
+        "Extra": ""
+      },
+      {
+        "Field": "total_cost",
+        "Type": "decimal(10,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "customer_notes",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "cancellation_reason",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "rejection_reason",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "cancellation_category",
+        "Type": "enum('Change of plans','Found another service','Budget constraints','Emergency','Other','No available technician','Scheduling conflict','Service unavailable','Customer request','Duplicate booking')",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "is_walk_in",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      },
+      {
+        "Field": "updated_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": "on update current_timestamp()"
+      },
+      {
+        "Field": "payment_status",
+        "Type": "enum('Unpaid','Paid','Refunded')",
+        "Null": "YES",
+        "Key": "",
+        "Default": "Unpaid",
+        "Extra": ""
+      },
+      {
+        "Field": "cancelled_by",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "marked_for_deletion",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "deletion_marked_at",
+        "Type": "datetime",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "deletion_marked_by",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "walkin_name",
+        "Type": "varchar(100)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "walkin_phone",
+        "Type": "varchar(20)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "walkin_email",
+        "Type": "varchar(100)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "cost_currency",
+        "Type": "varchar(3)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "PHP",
+        "Extra": ""
+      },
+      {
+        "Field": "cost_notes",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      }
+    ],
+    "audit_logs": [
+      {
+        "Field": "log_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "actor_role",
+        "Type": "varchar(50)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "actor_username",
+        "Type": "varchar(150)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "action",
+        "Type": "varchar(50)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "table_name",
+        "Type": "varchar(128)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "record_id",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "changes",
+        "Type": "longtext",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "ip_address",
+        "Type": "varchar(45)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "user_agent",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "customer_addresses": [
+      {
+        "Field": "address_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "address_label",
+        "Type": "varchar(50)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "Home",
+        "Extra": ""
+      },
+      {
+        "Field": "address_line",
+        "Type": "text",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "is_default",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "login_history": [
+      {
+        "Field": "history_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "ip_address",
+        "Type": "varchar(45)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "user_agent",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "success",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "1",
+        "Extra": ""
+      },
+      {
+        "Field": "failure_reason",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "notifications": [
+      {
+        "Field": "notification_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "title",
+        "Type": "enum('Appointment Approved','Appointment Rejected','Appointment Cancelled','Appointment Completed','New Job Assigned','Reminder')",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "message",
+        "Type": "text",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "is_read",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "related_appointment_id",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "payments": [
+      {
+        "Field": "payment_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "appointment_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "technician_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "total_cost",
+        "Type": "decimal(10,2)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "currency",
+        "Type": "varchar(3)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "PHP",
+        "Extra": ""
+      },
+      {
+        "Field": "note",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "reviews": [
+      {
+        "Field": "review_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "appointment_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "customer_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "technician_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "rating",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "feedback_text",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "service_categories": [
+      {
+        "Field": "category_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "name",
+        "Type": "varchar(50)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "color",
+        "Type": "varchar(20)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "#9CA3AF",
+        "Extra": ""
+      },
+      {
+        "Field": "icon",
+        "Type": "varchar(50)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "Menu",
+        "Extra": ""
+      }
+    ],
+    "services": [
+      {
+        "Field": "service_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "category_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "name",
+        "Type": "varchar(100)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "description",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "image",
+        "Type": "varchar(255)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "estimated_price",
+        "Type": "decimal(10,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "price_type",
+        "Type": "enum('Fixed','Starting At','Quote Required')",
+        "Null": "YES",
+        "Key": "",
+        "Default": "Fixed",
+        "Extra": ""
+      },
+      {
+        "Field": "duration_minutes",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "60",
+        "Extra": ""
+      },
+      {
+        "Field": "is_active",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "1",
+        "Extra": ""
+      },
+      {
+        "Field": "estimate_price",
+        "Type": "decimal(10,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0.00",
+        "Extra": ""
+      }
+    ],
+    "technician_profiles": [
+      {
+        "Field": "profile_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "UNI",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "specialty",
+        "Type": "enum('Hardware Repair','Software Support','Network Setup','Data Recovery','System Maintenance','Virus Removal','Custom Build','Consultation','General')",
+        "Null": "YES",
+        "Key": "",
+        "Default": "General",
+        "Extra": ""
+      },
+      {
+        "Field": "bio",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "availability_status",
+        "Type": "enum('available','busy','offline')",
+        "Null": "NO",
+        "Key": "",
+        "Default": "offline",
+        "Extra": ""
+      },
+      {
+        "Field": "total_jobs_completed",
+        "Type": "int(11)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "average_rating",
+        "Type": "decimal(3,2)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0.00",
+        "Extra": ""
+      }
+    ],
+    "user_addresses": [
+      {
+        "Field": "address_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "MUL",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "address_line",
+        "Type": "text",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "is_primary",
+        "Type": "tinyint(1)",
+        "Null": "YES",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      }
+    ],
+    "users": [
+      {
+        "Field": "user_id",
+        "Type": "int(11)",
+        "Null": "NO",
+        "Key": "PRI",
+        "Default": null,
+        "Extra": "auto_increment"
+      },
+      {
+        "Field": "username",
+        "Type": "varchar(50)",
+        "Null": "NO",
+        "Key": "UNI",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "first_name",
+        "Type": "varchar(50)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "last_name",
+        "Type": "varchar(50)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "email",
+        "Type": "varchar(100)",
+        "Null": "NO",
+        "Key": "UNI",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "phone_number",
+        "Type": "varchar(11)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "address",
+        "Type": "text",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "password_hash",
+        "Type": "varchar(255)",
+        "Null": "NO",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "role",
+        "Type": "enum('Admin','Receptionist','Technician','Customer')",
+        "Null": "NO",
+        "Key": "",
+        "Default": "Customer",
+        "Extra": ""
+      },
+      {
+        "Field": "profile_picture",
+        "Type": "varchar(255)",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      },
+      {
+        "Field": "status",
+        "Type": "enum('Active','Inactive','Banned')",
+        "Null": "YES",
+        "Key": "",
+        "Default": "Active",
+        "Extra": ""
+      },
+      {
+        "Field": "created_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": ""
+      },
+      {
+        "Field": "updated_at",
+        "Type": "timestamp",
+        "Null": "NO",
+        "Key": "",
+        "Default": "current_timestamp()",
+        "Extra": "on update current_timestamp()"
+      },
+      {
+        "Field": "is_online",
+        "Type": "tinyint(1)",
+        "Null": "NO",
+        "Key": "",
+        "Default": "0",
+        "Extra": ""
+      },
+      {
+        "Field": "last_seen",
+        "Type": "datetime",
+        "Null": "YES",
+        "Key": "",
+        "Default": null,
+        "Extra": ""
+      }
+    ]
+  },
+  "sampleData": {
+    "services": [
+      {
+        "service_id": 1,
+        "category_id": 1,
+        "name": "CCTV Installation (Basic)",
+        "description": "Standard installation of up to 4 CCTV cameras including basic cabling and setup.",
+        "image": "1.jpg",
+        "estimated_price": "1500.00",
+        "price_type": "Fixed",
+        "duration_minutes": 120,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 2,
+        "category_id": 1,
+        "name": "CCTV Installation (Advanced)",
+        "description": "Comprehensive installation for larger properties, including advanced camera positioning, extensive cabling, and system integration.",
+        "image": "2.jpg",
+        "estimated_price": "2500.00",
+        "price_type": "Fixed",
+        "duration_minutes": 240,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 3,
+        "category_id": 6,
+        "name": "CCTV Repair",
+        "description": "Diagnosis and repair of malfunctioning CCTV cameras, including lens replacement and sensor troubleshooting.",
+        "image": "3.jpg",
+        "estimated_price": "1200.00",
+        "price_type": "Fixed",
+        "duration_minutes": 60,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 4,
+        "category_id": 6,
+        "name": "System Maintenance",
+        "description": "Routine check-up and maintenance of your security system to ensure optimal performance and longevity.",
+        "image": "4.jpg",
+        "estimated_price": "1200.00",
+        "price_type": "Fixed",
+        "duration_minutes": 90,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 5,
+        "category_id": 2,
+        "name": "Laptop/PC repair",
+        "description": "Professional configuration of Digital Video Recorders (DVR) or Network Video Recorders (NVR) for efficient recording and storage.",
+        "image": "5.jpg",
+        "estimated_price": "1000.00",
+        "price_type": "Fixed",
+        "duration_minutes": 60,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 6,
+        "category_id": 1,
+        "name": "Cabling & Wiring",
+        "description": "Structured cabling and wiring services to ensure reliable connectivity and neat organization for your security systems.",
+        "image": "6.jpg",
+        "estimated_price": "2000.00",
+        "price_type": "Fixed",
+        "duration_minutes": 180,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 7,
+        "category_id": 7,
+        "name": "Remote Viewing Setup",
+        "description": "Configuration of remote viewing capabilities, allowing you to monitor your property from your smartphone or computer anywhere.",
+        "image": "7.jpg",
+        "estimated_price": "500.00",
+        "price_type": "Fixed",
+        "duration_minutes": 45,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      },
+      {
+        "service_id": 8,
+        "category_id": 7,
+        "name": "Security Consultation",
+        "description": "Expert consultation to assess your security needs and recommend the best surveillance solutions for your property.",
+        "image": "8.jpg",
+        "estimated_price": "0.00",
+        "price_type": "Fixed",
+        "duration_minutes": 30,
+        "is_active": 1,
+        "estimate_price": "0.00"
+      }
+    ],
+    "roles": [
+      "Admin",
+      "Customer",
+      "Receptionist",
+      "Technician"
+    ],
+    "cancellationCategories": [
+      "Emergency",
+      "Duplicate booking",
+      "Customer request",
+      "Other",
+      "No available technician",
+      "Scheduling conflict"
+    ]
+  }
+}

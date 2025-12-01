@@ -1,0 +1,14 @@
+graph TD
+    A[Customer] -->|Log in/Register| B[Web Portal]
+    B -->|Select Service & Date| C[Conflict Checker]
+    C -->|Available| D[Create Pending Appointment]
+    C -->|Conflict| B
+    D --> E[Receptionist/Admin Dashboard]
+    E -->|Approve & Assign| F[Technician Assigned]
+    F --> G[Technician Dashboard]
+    G -->|Start Job| H[In Progress]
+    H -->|Complete Job| I[Enter Final Cost & Notes]
+    I --> J[System Calculates Total]
+    J --> K[Audit Log & Notification]
+    K --> L[Customer Feedback]
+    K --> M[Reports & Analytics]

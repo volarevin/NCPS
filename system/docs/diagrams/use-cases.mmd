@@ -1,0 +1,33 @@
+graph TD
+    Customer((Customer))
+    Receptionist((Receptionist))
+    Technician((Technician))
+    Admin((Admin))
+
+    subgraph "NCPS System"
+        UC1("Register/Login")
+        UC2("Browse Services")
+        UC3("Book Appointment")
+        UC4("Manage Appointments")
+        UC5("Assign Technician")
+        UC6("Update Job Status")
+        UC7("Generate Reports")
+        UC8("Manage Users/Services")
+        UC9("View Audit Logs")
+    end
+
+    Customer --> UC1
+    Customer --> UC2
+    Customer --> UC3
+
+    Receptionist --> UC1
+    Receptionist --> UC4
+    Receptionist --> UC5
+
+    Technician --> UC1
+    Technician --> UC6
+
+    Admin --> UC1
+    Admin --> UC7
+    Admin --> UC8
+    Admin --> UC9

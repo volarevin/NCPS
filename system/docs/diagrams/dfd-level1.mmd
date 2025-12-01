@@ -1,0 +1,30 @@
+graph TD
+    P1(Authentication)
+    P2(Booking Process)
+    P3(Scheduling & Assignment)
+    P4(Service Execution)
+    P5(Reporting)
+    
+    DS1[(Users)]
+    DS2[(Services)]
+    DS3[(Appointments)]
+    DS4[(Audit Logs)]
+    
+    User -->|Login| P1
+    P1 --> DS1
+    
+    Customer -->|Request Service| P2
+    P2 --> DS2
+    P2 -->|Create| DS3
+    
+    Receptionist -->|Assign| P3
+    P3 -->|Update| DS3
+    P3 -->|Check| DS1
+    
+    Technician -->|Update Status/Cost| P4
+    P4 -->|Update| DS3
+    P4 -->|Log| DS4
+    
+    Admin -->|View Stats| P5
+    P5 --> DS3
+    P5 --> DS4
