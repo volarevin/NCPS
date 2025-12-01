@@ -82,12 +82,17 @@ export default function LoginPage() {
         radius: 450,
         pulseSpeed: 0.0015,
         pulseOffset: Math.random() * Math.PI * 2,
-        color: '11, 79, 108' 
-      }, // #0B4F6C
+        color: '255, 255, 255' 
+      }, // White for contrast
     ];
 
     const draw = () => {
-      ctx.fillStyle = '#F0F9FA';
+      // Create a gradient background
+      const gradient = ctx.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#0B4F6C'); // Primary Blue
+      gradient.addColorStop(1, '#042D62'); // Darker Blue
+
+      ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
       const time = Date.now();
@@ -144,11 +149,11 @@ export default function LoginPage() {
           }
 
           if (maxOpacity > 0.05) { // Threshold to avoid drawing barely visible boxes
-            ctx.strokeStyle = `rgba(${activeColor}, ${maxOpacity * 0.5})`; // Restored darkness
-            ctx.lineWidth = 1; // Restored thickness
+            ctx.strokeStyle = `rgba(${activeColor}, ${maxOpacity * 0.3})`; // Adjusted for dark bg
+            ctx.lineWidth = 1; 
             ctx.strokeRect(x, y, boxSize, boxSize);
             
-            ctx.fillStyle = `rgba(${activeColor}, ${maxOpacity * 0.05})`; // Very subtle fill
+            ctx.fillStyle = `rgba(${activeColor}, ${maxOpacity * 0.1})`; // Adjusted for dark bg
             ctx.fillRect(x, y, boxSize, boxSize);
           }
         }
@@ -298,7 +303,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F0F9FA] relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#0B4F6C] relative overflow-hidden">
       {/* Background Elements */}
       <canvas 
         ref={canvasRef}
@@ -308,21 +313,23 @@ export default function LoginPage() {
       <div className="w-full max-w-md z-10 px-4 py-8">
         <div className="text-center mb-8 space-y-2 transition-all duration-500 ease-in-out">
           <div className="flex justify-center mb-4">
-            <Logo size="xl" />
+            <div className="bg-white/10 p-4 rounded-3xl backdrop-blur-sm border border-white/20 shadow-2xl">
+              <Logo size="xl" />
+            </div>
           </div>
-          <h1 className="text-3xl font-bold text-[#0B4F6C] tracking-tight">
+          <h1 className="text-3xl font-bold text-white tracking-tight drop-shadow-md">
             {viewMode === 'login' && 'Welcome Back'}
             {viewMode === 'signup' && 'Create Account'}
             {viewMode === 'forgot-password' && 'Reset Password'}
           </h1>
-          <p className="text-gray-500">
+          <p className="text-blue-100/80">
             {viewMode === 'login' && 'Sign in to access your dashboard'}
             {viewMode === 'signup' && 'Join NCPS today'}
             {viewMode === 'forgot-password' && 'Enter your email to receive instructions'}
           </p>
         </div>
 
-        <Card className="border-none shadow-xl bg-white/80 backdrop-blur-sm overflow-hidden">
+        <Card className="border-none shadow-2xl bg-white/95 backdrop-blur-md overflow-hidden rounded-2xl">
           <CardHeader className="space-y-1 pb-2">
             <CardTitle className="text-xl text-center text-[#0B4F6C]">
               {viewMode === 'login' && 'NCPS Portal'}
@@ -577,7 +584,7 @@ export default function LoginPage() {
           </CardContent>
         </Card>
         
-        <div className="mt-8 text-center text-xs text-gray-400">
+        <div className="mt-8 text-center text-xs text-blue-200/60">
           &copy; 2025 Nasugbu Computer Parts and Services. All rights reserved.
         </div>
       </div>

@@ -21,7 +21,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 'md', showText = false, class
       <img
         src={src}
         alt="NCPS Logo"
-        className={`${sizeMap[size]} w-auto object-contain select-none`}
+        className={`${sizeMap[size]} w-auto object-contain select-none rounded-2xl`}
         onError={(e) => {
           const target = e.currentTarget;
           target.style.display = 'none';
