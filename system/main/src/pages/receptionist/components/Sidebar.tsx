@@ -3,6 +3,7 @@ import { Calendar, LogOut, LayoutDashboard, User, X } from 'lucide-react';
 import { Button } from "../../../components/ui/button";
 import { useNavigate } from 'react-router-dom';
 import { getProfilePictureUrl } from "@/lib/utils";
+import { Logo } from "@/components/Logo";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,16 +70,9 @@ export function Sidebar({ currentPage, onNavigate, mobileMenuOpen, setMobileMenu
       >
         {/* Header with Logo */}
         <div className="p-6 flex items-center gap-3">
-          <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 border-[#0B4F6C] flex items-center justify-center overflow-hidden bg-[#4DBDCC] p-2">
-            <img 
-              src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=042D62"
-              alt="NCPS Logo"
-              className="w-10 h-10 lg:w-14 lg:h-14"
-            />
-          </div>
+          <Logo size="md" />
           <div className="flex-1 flex flex-col">
-            <span className="font-bold text-xl lg:text-2xl leading-none">NCPS</span>
-            <span className="text-[10px] lg:text-xs font-medium text-blue-200 uppercase tracking-wider">Receptionist</span>
+            <span className="text-[10px] lg:text-xs font-medium text-blue-200 uppercase tracking-wider">Receptionist Portal</span>
           </div>
           
           {/* Mobile Close Button */}

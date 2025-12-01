@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { PageHeader } from "./PageHeader";
 import { Search, ChevronLeft, ChevronRight, Eye, Download, Calendar } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -168,16 +169,16 @@ export function AuditLogs() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-foreground">Audit Logs</h2>
-          <p className="text-muted-foreground">Track system changes and user activities.</p>
-        </div>
-        <Button onClick={handleExport} variant="outline" className="gap-2 dark:bg-card dark:text-foreground dark:border-border dark:hover:bg-muted">
-          <Download className="h-4 w-4" />
-          Export CSV
-        </Button>
-      </div>
+      <PageHeader
+        title="Audit Logs"
+        description="Track system changes and user activities."
+        action={
+          <Button onClick={handleExport} variant="outline" className="gap-2 dark:bg-card dark:text-foreground dark:border-border dark:hover:bg-muted">
+            <Download className="h-4 w-4" />
+            Export CSV
+          </Button>
+        }
+      />
 
       <Card className="dark:bg-card dark:border-border">
         <CardHeader className="pb-3">

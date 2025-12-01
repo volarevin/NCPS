@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Label } from '@/components/ui/label';
 import { useNavigate } from 'react-router-dom';
 import { useFeedback } from '@/context/FeedbackContext';
+import { Logo } from "@/components/Logo";
 
 type ViewMode = 'login' | 'signup' | 'forgot-password';
 
@@ -306,12 +307,8 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md z-10 px-4 py-8">
         <div className="text-center mb-8 space-y-2 transition-all duration-500 ease-in-out">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#0B4F6C] text-white mb-4 shadow-lg ring-4 ring-[#4DBDCC]/30">
-            <img 
-              src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=ffffff"
-              alt="NCPS Logo"
-              className="w-12 h-12"
-            />
+          <div className="flex justify-center mb-4">
+            <Logo size="xl" />
           </div>
           <h1 className="text-3xl font-bold text-[#0B4F6C] tracking-tight">
             {viewMode === 'login' && 'Welcome Back'}

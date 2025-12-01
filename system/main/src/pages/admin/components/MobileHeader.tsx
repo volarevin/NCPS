@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, User } from 'lucide-react';
 import { getProfilePictureUrl } from "@/lib/utils";
+import { Logo } from "@/components/Logo";
 
 interface MobileHeaderProps {
   onMenuClick: () => void;
@@ -32,16 +33,9 @@ export function MobileHeader({ onMenuClick }: MobileHeaderProps) {
         </button>
         
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-full border-2 border-[#0B4F6C] flex items-center justify-center overflow-hidden bg-[#4DBDCC] p-1.5 shadow-md">
-            <img 
-              src="https://img.icons8.com/?size=100&id=4RpOhIzbPx4i&format=png&color=042D62"
-              alt="Security Camera"
-              className="w-8 h-8"
-            />
-          </div>
+          <Logo size="sm" />
           <div className="flex flex-col">
-            <span className="font-bold text-lg leading-none">NCPS</span>
-            <span className="text-[10px] font-medium text-blue-200 uppercase tracking-wider">Admin</span>
+            <span className="text-[10px] font-medium text-blue-200 uppercase tracking-wider">Admin Portal</span>
           </div>
         </div>
       </div>
